@@ -8,15 +8,22 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AppBar appBar;
 
   CustomAppBar(
-      {Key key, this.padding, this.backgroundColor = BACKGROUND_COLOR, this.primaryColor = PRIMARY_COLOR, this.appBar})
+      {Key key,
+      this.padding,
+      this.backgroundColor = BACKGROUND_COLOR,
+      this.primaryColor = PRIMARY_COLOR,
+      this.appBar})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Container(
-      decoration: BoxDecoration(
-          color: backgroundColor, boxShadow: [BoxShadow(color: Colors.black12, offset: Offset(0, 3), blurRadius: 3)]),
+      decoration: BoxDecoration(color: backgroundColor,
+//          boxShadow: [
+//        BoxShadow(color: Colors.black12, offset: Offset(0, 3), blurRadius: 3)]
+
+      ),
       child: Container(
         padding: padding,
         child: appBar ??

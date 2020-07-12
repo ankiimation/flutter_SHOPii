@@ -9,6 +9,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import '../../themes/constant.dart';
+import '../../themes/constant.dart';
+import '../../themes/constant.dart';
+import '../../themes/constant.dart';
+import '../../themes/constant.dart';
+
 const double _leftRightMargin = 20;
 const double _topBottomMargin = 10;
 
@@ -33,7 +39,8 @@ class _HomePageState extends State<HomePage> {
       widget.callBackToParent(isScrollUp);
     });
     scrollController.addListener(() {
-      bool upDirection = scrollController.position.userScrollDirection == ScrollDirection.reverse;
+      bool upDirection = scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse;
       _scrollStreamController.sink.add(upDirection);
     });
   }
@@ -50,14 +57,15 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: BACKGROUND_COLOR,
       body: SingleChildScrollView(
-          controller: scrollController,
-          child: Column(
-            children: <Widget>[
-              buildForYou(),
-              // buildSearchBar(),
-              buildCategories()
-            ],
-          )),
+        controller: scrollController,
+        child: Column(
+          children: <Widget>[
+            buildForYou(),
+            // buildSearchBar(),
+            buildCategories()
+          ],
+        ),
+      ),
     );
   }
 
@@ -69,13 +77,16 @@ class _HomePageState extends State<HomePage> {
       floating: true,
       title: Container(
         margin: EdgeInsets.only(top: 15, bottom: 15),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(30)),
         child: Row(
           children: <Widget>[
             Expanded(
               child: TextField(
-                decoration:
-                    InputDecoration(contentPadding: EdgeInsets.all(15), hintText: 'Search', border: InputBorder.none),
+                decoration: InputDecoration(
+                    contentPadding: EdgeInsets.all(15),
+                    hintText: 'Search',
+                    border: InputBorder.none),
               ),
             ),
             IconButton(
@@ -100,14 +111,14 @@ class _HomePageState extends State<HomePage> {
     ];
     return Container(
       margin: EdgeInsets.only(top: _topBottomMargin, bottom: _topBottomMargin),
-      height: 200,
+      height: 240,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
-            margin: EdgeInsets.only(left: _leftRightMargin, bottom: 10),
+            margin: EdgeInsets.only(left: 25, bottom: 10),
             child: Text(
-              'For you' + Random().nextInt(10).toString(),
+              'For you',
               style: TextStyle(
                 color: PRIMARY_COLOR,
                 fontSize: 20,
@@ -120,14 +131,51 @@ class _HomePageState extends State<HomePage> {
                   scrollDirection: Axis.horizontal,
                   children: urls
                       .map(
-                        (e) => Container(
-                          margin: EdgeInsets.only(left: urls.indexOf(e) == 0 ? 20 : 0, right: 20, bottom: 20),
+                        (url) => Container(
                           width: 120,
+                          margin: EdgeInsets.only(
+                              left: urls.indexOf(url) == 0 ? 20 : 0, right: 20),
+                          padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                              boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(5, 5), blurRadius: 5)],
-                              image: DecorationImage(image: NetworkImage(e), fit: BoxFit.cover),
-                              color: PRIMARY_COLOR,
-                              borderRadius: BorderRadius.circular(25)),
+//                              boxShadow: [
+//                                BoxShadow(
+//                                    color: Colors.black26,
+//                                    offset: Offset(5, 5),
+//                                    blurRadius: 5)
+//                              ],
+                              color: FOREGROUND_COLOR,
+                              borderRadius: BorderRadius.circular(30)),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Container(
+                                width: 100,
+                                height: 120,
+                                decoration: BoxDecoration(
+//
+                                    image: DecorationImage(
+                                        image: NetworkImage(url),
+                                        fit: BoxFit.cover),
+                                    color: PRIMARY_COLOR,
+                                    borderRadius: BorderRadius.circular(25)),
+                              ),
+                              Expanded(
+                                child: Container(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Text(
+                                    'Bún thịt lướng',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       )
                       .toList()))
@@ -138,50 +186,177 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildCategories() {
     return Container(
+        height: 730,
         margin: EdgeInsets.only(
-            top: _topBottomMargin, bottom: _topBottomMargin, left: _leftRightMargin, right: _leftRightMargin),
+          top: _topBottomMargin,
+          bottom: _topBottomMargin,
+//            left: _leftRightMargin,
+//            right: _leftRightMargin
+        ),
         child: CustomTabView(
-          backgroundColor: WHITE_COLOR,
+          backgroundColor: BACKGROUND_COLOR,
           children: [
             CustomTabViewItem(
-                icon: MyIcons.food,
+                icon: Icons.fastfood,
                 label: 'Noodle',
-                color: Colors.red,
-                child: Container(
-                  child: Column(
-                    children: <Widget>[
-                      CustomListItem(
-                        image: NetworkImage(
-                            'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                        title: 'Mì xào hải sản',
-                        price: '50000đ',
-                      ),
-                      CustomListItem(),
-                      CustomListItem(),
-                      CustomListItem(),
-                      CustomListItem(),
-                      FlatButton(
-                          onPressed: () {},
-                          child: Text(
-                            'View More >>',
-                            style: TextStyle(color: PRIMARY_COLOR),
-                          ))
-                    ],
-                  ),
+                color: PRIMARY_COLOR,
+                child: Column(
+                  children: <Widget>[
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    FlatButton(
+                        onPressed: () {},
+                        child: Text(
+                          'View More >>',
+                          style: TextStyle(color: PRIMARY_COLOR),
+                        ))
+                  ],
                 )),
             CustomTabViewItem(
-                icon: MyIcons.food,
+                icon: Icons.free_breakfast,
                 label: 'Snack',
-                color: Colors.green,
-                child: Container(
-                  color: Colors.green,
+                color: PRIMARY_COLOR,
+                child: Column(
+                  children: <Widget>[
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    FlatButton(
+                        onPressed: () {},
+                        child: Text(
+                          'View More >>',
+                          style: TextStyle(color: PRIMARY_COLOR),
+                        ))
+                  ],
                 )),
             CustomTabViewItem(
                 icon: Icons.local_drink,
-                label: 'Juice',
-                color: Colors.blue,
-                child: Container(
-                  color: Colors.blue,
+                label: 'Drink',
+                color: PRIMARY_COLOR,
+                child: Column(
+                  children: <Widget>[
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    CustomListItem(
+                      image: NetworkImage(
+                          'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
+                      title: 'Mì xào hải sản',
+                      price: '50000đ',
+                      priceTextColor: Colors.red,
+                      backgroundColor: FOREGROUND_COLOR,
+                    ),
+                    FlatButton(
+                        onPressed: () {},
+                        child: Text(
+                          'View More >>',
+                          style: TextStyle(color: PRIMARY_COLOR),
+                        ))
+                  ],
                 )),
           ],
         ));

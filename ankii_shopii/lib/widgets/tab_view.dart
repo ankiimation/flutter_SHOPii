@@ -7,7 +7,10 @@ class CustomTabView extends StatefulWidget {
   final Color itemColor;
   final List<CustomTabViewItem> children;
 
-  CustomTabView({this.backgroundColor = BACKGROUND_COLOR, this.itemColor = PRIMARY_COLOR, this.children});
+  CustomTabView(
+      {this.backgroundColor = BACKGROUND_COLOR,
+      this.itemColor = PRIMARY_COLOR,
+      this.children});
 
   @override
   _CustomTabViewState createState() => _CustomTabViewState();
@@ -26,7 +29,8 @@ class _CustomTabViewState extends State<CustomTabView> {
   }
 
   void onTapChangePage(int index) {
-    pageViewController.animateToPage(index, duration: Duration(milliseconds: 200), curve: Curves.easeInOut);
+    pageViewController.animateToPage(index,
+        duration: Duration(milliseconds: 200), curve: Curves.easeInOut);
   }
 
   @override
@@ -38,30 +42,15 @@ class _CustomTabViewState extends State<CustomTabView> {
           Container(
             decoration: BoxDecoration(
                 color: widget.backgroundColor,
-                borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20))),
-            margin: EdgeInsets.only(top: 25),
+                borderRadius: BorderRadius.circular(20)),
+            margin: EdgeInsets.only(top: 35),
             padding: EdgeInsets.only(top: 25),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  child: Container(
-                      margin: EdgeInsets.only(left: 10),
-                      child: Text(
-                        widget.children[_currentIndex].label,
-                        style: TextStyle(color: widget.children[_currentIndex].color ?? widget.itemColor, fontSize: 20),
-                      )),
-                ),
-                Expanded(
-                  child: PageView(
-                    controller: pageViewController,
-                    onPageChanged: (index) {
-                      onSwipeChangePage(index);
-                    },
-                    children: widget.children.map((child) => Expanded(child: child.child)).toList(),
-                  ),
-                ),
-              ],
+            child: PageView(
+              controller: pageViewController,
+              onPageChanged: (index) {
+                onSwipeChangePage(index);
+              },
+              children: widget.children.map((child) => child.child).toList(),
             ),
           ),
           Container(
@@ -77,21 +66,40 @@ class _CustomTabViewState extends State<CustomTabView> {
                 var label = child.label;
                 var index = widget.children.indexOf(child);
 
-                return GestureDetector(
-                  onTap: () {
-                    onTapChangePage(index);
-                  },
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 300),
-                    padding: EdgeInsets.all(10),
-                    margin: EdgeInsets.only(top: _currentIndex == index ? 10 : 0),
-                    decoration: BoxDecoration(color: widget.backgroundColor, borderRadius: BorderRadius.circular(50)),
-                    child: Icon(
-                      icon,
-                      size: 20,
-                      color: _currentIndex == index ? color : color.withOpacity(0.3),
+                return Column(
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        onTapChangePage(index);
+                      },
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 300),
+                        padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+                        margin: EdgeInsets.only(
+                            top: _currentIndex == index ? 10 : 0),
+                        decoration: BoxDecoration(
+                            color: widget.backgroundColor,
+                            borderRadius: BorderRadius.circular(50)),
+                        child: Icon(
+                          icon,
+                          size: 20,
+                          color: _currentIndex == index
+                              ? color
+                              : color.withOpacity(0.3),
+                        ),
+                      ),
                     ),
-                  ),
+                    SizedBox(height: 5,),
+                    Text(
+                      _currentIndex == index
+                          ? widget.children[_currentIndex].label
+                          : '',
+                      style: TextStyle(
+                          color: widget.children[_currentIndex].color ??
+                              widget.itemColor,
+                          fontSize: 14),
+                    )
+                  ],
                 );
               }).toList(),
             ),
@@ -108,5 +116,9 @@ class CustomTabViewItem {
   final Color color;
   final Widget child;
 
-  CustomTabViewItem({@required this.icon, @required this.label, this.color, @required this.child});
+  CustomTabViewItem(
+      {@required this.icon,
+      @required this.label,
+      this.color,
+      @required this.child});
 }

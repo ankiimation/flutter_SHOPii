@@ -1,12 +1,16 @@
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/pages/categories/categories_page.dart';
 import 'package:ankiishopii/pages/home/home_page.dart';
+import 'package:ankiishopii/pages/search/search_page.dart';
 import 'package:ankiishopii/themes/app_icon.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/bottom_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../../themes/constant.dart';
+import '../../themes/constant.dart';
 
 GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -23,7 +27,8 @@ class _NavigatorPageState extends State<NavigatorPage> {
   List<Widget> pages = [];
 
   void _openCloseSearchInput() {
-    print('open search page');
+    //print('open search page');
+    Navigator.push(context, MaterialPageRoute(builder: (b) => SearchPage()));
   }
 
   void _changePage(int index) {
@@ -49,7 +54,12 @@ class _NavigatorPageState extends State<NavigatorPage> {
     // TODO: implement initState
     super.initState();
 
-    pages = [HomePage(hideTopBottomBar), CategoriesPage(), Text('Notification'), Text('account')];
+    pages = [
+      HomePage(hideTopBottomBar),
+      CategoriesPage(),
+      Text('Notification'),
+      Text('account')
+    ];
   }
 
   @override
@@ -85,22 +95,22 @@ class _NavigatorPageState extends State<NavigatorPage> {
       child: CustomBottomNavigationBar(
         currentIndex: _currentIndex,
         onChange: (index) {
-          _pageController.animateToPage(index, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+          _pageController.animateToPage(index,
+              duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
         },
         children: [
           CustomBottomNavigationItem(
-            icon: MyIcons.store,
-            label: 'Home',
-          ),
+              icon: Icons.store, label: 'Home', color: PRIMARY_COLOR),
           CustomBottomNavigationItem(
-            icon: MyIcons.file,
-            label: 'Receipt',
-          ),
+              icon: Icons.receipt, label: 'Receipt', color: PRIMARY_COLOR),
           CustomBottomNavigationItem(
-            icon: MyIcons.alarm,
-            label: 'Notification',
-          ),
-          CustomBottomNavigationItem(icon: MyIcons.users, label: 'Account'),
+              icon: Icons.notifications,
+              label: 'Notification',
+              color: PRIMARY_COLOR),
+          CustomBottomNavigationItem(
+              icon: Icons.account_circle,
+              label: 'Account',
+              color: PRIMARY_COLOR),
         ],
       ),
     );
@@ -117,7 +127,10 @@ class _NavigatorPageState extends State<NavigatorPage> {
         title: Container(
           child: Text(
             'SHOPii',
-            style: TextStyle(color: PRIMARY_COLOR, letterSpacing: 1.5, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: PRIMARY_COLOR,
+                letterSpacing: 1.5,
+                fontWeight: FontWeight.bold),
           ),
         ),
         actions: <Widget>[
@@ -125,8 +138,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
             child: Container(
               margin: EdgeInsets.only(right: 20),
               child: Icon(
-                MyIcons.search_1,
-                size: 20,
+                Icons.search,
                 color: PRIMARY_COLOR,
               ),
             ),
@@ -138,7 +150,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
             child: Container(
               margin: EdgeInsets.only(right: 5),
               child: Icon(
-                MyIcons.cart,
+                Icons.shopping_cart,
                 color: PRIMARY_COLOR,
               ),
             ),
@@ -149,7 +161,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
           child: Container(
             margin: EdgeInsets.only(right: 5),
             child: Icon(
-              MyIcons.menu,
+              Icons.menu,
               color: PRIMARY_COLOR,
             ),
           ),
