@@ -2,6 +2,7 @@ import 'package:ankiishopii/themes/constant.dart';
 import 'package:flutter/material.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
+  final bool barShadow;
   final Color backgroundColor;
   final Color itemColor;
   final List<CustomBottomNavigationItem> children;
@@ -10,6 +11,7 @@ class CustomBottomNavigationBar extends StatefulWidget {
 
   CustomBottomNavigationBar(
       {this.backgroundColor = BACKGROUND_COLOR,
+      this.barShadow = false,
       this.itemColor = PRIMARY_COLOR,
       this.currentIndex = 0,
       @required this.children,
@@ -38,7 +40,8 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
       height: 60,
       decoration: BoxDecoration(
           color: widget.backgroundColor,
-          boxShadow: [BoxShadow(color: Colors.black12, offset: Offset(0, -3), blurRadius: 3)]),
+          boxShadow:
+              widget.barShadow ? [BoxShadow(color: Colors.black26, offset: Offset(0, -3), blurRadius: 3)] : null),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: widget.children.map((item) {

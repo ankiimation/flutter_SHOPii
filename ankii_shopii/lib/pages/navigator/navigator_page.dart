@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:ankiishopii/helpers/media_query_helper.dart';
+import 'package:ankiishopii/pages/account/account_page.dart';
 import 'package:ankiishopii/pages/categories/categories_page.dart';
+import 'package:ankiishopii/pages/favorite/favorite_page.dart';
 import 'package:ankiishopii/pages/home/home_page.dart';
+import 'package:ankiishopii/pages/notification/notification_page.dart';
 import 'package:ankiishopii/pages/search/search_page.dart';
 import 'package:ankiishopii/themes/app_icon.dart';
 import 'package:ankiishopii/themes/constant.dart';
@@ -8,6 +13,7 @@ import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/bottom_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import '../../themes/constant.dart';
 import '../../themes/constant.dart';
@@ -15,11 +21,15 @@ import '../../themes/constant.dart';
 GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class NavigatorPage extends StatefulWidget {
+  static const String routeName = "/";
+
   @override
   _NavigatorPageState createState() => _NavigatorPageState();
 }
 
 class _NavigatorPageState extends State<NavigatorPage> {
+  var _scrollStreamController = StreamController();
+  var scrollController = ScrollController();
   var _pageController = PageController(keepPage: true);
   bool _isHideTopBottomBar = false;
 
@@ -28,7 +38,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
 
   void _openCloseSearchInput() {
     //print('open search page');
-    Navigator.push(context, MaterialPageRoute(builder: (b) => SearchPage()));
+    Navigator.pushNamed(context, SearchPage.routeName);
   }
 
   void _changePage(int index) {
@@ -53,18 +63,28 @@ class _NavigatorPageState extends State<NavigatorPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _scrollStreamController.stream.listen((isScrollUp) {
+      hideTopBottomBar(isScrollUp);
+    });
+    scrollController.addListener(() {
+      bool upDirection = scrollController.position.userScrollDirection == ScrollDirection.reverse;
+      _scrollStreamController.sink.add(upDirection);
+    });
 
     pages = [
-      HomePage(hideTopBottomBar),
-      CategoriesPage(),
-      Text('Notification'),
-      Text('account')
+      HomePage(scrollController),
+      CategoriesPage(scrollController),
+      FavoritePage(scrollController),
+      NotificationPage(scrollController),
+     AccountPage(scrollController)
     ];
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
+    // scrollController.dispose();
+    _scrollStreamController.close();
     super.dispose();
   }
 
@@ -73,7 +93,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
     return Scaffold(
         key: _scaffoldKey,
         backgroundColor: BACKGROUND_COLOR,
-        appBar: buildAppBar(),
+       // appBar: buildAppBar(),
         drawer: buildDrawer(),
         body: PageView(
           onPageChanged: (index) {
@@ -93,24 +113,17 @@ class _NavigatorPageState extends State<NavigatorPage> {
       duration: Duration(milliseconds: 200),
       height: _isHideTopBottomBar ? 0 : 60,
       child: CustomBottomNavigationBar(
+        barShadow: true,
         currentIndex: _currentIndex,
         onChange: (index) {
-          _pageController.animateToPage(index,
-              duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+          _pageController.animateToPage(index, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
         },
         children: [
-          CustomBottomNavigationItem(
-              icon: Icons.store, label: 'Home', color: PRIMARY_COLOR),
-          CustomBottomNavigationItem(
-              icon: Icons.receipt, label: 'Receipt', color: PRIMARY_COLOR),
-          CustomBottomNavigationItem(
-              icon: Icons.notifications,
-              label: 'Notification',
-              color: PRIMARY_COLOR),
-          CustomBottomNavigationItem(
-              icon: Icons.account_circle,
-              label: 'Account',
-              color: PRIMARY_COLOR),
+          CustomBottomNavigationItem(icon: Icons.store, label: 'Home', color: PRIMARY_COLOR),
+          CustomBottomNavigationItem(icon: Icons.receipt, label: 'Categories', color: PRIMARY_COLOR),
+          CustomBottomNavigationItem(icon: Icons.favorite, label: 'Favorite', color: PRIMARY_COLOR),
+          CustomBottomNavigationItem(icon: Icons.notifications, label: 'Notification', color: PRIMARY_COLOR),
+          CustomBottomNavigationItem(icon: Icons.account_circle, label: 'Account', color: PRIMARY_COLOR),
         ],
       ),
     );
@@ -119,18 +132,20 @@ class _NavigatorPageState extends State<NavigatorPage> {
   Widget buildAppBar() {
     return CustomAppBar(
       backgroundColor: BACKGROUND_COLOR,
-      padding: EdgeInsets.only(left: 5, right: 5),
+     // padding: EdgeInsets.only(left: 5, right: 5),
       appBar: AppBar(
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: Container(
+        elevation:0,
+        backgroundColor: BACKGROUND_COLOR,
+        title: AnimatedSwitcher(
+          duration: Duration(milliseconds: 200),
           child: Text(
-            'SHOPii',
-            style: TextStyle(
-                color: PRIMARY_COLOR,
-                letterSpacing: 1.5,
-                fontWeight: FontWeight.bold),
+            _currentIndex == 1
+                ? 'Categories'
+                : _currentIndex == 2
+                    ? 'Favorite'
+                    : _currentIndex == 3 ? 'Notification' : _currentIndex == 4 ? 'Account' : 'SHOPii',
+            style: DEFAULT_TEXT_STYLE.copyWith(letterSpacing: 1.5, fontWeight: FontWeight.bold),
           ),
         ),
         actions: <Widget>[

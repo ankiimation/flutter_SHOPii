@@ -1,3 +1,4 @@
+import 'package:ankiishopii/routes.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,7 +36,10 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: LoadingScreen(),
+//      onGenerateRoute: Routes.onGenerateRoute,
+//      navigatorObservers: [MyRouteObserver()],
+//      initialRoute: MyRouteObserver.currentRoute,
+      home: NavigatorPage(),
     );
   }
 }

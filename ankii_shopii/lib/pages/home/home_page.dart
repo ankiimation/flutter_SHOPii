@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/themes/app_icon.dart';
 import 'package:ankiishopii/themes/constant.dart';
-import 'package:ankiishopii/widgets/item.dart';
+import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:ankiishopii/widgets/tab_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,36 +21,26 @@ const double _leftRightMargin = 20;
 const double _topBottomMargin = 10;
 
 class HomePage extends StatefulWidget {
-  final Function callBackToParent;
+  static const String routeName = "/homePage";
+  final ScrollController scrollController;
 
-  HomePage(this.callBackToParent);
+  HomePage(this.scrollController);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  var _scrollStreamController = StreamController();
-  var scrollController = ScrollController();
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _scrollStreamController.stream.listen((isScrollUp) {
-      widget.callBackToParent(isScrollUp);
-    });
-    scrollController.addListener(() {
-      bool upDirection = scrollController.position.userScrollDirection ==
-          ScrollDirection.reverse;
-      _scrollStreamController.sink.add(upDirection);
-    });
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    _scrollStreamController.close();
+
     super.dispose();
   }
 
@@ -57,13 +49,21 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: BACKGROUND_COLOR,
       body: SingleChildScrollView(
-        controller: scrollController,
-        child: Column(
-          children: <Widget>[
-            buildForYou(),
-            // buildSearchBar(),
-            buildCategories()
-          ],
+        controller: widget.scrollController,
+        child: Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+
+              InPageAppBar(
+                title: 'Home',
+              ),
+              buildForYou(),
+              // buildSearchBar(),
+              buildCategories()
+            ],
+          ),
         ),
       ),
     );
@@ -77,16 +77,13 @@ class _HomePageState extends State<HomePage> {
       floating: true,
       title: Container(
         margin: EdgeInsets.only(top: 15, bottom: 15),
-        decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(30)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
         child: Row(
           children: <Widget>[
             Expanded(
               child: TextField(
-                decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(15),
-                    hintText: 'Search',
-                    border: InputBorder.none),
+                decoration:
+                    InputDecoration(contentPadding: EdgeInsets.all(15), hintText: 'Search', border: InputBorder.none),
               ),
             ),
             IconButton(
@@ -111,7 +108,7 @@ class _HomePageState extends State<HomePage> {
     ];
     return Container(
       margin: EdgeInsets.only(top: _topBottomMargin, bottom: _topBottomMargin),
-      height: 240,
+      height: 250,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -119,7 +116,7 @@ class _HomePageState extends State<HomePage> {
             margin: EdgeInsets.only(left: 25, bottom: 10),
             child: Text(
               'For you',
-              style: TextStyle(
+              style: DEFAULT_TEXT_STYLE.copyWith(
                 color: PRIMARY_COLOR,
                 fontSize: 20,
                 letterSpacing: 1.2,
@@ -132,9 +129,8 @@ class _HomePageState extends State<HomePage> {
                   children: urls
                       .map(
                         (url) => Container(
-                          width: 120,
-                          margin: EdgeInsets.only(
-                              left: urls.indexOf(url) == 0 ? 20 : 0, right: 20),
+                          width: 150,
+                          margin: EdgeInsets.only(left: urls.indexOf(url) == 0 ? 20 : 0, right: 20),
                           padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(
 //                              boxShadow: [
@@ -148,30 +144,62 @@ class _HomePageState extends State<HomePage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Container(
-                                width: 100,
-                                height: 120,
-                                decoration: BoxDecoration(
+                              Expanded(
+                                flex: 5,
+                                child: Container(
+                                  decoration: BoxDecoration(
 //
-                                    image: DecorationImage(
-                                        image: NetworkImage(url),
-                                        fit: BoxFit.cover),
-                                    color: PRIMARY_COLOR,
-                                    borderRadius: BorderRadius.circular(25)),
+                                      image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
+                                      color: PRIMARY_COLOR,
+                                      borderRadius: BorderRadius.circular(25)),
+                                ),
                               ),
                               Expanded(
-                                child: Container(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Text(
-                                    'Bún thịt lướng',
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                flex: 2,
+                                child: Column(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Text(
+                                        'Bún thịt lướng',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
+                                        style: DEFAULT_TEXT_STYLE.copyWith(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    Expanded(
+                                      child: Text(
+                                        '50.000đ',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
+                                        style: DEFAULT_TEXT_STYLE.copyWith(
+                                          color: Colors.red,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    Icon(
+                                      Icons.add_shopping_cart,
+                                      size: 20,
+                                    ),
+                                    Icon(
+                                      Icons.favorite_border,
+                                      size: 20,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -186,7 +214,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildCategories() {
     return Container(
-        height: 730,
+        height: 800,
         margin: EdgeInsets.only(
           top: _topBottomMargin,
           bottom: _topBottomMargin,
@@ -202,7 +230,7 @@ class _HomePageState extends State<HomePage> {
                 color: PRIMARY_COLOR,
                 child: Column(
                   children: <Widget>[
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -210,7 +238,7 @@ class _HomePageState extends State<HomePage> {
                       priceTextColor: Colors.red,
                       backgroundColor: FOREGROUND_COLOR,
                     ),
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -218,7 +246,7 @@ class _HomePageState extends State<HomePage> {
                       priceTextColor: Colors.red,
                       backgroundColor: FOREGROUND_COLOR,
                     ),
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -226,7 +254,7 @@ class _HomePageState extends State<HomePage> {
                       priceTextColor: Colors.red,
                       backgroundColor: FOREGROUND_COLOR,
                     ),
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -234,7 +262,7 @@ class _HomePageState extends State<HomePage> {
                       priceTextColor: Colors.red,
                       backgroundColor: FOREGROUND_COLOR,
                     ),
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -246,7 +274,7 @@ class _HomePageState extends State<HomePage> {
                         onPressed: () {},
                         child: Text(
                           'View More >>',
-                          style: TextStyle(color: PRIMARY_COLOR),
+                          style: DEFAULT_TEXT_STYLE.copyWith(color: PRIMARY_COLOR),
                         ))
                   ],
                 )),
@@ -256,7 +284,7 @@ class _HomePageState extends State<HomePage> {
                 color: PRIMARY_COLOR,
                 child: Column(
                   children: <Widget>[
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -264,7 +292,7 @@ class _HomePageState extends State<HomePage> {
                       priceTextColor: Colors.red,
                       backgroundColor: FOREGROUND_COLOR,
                     ),
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -272,7 +300,7 @@ class _HomePageState extends State<HomePage> {
                       priceTextColor: Colors.red,
                       backgroundColor: FOREGROUND_COLOR,
                     ),
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -280,7 +308,7 @@ class _HomePageState extends State<HomePage> {
                       priceTextColor: Colors.red,
                       backgroundColor: FOREGROUND_COLOR,
                     ),
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -288,7 +316,7 @@ class _HomePageState extends State<HomePage> {
                       priceTextColor: Colors.red,
                       backgroundColor: FOREGROUND_COLOR,
                     ),
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -300,7 +328,7 @@ class _HomePageState extends State<HomePage> {
                         onPressed: () {},
                         child: Text(
                           'View More >>',
-                          style: TextStyle(color: PRIMARY_COLOR),
+                          style: DEFAULT_TEXT_STYLE.copyWith(color: PRIMARY_COLOR),
                         ))
                   ],
                 )),
@@ -310,7 +338,7 @@ class _HomePageState extends State<HomePage> {
                 color: PRIMARY_COLOR,
                 child: Column(
                   children: <Widget>[
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -318,7 +346,7 @@ class _HomePageState extends State<HomePage> {
                       priceTextColor: Colors.red,
                       backgroundColor: FOREGROUND_COLOR,
                     ),
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -326,7 +354,7 @@ class _HomePageState extends State<HomePage> {
                       priceTextColor: Colors.red,
                       backgroundColor: FOREGROUND_COLOR,
                     ),
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -334,7 +362,7 @@ class _HomePageState extends State<HomePage> {
                       priceTextColor: Colors.red,
                       backgroundColor: FOREGROUND_COLOR,
                     ),
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -342,7 +370,7 @@ class _HomePageState extends State<HomePage> {
                       priceTextColor: Colors.red,
                       backgroundColor: FOREGROUND_COLOR,
                     ),
-                    CustomListItem(
+                    CustomProductListItem(
                       image: NetworkImage(
                           'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
                       title: 'Mì xào hải sản',
@@ -354,7 +382,7 @@ class _HomePageState extends State<HomePage> {
                         onPressed: () {},
                         child: Text(
                           'View More >>',
-                          style: TextStyle(color: PRIMARY_COLOR),
+                          style: DEFAULT_TEXT_STYLE.copyWith(color: PRIMARY_COLOR),
                         ))
                   ],
                 )),
