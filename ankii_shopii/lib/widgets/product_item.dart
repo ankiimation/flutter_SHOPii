@@ -9,7 +9,7 @@ class CustomProductListItem extends StatelessWidget {
   final String title;
   final String price;
   final Color priceTextColor;
-  final Color addToCartButtonColor;
+  final Color quickActionColor;
   final String description;
   final Function onTap;
   final Function onAddToCart;
@@ -25,111 +25,114 @@ class CustomProductListItem extends StatelessWidget {
       this.onTap,
       this.onAddToCart,
       this.onFavourite,
-      this.addToCartButtonColor = PRIMARY_COLOR,
+      this.quickActionColor = PRIMARY_COLOR,
       this.priceTextColor = Colors.red});
 
   @override
   Widget build(BuildContext context) {
     double height = 100;
     // TODO: implement build
-    return Container(
-      height: height,
-      margin: EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
-      child: Stack(
-        children: <Widget>[
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.only(left: height - 50, top: 10, bottom: 10, right: 10),
-            child: Container(
-              padding: EdgeInsets.only(left: 60, top: 10, right: 20, bottom: 10),
-              decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.only(topRight: Radius.circular(100), bottomRight: Radius.circular(100))),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    flex: 5,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Expanded(
-                          child: Text(
-                            title ?? '',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: PRIMARY_COLOR, fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            price ?? '0đ',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                letterSpacing: 1.2, color: priceTextColor, fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            description ?? '',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: PRIMARY_COLOR, fontSize: 12, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      children: <Widget>[
-                        Expanded(
-                          child: InkWell(
-                            onTap: onFavourite,
-                            child: Container(
-                                child: Icon(
-                              Icons.favorite_border,
-                              color: addToCartButtonColor,
-                              size: 20,
-                            )),
-                          ),
-                        ),
-                        Expanded(
-                          child: InkWell(
-                            onTap: onAddToCart,
-                            child: Container(
-                                child: Icon(
-                              Icons.add_shopping_cart,
-                              color: addToCartButtonColor,
-                              size: 20,
-                            )),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-          Container(
-            width: height,
-            height: height,
-            child: CircleAvatar(
-              backgroundColor: backgroundColor,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: height,
+        margin: EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+        child: Stack(
+          children: <Widget>[
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(left: height - 50, top: 10, bottom: 10, right: 10),
               child: Container(
-                width: height - 15,
-                height: height - 15,
-                child: CircleAvatar(
-                  backgroundColor: Colors.yellow,
-                  backgroundImage: image,
+                padding: EdgeInsets.only(left: 60, top: 10, right: 20, bottom: 10),
+                decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(100), bottomRight: Radius.circular(100))),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              title ?? '',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: PRIMARY_COLOR, fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              price ?? '0đ',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  letterSpacing: 1.2, color: priceTextColor, fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              description ?? '',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: PRIMARY_COLOR, fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: InkWell(
+                              onTap: onFavourite,
+                              child: Container(
+                                  child: Icon(
+                                Icons.favorite_border,
+                                color: quickActionColor,
+                                size: 20,
+                              )),
+                            ),
+                          ),
+                          Expanded(
+                            child: InkWell(
+                              onTap: onAddToCart,
+                              child: Container(
+                                  child: Icon(
+                                Icons.add_shopping_cart,
+                                color: quickActionColor,
+                                size: 20,
+                              )),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),
-          ),
-        ],
+            Container(
+              width: height,
+              height: height,
+              child: CircleAvatar(
+                backgroundColor: backgroundColor,
+                child: Container(
+                  width: height - 15,
+                  height: height - 15,
+                  child: CircleAvatar(
+                    backgroundColor: backgroundColor,
+                    backgroundImage: image,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

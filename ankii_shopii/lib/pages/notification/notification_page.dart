@@ -1,4 +1,5 @@
 import 'package:ankiishopii/helpers/media_query_helper.dart';
+import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/notification_item.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: BACKGROUND_COLOR,
       body: SingleChildScrollView(
           controller: widget.scrollController,
           child: Column(

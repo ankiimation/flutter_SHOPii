@@ -19,6 +19,7 @@ class _FavoritePageState extends State<FavoritePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: BACKGROUND_COLOR,
       body: Column(
         children: <Widget>[
           InPageAppBar(

@@ -1,8 +1,16 @@
 import 'dart:ui';
 
+import 'package:ankiishopii/blocs/category_bloc/bloc.dart';
+import 'package:ankiishopii/blocs/category_bloc/event.dart';
+import 'package:ankiishopii/blocs/category_bloc/state.dart';
+import 'package:ankiishopii/models/category_model.dart';
+import 'package:ankiishopii/pages/product/product_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/debug_widget.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CategoriesPage extends StatefulWidget {
   static const String routeName = "/categoriesPage";
@@ -15,6 +23,15 @@ class CategoriesPage extends StatefulWidget {
 }
 
 class _CategoriesPageState extends State<CategoriesPage> {
+  CategoryBloc bloc = CategoryBloc(CategoriesLoading())..add(GetCategories());
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    bloc.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,60 +44,69 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 InPageAppBar(
                   title: 'Categories',
                 ),
-                buildListCategories(),
+                BlocBuilder(
+                  builder: (_, state) {
+                    if (state is CategoriesLoaded) {
+                      return buildListCategories(state.categories);
+                    } else if (state is CategoriesLoadingError) {
+                      return Center(
+                        child: CustomErrorWidget(),
+                      );
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
+                  bloc: bloc,
+                )
               ],
             ),
           ),
         ));
   }
 
-  Widget buildListCategories() {
-    List<String> urls = [
-      'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg',
-      'https://shipdoandemff.com/wp-content/uploads/2017/06/M%C3%AC-x%C3%A0o-gi%C3%B2n-shipdoandemFF.jpg',
-      'https://cdn.tgdd.vn/Files/2020/03/08/1240753/3-cach-lam-mon-com-chien-thom-ngon-bo-duong-cho-bua-com-gia-dinh-2.png',
-      'https://thucthan.com/media/2019/07/bun-rieu-cua/bun-rieu-cua.png',
-    ];
+  Widget buildListCategories(List<CategoryModel> categories) {
     return Container(
         margin: EdgeInsets.only(left: 20, right: 20, bottom: 30),
-        child: Column(
-            children: urls
-                .map((url) => _buildCategoryItem(url,
-                    title: 'Category Category Category Category Category',
-                    description: 'Description Description Description Description Description Description'))
-                .toList()));
+        child: Column(children: categories.map((category) => _buildCategoryItem(category)).toList()));
   }
 
-  Widget _buildCategoryItem(String imageUrl, {String title, String description}) {
-    return Container(
-      margin: EdgeInsets.only(top: 20),
-      height: 200,
-      width: double.infinity,
-      decoration: BoxDecoration(
-          image: DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
-          color: FOREGROUND_COLOR,
-          borderRadius: BorderRadius.circular(20)),
+  Widget _buildCategoryItem(CategoryModel category) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (b) => ProductPage(category: category)));
+      },
       child: Container(
-        padding: EdgeInsets.only(left: 20, right: 20),
-        decoration: BoxDecoration(color: PRIMARY_COLOR.withOpacity(0.7), borderRadius: BorderRadius.circular(20)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              title ?? '',
-              style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 40, color: BACKGROUND_COLOR),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              description ?? '',
-              style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, color: FOREGROUND_COLOR),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+        margin: EdgeInsets.only(top: 20),
+        height: 200,
+        width: double.infinity,
+        decoration: BoxDecoration(
+            image: DecorationImage(image: CachedNetworkImageProvider(category.image), fit: BoxFit.cover),
+            color: FOREGROUND_COLOR,
+            borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: EdgeInsets.only(left: 20, right: 20),
+          decoration: BoxDecoration(color: PRIMARY_COLOR.withOpacity(0.7), borderRadius: BorderRadius.circular(20)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                category.name ?? '',
+                style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 40, color: BACKGROUND_COLOR),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                category.description ?? '',
+                style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, color: FOREGROUND_COLOR),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );

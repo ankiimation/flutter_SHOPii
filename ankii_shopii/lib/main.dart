@@ -1,3 +1,8 @@
+import 'dart:io';
+
+import 'package:ankiishopii/blocs/account_bloc/service.dart';
+import 'package:ankiishopii/blocs/login_bloc/service.dart';
+import 'package:ankiishopii/global/global_variable.dart';
 import 'package:ankiishopii/routes.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:flutter/material.dart';
@@ -6,8 +11,17 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'pages/navigator/navigator_page.dart';
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 main() {
   WidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = new MyHttpOverrides();
   runApp(MyApp());
 }
 
@@ -39,7 +53,7 @@ class MyApp extends StatelessWidget {
 //      onGenerateRoute: Routes.onGenerateRoute,
 //      navigatorObservers: [MyRouteObserver()],
 //      initialRoute: MyRouteObserver.currentRoute,
-      home: NavigatorPage(),
+      home: LoadingScreen(),
     );
   }
 }
@@ -72,9 +86,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   Future<bool> load() async {
-    Future.delayed(Duration(seconds: 2), () {
-      return true;
-    });
+    await getGlobal();
+    if (currentLogin == null) {
+      print('Not Logged In!');
+    }
     return true;
   }
 }
