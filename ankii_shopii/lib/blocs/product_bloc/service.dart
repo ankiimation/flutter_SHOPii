@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:ankiishopii/blocs/bloc_service.dart';
+import 'package:ankiishopii/blocs/favorite_bloc/service.dart';
 import 'package:ankiishopii/helpers/http_helper.dart';
+import 'package:ankiishopii/models/favorite_model.dart';
 import 'package:ankiishopii/models/product_model.dart';
 
 class ProductService extends BlocService<ProductModel> {
@@ -12,7 +14,9 @@ class ProductService extends BlocService<ProductModel> {
     if (rs.statusCode == 200) {
       var json = jsonDecode(rs.body);
       // print(jsonList.toList());
-      return ProductModel.fromJson(json);
+      var product = ProductModel.fromJson(json);
+      product = _checkIsFavoriteByCurrentUser(product);
+      return product;
     }
     return null;
   }
@@ -25,9 +29,28 @@ class ProductService extends BlocService<ProductModel> {
     if (rs.statusCode == 200) {
       var jsonList = jsonDecode(rs.body) as List;
       // print(jsonList.toList());
-      return jsonList.map((j) => ProductModel.fromJson(j)).toList();
+      var products = jsonList.map((j) => ProductModel.fromJson(j)).toList();
+      for (var product in products) {
+        product = _checkIsFavoriteByCurrentUser(product);
+      }
+      return products;
     }
     return null;
+  }
+
+  ProductModel _checkIsFavoriteByCurrentUser(ProductModel product) {
+    var favorite = FavoriteService().getFavoriteFromLocalByProductId(product.id);
+    if (favorite != null) {
+      product.isFavoriteByCurrentUser = favorite.isfavorite;
+    }
+    return product;
+  }
+
+  ProductModel _checkIsFavoriteByFavoriteModel({ProductModel productModel, FavoriteModel favoriteModel}) {
+    if (favoriteModel != null) {
+      productModel.isFavoriteByCurrentUser = favoriteModel.isfavorite;
+    }
+    return productModel;
   }
 
   Future<List<ProductModel>> getAllWithCategoryId(int categoryID, {int from = 0, int limit}) async {
@@ -37,8 +60,19 @@ class ProductService extends BlocService<ProductModel> {
     if (rs.statusCode == 200) {
       var jsonList = jsonDecode(rs.body) as List;
       // print(jsonList.toList());
-      return jsonList.map((j) => ProductModel.fromJson(j)).toList();
+      var products = jsonList.map((j) => ProductModel.fromJson(j)).toList();
+      for (var product in products) {
+        product = _checkIsFavoriteByCurrentUser(product);
+      }
+      return products;
     }
     return null;
+  }
+
+  Future<ProductModel> doFavorite(ProductModel productModel) async {
+    var favorite = await FavoriteService().doFavorite(productID: productModel.id);
+    var rs = _checkIsFavoriteByFavoriteModel(productModel: productModel, favoriteModel: favorite);
+   // print(jsonEncode(rs.isFavoriteByCurrentUser));
+    return rs;
   }
 }

@@ -31,11 +31,11 @@ namespace SHOPii.Controllers
 
             if (categoryID == null)
             {
-                return await new QueryHelper<Product>(_context.Product.Include(p => p.ProductImage)).pagingQuery(from, limit).ToListAsync();
+                return await new QueryHelper<Product>(_context.Product.Include(p => p.ProductImage).Include(p=>p.Category)).pagingQuery(from, limit).ToListAsync();
             }
             else
             {
-                return await new QueryHelper<Product>(_context.Product.Include(p => p.ProductImage).Where(p => p.CategoryId == categoryID)).pagingQuery(from, limit).ToListAsync();
+                return await new QueryHelper<Product>(_context.Product.Include(p => p.ProductImage).Include(p => p.Category).Where(p => p.CategoryId == categoryID)).pagingQuery(from, limit).ToListAsync();
             }
         }
 
@@ -43,7 +43,7 @@ namespace SHOPii.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _context.Product.FindAsync(id);
+            var product = await _context.Product.Include(p => p.Category.Product).FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
             {

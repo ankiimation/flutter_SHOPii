@@ -22,17 +22,21 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  ProductBloc bloc = ProductBloc(ListProductsLoading());
+  ProductBloc bloc = ProductBloc(ProductLoading());
+
+  void refresh() {
+    if (widget.category == null) {
+      bloc.add(GetAllProducts());
+    } else {
+      bloc.add(GetAllProductsByCategoryId(widget.category.id));
+    }
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    if (widget.category == null) {
-      bloc.add(GetAllProducts());
-    } else {
-      bloc.add(GetAllProductsViaCategoryId(widget.category.id));
-    }
+    refresh();
   }
 
   @override
@@ -63,7 +67,7 @@ class _ProductPageState extends State<ProductPage> {
             BlocBuilder(
                 bloc: bloc,
                 builder: (context, state) {
-                  if (state is ListProductsLoadingError) {
+                  if (state is ProductLoadingError) {
                     return Center(
                       child: CustomErrorWidget(),
                     );
@@ -84,14 +88,21 @@ class _ProductPageState extends State<ProductPage> {
   Widget buildProducts(List<ProductModel> products) {
     List<Widget> children = products
         .map<Widget>((product) => CustomProductListItem(
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+              onTap: () async {
+                await Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+                refresh();
               },
               image: CachedNetworkImageProvider(product.image),
               title: product.name,
               price: product.price.toString() + "đ",
               priceTextColor: Colors.red,
               backgroundColor: FOREGROUND_COLOR,
+              isFavorite: product.isFavoriteByCurrentUser,
+              onFavourite: () {
+                bloc.add(DoFavorite(product));
+
+                refresh();
+              },
             ))
         .toList();
     return Column(children: children);

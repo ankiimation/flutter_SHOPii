@@ -1,9 +1,16 @@
+import 'package:ankiishopii/blocs/product_bloc/bloc.dart';
+import 'package:ankiishopii/blocs/product_bloc/event.dart';
+import 'package:ankiishopii/blocs/product_bloc/state.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
+import 'package:ankiishopii/models/product_model.dart';
+import 'package:ankiishopii/pages/product/product_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/debug_widget.dart';
 import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:ankiishopii/widgets/tab_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class FavoritePage extends StatefulWidget {
   static const String pageRoute = '/favoritePage';
@@ -16,6 +23,22 @@ class FavoritePage extends StatefulWidget {
 }
 
 class _FavoritePageState extends State<FavoritePage> {
+  ProductBloc bloc = ProductBloc(ProductLoading());
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    bloc.add(GetAllProducts());
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    bloc.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,187 +48,69 @@ class _FavoritePageState extends State<FavoritePage> {
           InPageAppBar(
             title: 'Favorite',
           ),
-          Expanded(child: buildFavorite()),
+          Expanded(
+              child: BlocBuilder(
+                  bloc: bloc,
+                  builder: (context, state) {
+                    if (state is ListProductsLoaded)
+                      return buildFavorite(state.products);
+                    else if (state is ProductLoadingError)
+                      return Center(
+                        child: CustomErrorWidget(),
+                      );
+                    else
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                  })),
         ],
       ),
     );
   }
 
-  Widget buildFavorite() {
+  Widget buildFavorite(List<ProductModel> products) {
+    var categories = products
+        .where((product) => product.isFavoriteByCurrentUser)
+        .map((product) => product.category.name)
+        .toSet()
+        .toList();
+
+    if (categories.isEmpty) {
+      return Center(
+        child: Text('<No Favorite>'),
+      );
+    }
     return CustomTabView(
-      barShadow: false,
-      backgroundColor: BACKGROUND_COLOR,
-      children: [
-        CustomTabViewItem(
-            icon: Icons.fastfood,
-            label: 'Noodle',
-            color: PRIMARY_COLOR,
-            child: SingleChildScrollView(
-              controller: widget.scrollController,
-              child: Column(
-                children: <Widget>[
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  FlatButton(
-                      onPressed: () {},
-                      child: Text(
-                        'View More >>',
-                        style: DEFAULT_TEXT_STYLE.copyWith(color: PRIMARY_COLOR),
-                      ))
-                ],
-              ),
-            )),
-        CustomTabViewItem(
-            icon: Icons.free_breakfast,
-            label: 'Snack',
-            color: PRIMARY_COLOR,
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  FlatButton(
-                      onPressed: () {},
-                      child: Text(
-                        'View More >>',
-                        style: DEFAULT_TEXT_STYLE.copyWith(color: PRIMARY_COLOR),
-                      ))
-                ],
-              ),
-            )),
-        CustomTabViewItem(
-            icon: Icons.local_drink,
-            label: 'Drink',
-            color: PRIMARY_COLOR,
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  CustomProductListItem(
-                    image: NetworkImage(
-                        'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg'),
-                    title: 'Mì xào hải sản',
-                    price: '50000đ',
-                    priceTextColor: Colors.red,
-                    backgroundColor: FOREGROUND_COLOR,
-                  ),
-                  FlatButton(
-                      onPressed: () {},
-                      child: Text(
-                        'View More >>',
-                        style: DEFAULT_TEXT_STYLE.copyWith(color: PRIMARY_COLOR),
-                      ))
-                ],
-              ),
-            )),
-      ],
-    );
+        barShadow: false,
+        backgroundColor: BACKGROUND_COLOR,
+        children: categories.map((categoryName) {
+          var favoriteProducts =
+              products.where((product) => product.category.name == categoryName && product.isFavoriteByCurrentUser);
+          return CustomTabViewItem(
+              label: categoryName,
+              icon: Icons.favorite,
+              child: SingleChildScrollView(
+                child: Column(
+                    children: favoriteProducts
+                        .map((favoriteProduct) => CustomProductListItem(
+                              onTap: () async {
+                                await Navigator.push(
+                                    context, MaterialPageRoute(builder: (b) => ProductDetailPage(favoriteProduct)));
+                                bloc.add(GetAllProducts());
+                              },
+                              onFavourite: () {
+                                bloc.add(DoFavorite(favoriteProduct));
+                                bloc.add(GetAllProducts());
+                              },
+                              image: NetworkImage(favoriteProduct.image),
+                              title: favoriteProduct.name,
+                              price: favoriteProduct.price.toString(),
+                              priceTextColor: Colors.red,
+                              isFavorite: favoriteProduct.isFavoriteByCurrentUser,
+                              backgroundColor: FOREGROUND_COLOR,
+                            ))
+                        .toList()),
+              ));
+        }).toList());
   }
 }

@@ -1,13 +1,18 @@
 import 'dart:async';
 
+import 'package:ankiishopii/blocs/product_bloc/bloc.dart';
+import 'package:ankiishopii/blocs/product_bloc/event.dart';
+import 'package:ankiishopii/blocs/product_bloc/state.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/models/product_model.dart';
 import 'package:ankiishopii/themes/constant.dart';
+import 'package:ankiishopii/widgets/debug_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final ProductModel product;
@@ -19,6 +24,7 @@ class ProductDetailPage extends StatefulWidget {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
+  ProductBloc bloc = ProductBloc(ProductLoading());
   StreamController _scrollStreamController = StreamController();
   ScrollController _scrollController = ScrollController();
 
@@ -26,6 +32,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    bloc.add(GetProductById(widget.product.id));
     _scrollController.addListener(() {
       bool isScrollUp = _scrollController.position.userScrollDirection == ScrollDirection.reverse;
       _scrollStreamController.sink.add(isScrollUp);
@@ -43,23 +50,117 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: FOREGROUND_COLOR,
-      body: Stack(
-        children: <Widget>[
-          buildAvatar(),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: buildInfo(),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: buildFloatingBottomBar(),
-          ),
-          buildNavigator()
-        ],
-      ),
+      body: BlocBuilder(
+          bloc: bloc,
+          builder: (context, state) {
+            if (state is ProductLoaded) {
+              return Stack(
+                children: <Widget>[
+                  buildAvatar(state.product),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      child: buildInfo(state.product),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: buildFloatingBottomBar(state.product),
+                  ),
+                  buildNavigator()
+                ],
+              );
+            } else if (state is ProductLoadingError) {
+              return Center(
+                child: CustomErrorWidget(),
+              );
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          }),
+    );
+  }
+
+  Widget buildRelated(List<ProductModel> products) {
+    products.removeWhere((product) => product.id == widget.product.id);
+    return Container(
+//      margin: EdgeInsets.only(top: _topBottomMargin, bottom: _topBottomMargin),
+      height: 200,
+      child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: products
+              .map(
+                (product) => GestureDetector(
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+                  },
+                  child: Container(
+                    width: 150,
+                    margin: EdgeInsets.only(left: products.indexOf(product) == 0 ? 20 : 0, right: 20),
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+//                              boxShadow: [
+//                                BoxShadow(
+//                                    color: Colors.black26,
+//                                    offset: Offset(5, 5),
+//                                    blurRadius: 5)
+//                              ],
+                        color: FOREGROUND_COLOR,
+                        borderRadius: BorderRadius.circular(30)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                          flex: 5,
+                          child: Container(
+                            decoration: BoxDecoration(
+//
+                                image: DecorationImage(image: NetworkImage(product.image), fit: BoxFit.cover),
+                                color: PRIMARY_COLOR,
+                                borderRadius: BorderRadius.circular(25)),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  product.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: DEFAULT_TEXT_STYLE.copyWith(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  product.price.toString(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: DEFAULT_TEXT_STYLE.copyWith(
+                                    color: Colors.red,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+              .toList()),
     );
   }
 
@@ -90,18 +191,21 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         ));
   }
 
-  Widget buildAvatar() {
+  Widget buildAvatar(ProductModel productModel) {
     return Container(
-      padding: EdgeInsets.only(top: ScreenHelper.getPaddingTop(context), bottom: 30),
-      alignment: Alignment.topCenter,
-      child: CircleAvatar(
-        radius: 70,
-        backgroundImage: CachedNetworkImageProvider(widget.product.image),
-      ),
-    );
+        alignment: Alignment.topCenter,
+        child: Container(
+          height: ScreenHelper.getHeight(context) * 0.35,
+          width: ScreenHelper.getWidth(context),
+          //  decoration: BoxDecoration(image: DecorationImage(image: CachedNetworkImageProvider(productModel.image))),
+          child: Image.network(
+            productModel.image,
+            fit: BoxFit.fill,
+          ),
+        ));
   }
 
-  Widget buildInfo() {
+  Widget buildInfo(ProductModel productModel) {
     return Container(
       constraints: BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.7),
       margin: EdgeInsets.only(top: ScreenHelper.getPaddingTop(context) + 180),
@@ -117,7 +221,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               margin: EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  widget.product.name,
+                  productModel.name,
                   style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 1.2),
                 ),
               )),
@@ -131,8 +235,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.all(10),
-                      child: Text(widget.product.description != null && widget.product.description.length > 0
-                          ? widget.product.description
+                      child: Text(productModel.description != null && productModel.description.length > 0
+                          ? productModel.description
                           : 'No Description'),
                     )
                   ],
@@ -148,8 +252,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.all(10),
-                      child: widget.product.productImage != null && widget.product.productImage.length > 0
-                          ? _buildCarousel(widget.product.productImage)
+                      child: productModel.productImage != null && productModel.productImage.length > 0
+                          ? _buildCarousel(productModel.productImage)
                           : Text('No Image'),
                     )
                   ],
@@ -164,11 +268,21 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.all(10),
-                      child: Text(widget.product.description != null && widget.product.description.length > 0
-                          ? widget.product.description
+                      child: Text(productModel.description != null && productModel.description.length > 0
+                          ? productModel.description
                           : 'No Review'),
                     )
                   ],
+                ),
+              )),
+          Container(
+              width: double.maxFinite,
+              child: Theme(
+                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  initiallyExpanded: true,
+                  title: Text('Related'),
+                  children: <Widget>[Container(child: buildRelated(productModel.category.product))],
                 ),
               )),
         ],
@@ -189,7 +303,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         options: CarouselOptions(enlargeCenterPage: true, autoPlay: true, autoPlayInterval: Duration(seconds: 2)));
   }
 
-  Widget buildFloatingBottomBar() {
+  Widget buildFloatingBottomBar(ProductModel productModel) {
     return StreamBuilder(
         stream: _scrollStreamController.stream,
         builder: (context, snapshot) {
@@ -203,19 +317,25 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround, //
                       children: <Widget>[
-                        Container(
-                            width: 50,
-                            alignment: Alignment.center,
-                            margin: EdgeInsets.only(right: 10),
-                            decoration: BoxDecoration(
-                                color: BACKGROUND_COLOR,
-                                boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(-2, -2), blurRadius: 3)],
-                                borderRadius:
-                                    BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30))),
-                            child: Icon(
-                              Icons.favorite_border,
-                              color: PRIMARY_COLOR,
-                            )),
+                        GestureDetector(
+                          onTap: () {
+                            bloc.add(DoFavorite(productModel, isDoFromListProducts: false));
+                            bloc.add(GetProductById(widget.product.id));
+                          },
+                          child: Container(
+                              width: 50,
+                              alignment: Alignment.center,
+                              margin: EdgeInsets.only(right: 10),
+                              decoration: BoxDecoration(
+                                  color: BACKGROUND_COLOR,
+                                  boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(-2, -2), blurRadius: 3)],
+                                  borderRadius:
+                                      BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30))),
+                              child: Icon(
+                                productModel.isFavoriteByCurrentUser ? Icons.favorite : Icons.favorite_border,
+                                color: PRIMARY_COLOR,
+                              )),
+                        ),
                         Expanded(
                             child: Container(
                                 alignment: Alignment.center,

@@ -16,6 +16,15 @@ class ListProductsLoaded extends ProductState {
   List<Object> get props => [products];
 }
 
-class ListProductsLoadingError extends ProductState {}
+class ProductLoaded extends ProductState{
+  final ProductModel product;
 
-class ListProductsLoading extends ProductState {}
+  ProductLoaded(this.product);
+  @override
+  // TODO: implement props
+  List<Object> get props => [product];
+}
+
+class ProductLoadingError extends ProductState {}
+
+class ProductLoading extends ProductState {}

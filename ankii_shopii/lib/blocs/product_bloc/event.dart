@@ -1,3 +1,4 @@
+import 'package:ankiishopii/models/product_model.dart';
 import 'package:equatable/equatable.dart';
 
 class ProductEvent extends Equatable {
@@ -8,7 +9,21 @@ class ProductEvent extends Equatable {
 
 class GetAllProducts extends ProductEvent {}
 
-class GetAllProductsViaCategoryId extends ProductEvent {
+class GetAllProductsByCategoryId extends ProductEvent {
   final int categoryID;
-  GetAllProductsViaCategoryId(this.categoryID);
+
+  GetAllProductsByCategoryId(this.categoryID);
+}
+
+class GetProductById extends ProductEvent {
+  final int productID;
+
+  GetProductById(this.productID);
+}
+
+class DoFavorite extends ProductEvent {
+  final ProductModel product;
+  final bool isDoFromListProducts;
+
+  DoFavorite(this.product, {this.isDoFromListProducts = true});
 }

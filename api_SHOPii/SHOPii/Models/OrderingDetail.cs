@@ -5,9 +5,10 @@ namespace SHOPii.Models
 {
     public partial class OrderingDetail
     {
-        public int Id { get; set; }
-        public int OrderingId { get; set; }
-        public int ProductId { get; set; }
+        public long Id { get; set; }
+        public int? OrderingId { get; set; }
+        public int? ProductId { get; set; }
+        public int Count { get; set; }
 
         public virtual Ordering Ordering { get; set; }
         public virtual Product Product { get; set; }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Khoa_Projects\\ASP.NET\\SHOPii\\SHOPii\\SHOPii.csproj": {}
+    "D:\\Khoa_Projects\\_git\\SHOPii\\flutter_SHOPii\\api_SHOPii\\SHOPii\\SHOPii.csproj": {}
   },
   "projects": {
-    "D:\\Khoa_Projects\\ASP.NET\\SHOPii\\SHOPii\\SHOPii.csproj": {
+    "D:\\Khoa_Projects\\_git\\SHOPii\\flutter_SHOPii\\api_SHOPii\\SHOPii\\SHOPii.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Khoa_Projects\\ASP.NET\\SHOPii\\SHOPii\\SHOPii.csproj",
+        "projectUniqueName": "D:\\Khoa_Projects\\_git\\SHOPii\\flutter_SHOPii\\api_SHOPii\\SHOPii\\SHOPii.csproj",
         "projectName": "SHOPii",
-        "projectPath": "D:\\Khoa_Projects\\ASP.NET\\SHOPii\\SHOPii\\SHOPii.csproj",
+        "projectPath": "D:\\Khoa_Projects\\_git\\SHOPii\\flutter_SHOPii\\api_SHOPii\\SHOPii\\SHOPii.csproj",
         "packagesPath": "C:\\Users\\khoaln\\.nuget\\packages\\",
-        "outputPath": "D:\\Khoa_Projects\\ASP.NET\\SHOPii\\SHOPii\\obj\\",
+        "outputPath": "D:\\Khoa_Projects\\_git\\SHOPii\\flutter_SHOPii\\api_SHOPii\\SHOPii\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\khoaln\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using SHOPii.Models;
 namespace SHOPii.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class FavoritesController : ControllerBase
     {
@@ -22,16 +24,18 @@ namespace SHOPii.Controllers
 
         // GET: api/Favorites
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Favorite>>> GetFavorite(String username)
+        public async Task<ActionResult<IEnumerable<Favorite>>> GetFavorite()
         {
-            return await _context.Favorite.Where(f => f.Username.Equals(username)).ToListAsync();
+            String username = User.Identity.Name;
+            return await _context.Favorite.Include(f => f.Product).Where(f => f.Username.Equals(username)).ToListAsync();
         }
 
         // GET: api/Favorites/5
         [HttpGet("{productID}")]
-        public async Task<ActionResult<Favorite>> GetFavorite(String username, int productID)
+        public async Task<ActionResult<Favorite>> GetFavorite(int productID)
         {
-            var favorite = await _context.Favorite.Where(f => f.Username.Equals(username) && f.ProductId == productID).FirstOrDefaultAsync();
+            String username = User.Identity.Name;
+            var favorite = await _context.Favorite.Include(f => f.Product).Where(f => f.Username.Equals(username) && f.ProductId == productID).FirstOrDefaultAsync();
 
             if (favorite == null)
             {
@@ -100,14 +104,17 @@ namespace SHOPii.Controllers
         [HttpPost]
         public async Task<ActionResult<Favorite>> PostFavorite(ProductFavorite productFavorite)
         {
+            String username = User.Identity.Name;
             //CHECK EXIST
-            var currentFavorite = await _context.Favorite.Where(f => f.Username.Equals(productFavorite.username) && f.ProductId == productFavorite.productID).FirstOrDefaultAsync();
+            var currentFavorite = await _context.Favorite.Include(f=>f.Product).Where(f => f.Username.Equals(username) && f.ProductId == productFavorite.productID).FirstOrDefaultAsync();
 
             if (currentFavorite == null)
             {
                 Favorite temp = new Favorite();
                 temp.ProductId = productFavorite.productID;
-                temp.Username = productFavorite.username;
+                temp.Username = username;
+                temp.Isfavorite = true;
+              //  temp.Product = await _context.Product.FirstOrDefaultAsync(p => p.Id == productFavorite.productID);
 
                 _context.Favorite.Add(temp);
                 await _context.SaveChangesAsync();
@@ -116,7 +123,9 @@ namespace SHOPii.Controllers
             }
             else
             {
-                _context.Favorite.Remove(currentFavorite);
+                currentFavorite.Isfavorite = !currentFavorite.Isfavorite;
+                 _context.Favorite.Update(currentFavorite);
+                await _context.SaveChangesAsync();
                 return Ok(currentFavorite);
             }
         }

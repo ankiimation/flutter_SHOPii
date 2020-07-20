@@ -15,6 +15,7 @@ class CustomProductListItem extends StatelessWidget {
   final Function onAddToCart;
   final Function onFavourite;
   final Color backgroundColor;
+  final bool isFavorite;
 
   CustomProductListItem(
       {this.backgroundColor = BACKGROUND_COLOR,
@@ -26,7 +27,8 @@ class CustomProductListItem extends StatelessWidget {
       this.onAddToCart,
       this.onFavourite,
       this.quickActionColor = PRIMARY_COLOR,
-      this.priceTextColor = Colors.red});
+      this.priceTextColor = Colors.red,
+      this.isFavorite = false});
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +94,7 @@ class CustomProductListItem extends StatelessWidget {
                               onTap: onFavourite,
                               child: Container(
                                   child: Icon(
-                                Icons.favorite_border,
+                                isFavorite ? Icons.favorite : Icons.favorite_border,
                                 color: quickActionColor,
                                 size: 20,
                               )),

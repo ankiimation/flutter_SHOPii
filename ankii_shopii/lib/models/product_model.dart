@@ -1,3 +1,7 @@
+import 'package:ankiishopii/models/category_model.dart';
+
+import 'favorite_model.dart';
+
 class ProductModel {
   int id;
   String name;
@@ -5,9 +9,21 @@ class ProductModel {
   String image;
   int price;
   int categoryId;
+  CategoryModel category;
   List<ProductImageModel> productImage;
+  List<FavoriteModel> favorite;
+  bool isFavoriteByCurrentUser = false;
 
-  ProductModel({this.id, this.name, this.description, this.image, this.price, this.categoryId, this.productImage});
+  ProductModel(
+      {this.id,
+      this.name,
+      this.description,
+      this.image,
+      this.price,
+      this.categoryId,
+      this.productImage,
+      this.favorite,
+      this.category});
 
   ProductModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -22,6 +38,15 @@ class ProductModel {
         productImage.add(new ProductImageModel.fromJson(v));
       });
     }
+    if (json['favorite'] != null) {
+      favorite = new List<FavoriteModel>();
+      json['favorite'].forEach((v) {
+        favorite.add(new FavoriteModel.fromJson(v));
+      });
+    }
+    category = json['category'] != null
+        ? new CategoryModel.fromJson(json['category'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -32,8 +57,14 @@ class ProductModel {
     data['image'] = this.image;
     data['price'] = this.price;
     data['categoryId'] = this.categoryId;
+    if (this.category != null) {
+      data['category'] = this.category.toJson();
+    }
     if (this.productImage != null) {
       data['productImage'] = this.productImage.map((v) => v.toJson()).toList();
+    }
+    if (this.favorite != null) {
+      data['favorite'] = this.favorite.map((v) => v.toJson()).toList();
     }
     return data;
   }

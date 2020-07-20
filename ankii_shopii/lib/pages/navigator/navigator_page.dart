@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:ankiishopii/blocs/product_bloc/bloc.dart';
+import 'package:ankiishopii/blocs/product_bloc/state.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/pages/account/account_page.dart';
 import 'package:ankiishopii/pages/categories/categories_page.dart';
@@ -14,6 +16,7 @@ import 'package:ankiishopii/widgets/bottom_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../themes/constant.dart';
 import '../../themes/constant.dart';
@@ -30,7 +33,7 @@ class NavigatorPage extends StatefulWidget {
 class _NavigatorPageState extends State<NavigatorPage> {
   var _scrollStreamController = StreamController();
   var scrollController = ScrollController();
-  var _pageController = PageController(keepPage: true);
+  var _pageController = PageController(keepPage: false);
   bool _isHideTopBottomBar = false;
 
   int _currentIndex = 0;

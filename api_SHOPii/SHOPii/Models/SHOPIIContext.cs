@@ -125,6 +125,11 @@ namespace SHOPii.Models
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
+                entity.Property(e => e.Isfavorite)
+                    .IsRequired()
+                    .HasColumnName("ISFAVORITE")
+                    .HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.ProductId).HasColumnName("PRODUCT_ID");
 
                 entity.Property(e => e.Username)
@@ -152,15 +157,23 @@ namespace SHOPii.Models
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.DeliveryId).HasColumnName("DELIVERY_ID");
+                entity.Property(e => e.DeliveryId)
+                    .HasColumnName("DELIVERY_ID")
+                    .HasDefaultValueSql("((-1))");
 
                 entity.Property(e => e.Status).HasColumnName("STATUS");
 
-                entity.HasOne(d => d.Delivery)
+                entity.Property(e => e.Username)
+                    .IsRequired()
+                    .HasColumnName("USERNAME")
+                    .HasMaxLength(32)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.UsernameNavigation)
                     .WithMany(p => p.Ordering)
-                    .HasForeignKey(d => d.DeliveryId)
+                    .HasForeignKey(d => d.Username)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ORDERING__DELIVE__4E88ABD4");
+                    .HasConstraintName("FK__ORDERING__USERNA__02084FDA");
             });
 
             modelBuilder.Entity<OrderingDetail>(entity =>
@@ -169,6 +182,8 @@ namespace SHOPii.Models
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
+                entity.Property(e => e.Count).HasColumnName("COUNT");
+
                 entity.Property(e => e.OrderingId).HasColumnName("ORDERING_ID");
 
                 entity.Property(e => e.ProductId).HasColumnName("PRODUCT_ID");
@@ -176,14 +191,12 @@ namespace SHOPii.Models
                 entity.HasOne(d => d.Ordering)
                     .WithMany(p => p.OrderingDetail)
                     .HasForeignKey(d => d.OrderingId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ORDERING___ORDER__52593CB8");
+                    .HasConstraintName("FK__ORDERING___ORDER__05D8E0BE");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.OrderingDetail)
                     .HasForeignKey(d => d.ProductId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ORDERING___PRODU__534D60F1");
+                    .HasConstraintName("FK__ORDERING___PRODU__06CD04F7");
             });
 
             modelBuilder.Entity<Product>(entity =>

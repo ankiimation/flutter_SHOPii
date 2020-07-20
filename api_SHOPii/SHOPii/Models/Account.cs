@@ -9,6 +9,7 @@ namespace SHOPii.Models
         {
             DeliveryAddress = new HashSet<DeliveryAddress>();
             Favorite = new HashSet<Favorite>();
+            Ordering = new HashSet<Ordering>();
         }
 
         public string Username { get; set; }
@@ -20,5 +21,6 @@ namespace SHOPii.Models
 
         public virtual ICollection<DeliveryAddress> DeliveryAddress { get; set; }
         public virtual ICollection<Favorite> Favorite { get; set; }
+        public virtual ICollection<Ordering> Ordering { get; set; }
     }
 }

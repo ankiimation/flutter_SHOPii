@@ -11,10 +11,11 @@ namespace SHOPii.Models
         }
 
         public int Id { get; set; }
-        public int DeliveryId { get; set; }
         public int Status { get; set; }
+        public string Username { get; set; }
+        public int DeliveryId { get; set; }
 
-        public virtual DeliveryAddress Delivery { get; set; }
+        public virtual Account UsernameNavigation { get; set; }
         public virtual ICollection<OrderingDetail> OrderingDetail { get; set; }
     }
 }

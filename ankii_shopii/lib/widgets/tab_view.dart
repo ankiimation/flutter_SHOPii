@@ -68,8 +68,9 @@ class _CustomTabViewState extends State<CustomTabView> {
           alignment: Alignment.center,
           decoration: BoxDecoration(
               color: widget.backgroundColor,
-              boxShadow:
-                  widget.barShadow ? [BoxShadow(color: Colors.grey.withOpacity(0.3), offset: Offset(0, 6), blurRadius: 3)] : null),
+              boxShadow: widget.barShadow
+                  ? [BoxShadow(color: Colors.grey.withOpacity(0.3), offset: Offset(0, 6), blurRadius: 3)]
+                  : null),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: widget.children.map((child) {
@@ -78,29 +79,28 @@ class _CustomTabViewState extends State<CustomTabView> {
               var label = child.label;
               var index = widget.children.indexOf(child);
 
-              return Column(
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () {
-                      onTapChangePage(index);
-                    },
-                    child: AnimatedContainer(
-                      duration: Duration(milliseconds: 300),
-                      padding: EdgeInsets.only(top: 10, left: 10, right: 10),
-                      margin: EdgeInsets.only(top: _currentIndex == index ? 10 : 0),
-                      child: Icon(
-                        icon,
-                        size: 20,
-                        color: _currentIndex == index ? color : color.withOpacity(0.3),
-                      ),
+              return GestureDetector(
+                  onTap: () {
+                    onTapChangePage(index);
+                  },
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+                    margin: EdgeInsets.only(top: _currentIndex == index ? 5 : 0),
+                    child: Column(
+                      children: <Widget>[
+                        Icon(
+                          icon,
+                          size: 20,
+                          color: _currentIndex == index ? color : color.withOpacity(0.3),
+                        ),
+                        Text(
+                          _currentIndex == index ? label : '',
+                          style: TextStyle(color: color, fontSize: 14),
+                        )
+                      ],
                     ),
-                  ),
-                  Text(
-                    _currentIndex == index ? label : '',
-                    style: TextStyle(color: color, fontSize: 14),
-                  )
-                ],
-              );
+                  ));
             }).toList(),
           ),
         ),

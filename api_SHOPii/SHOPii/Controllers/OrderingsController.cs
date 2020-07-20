@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace SHOPii.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class OrderingsController : ControllerBase
     {
         private readonly SHOPIIContext _context;
@@ -24,7 +26,7 @@ namespace SHOPii.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Ordering>>> GetOrdering()
         {
-            return await _context.Ordering.Include(o=>o.OrderingDetail).Include(o=>o.Delivery).ToListAsync();
+            return await _context.Ordering.Include(o => o.OrderingDetail).ToListAsync();
         }
 
         // GET: api/Orderings/5
@@ -76,14 +78,99 @@ namespace SHOPii.Controllers
         // POST: api/Orderings
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Ordering>> PostOrdering(Ordering ordering)
-        {
-            _context.Ordering.Add(ordering);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetOrdering", new { id = ordering.Id }, ordering);
+        //public async Task<ActionResult<Ordering>> PostOrdering(Ordering ordering)
+        //{
+        //    _context.Ordering.Add(ordering);
+        //    await _context.SaveChangesAsync();
+
+        //    return CreatedAtAction("GetOrdering", new { id = ordering.Id }, ordering);
+        //}
+        public class DoOrderModel
+        {
+            public int productID;
+            public int count;
+
+            public DoOrderModel(int productID,int count)
+            {
+                this.productID = productID;
+                this.count = count;
+            }
         }
+
+        [HttpPost("addToCart")]
+        public async Task<ActionResult<Ordering>> PostOrdering(DoOrderModel doOrderModel)
+        {
+            String username = User.Identity.Name;
+            var currentOrdering = await _context.Ordering.Include(o => o.OrderingDetail).FirstOrDefaultAsync(o => o.Username.Equals(username) && o.Status == 0);
+            if (currentOrdering != null)
+            {
+                //get ordering detail via ordering id && product id
+                var currentOrderingDetail = await _context.OrderingDetail.Include(od => od.Product).FirstOrDefaultAsync(od => od.OrderingId == currentOrdering.Id && od.ProductId == doOrderModel.productID);
+                if (currentOrderingDetail != null)
+                {
+                    currentOrderingDetail.Count += doOrderModel.count;
+                    if(currentOrderingDetail.Count < 0)
+                    {
+                        currentOrderingDetail.Count = 0;
+                    }
+                    _context.OrderingDetail.Update(currentOrderingDetail);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    OrderingDetail detailTemp = new OrderingDetail();
+                    detailTemp.OrderingId = currentOrdering.Id;
+                    detailTemp.ProductId = doOrderModel.productID;
+                    //detailTemp.Product = await _context.Product.Include(p => p.ProductImage).FirstOrDefaultAsync(p => p.Id == doOrderModel.productID);
+                    detailTemp.Count = doOrderModel.count;
+                    if (detailTemp.Count < 0)
+                    {
+                        detailTemp.Count = 0;
+                    }
+                    _context.OrderingDetail.Add(detailTemp);
+                    await _context.SaveChangesAsync();
+                }
+                return Ok(currentOrdering);
+            }
+            else
+            {
+                //ADD ORDER
+                Ordering orderingTemp = new Ordering();
+                orderingTemp.Username = username;
+                _context.Ordering.Add(orderingTemp);
+                await _context.SaveChangesAsync();
+                //ADD ORDER  DETAIL
+                OrderingDetail detailTemp = new OrderingDetail();
+                detailTemp.OrderingId = orderingTemp.Id;
+                detailTemp.ProductId = doOrderModel.productID;
+                //detailTemp.Product = await _context.Product.Include(p => p.ProductImage).FirstOrDefaultAsync(p => p.Id == doOrderModel.productID);
+                detailTemp.Count = doOrderModel.count;
+                if (detailTemp.Count < 0)
+                {
+                    detailTemp.Count = 0;
+                }
+                _context.OrderingDetail.Add(detailTemp);
+
+                await _context.SaveChangesAsync();
+
+                
+                return Ok(orderingTemp);
+            }
+
+
+
+
+            //Ordering orderingTemp = new Ordering();
+            //orderingTemp.Username = username;
+
+
+            //_context.Ordering.Add(ordering);
+            //await _context.SaveChangesAsync();
+
+            //return CreatedAtAction("GetOrdering", new { id = ordering.Id }, ordering);
+        }
+
 
         // DELETE: api/Orderings/5
         [HttpDelete("{id}")]
