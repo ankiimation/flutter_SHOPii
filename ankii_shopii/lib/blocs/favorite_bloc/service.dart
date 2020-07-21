@@ -7,9 +7,9 @@ import 'package:ankiishopii/helpers/shared_preferences_helper.dart';
 import 'package:ankiishopii/models/favorite_model.dart';
 import 'package:flutter/material.dart';
 
-class FavoriteService extends BlocService {
+class FavoriteService extends BlocService<FavoriteModel> {
   @override
-  Future get(int id) async {
+  Future<FavoriteModel> get(int id) async {
     // TODO: implement get
     var rs = await HttpHelper.get(FAVORITE_ENDPOINT + '/$id', bearerToken: currentLogin.token);
     if (rs.statusCode == 200 || rs.statusCode == 201) {
@@ -22,7 +22,7 @@ class FavoriteService extends BlocService {
   }
 
   @override
-  Future<List> getAll({int from = 0, int limit}) async {
+  Future<List<FavoriteModel>> getAll({int from = 0, int limit}) async {
     // TODO: implement getAll
     var rs = await HttpHelper.get(FAVORITE_ENDPOINT, bearerToken: currentLogin.token);
     if (rs.statusCode == 200 || rs.statusCode == 201) {
@@ -63,6 +63,9 @@ class FavoriteService extends BlocService {
 
   FavoriteModel getFavoriteFromLocalByProductId(int productID) {
     // print(currentLogin.account.favorite.map((e) => e.productId).toList());
+    if (currentLogin == null) {
+      return null;
+    }
     return currentLogin.account.favorite.firstWhere((favorite) => favorite.productId == productID, orElse: () => null);
   }
 }

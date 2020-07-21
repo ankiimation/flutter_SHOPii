@@ -1,5 +1,6 @@
 import 'package:ankiishopii/blocs/login_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/login_bloc/service.dart';
+import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
@@ -153,6 +154,8 @@ class _LoginPageState extends State<LoginPage> {
           var account = await LoginService().logIn(usernameTextController.text, passwordTextController.text);
           LoadingDialog.hideLoadingDialog(context);
           if (account != null) {
+            refreshCart(context);
+            refeshLogin(context);
             Navigator.pop(context);
           } else {
             await showDialog(

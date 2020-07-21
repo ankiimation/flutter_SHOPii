@@ -26,14 +26,16 @@ namespace SHOPii.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Ordering>>> GetOrdering()
         {
-            return await _context.Ordering.Include(o => o.OrderingDetail).ToListAsync();
+            var username = User.Identity.Name;
+            return await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od=>od.Product).Where(o => o.Username.Equals(username)).ToListAsync();
         }
 
         // GET: api/Orderings/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Ordering>> GetOrdering(int id)
         {
-            var ordering = await _context.Ordering.FindAsync(id);
+            var username = User.Identity.Name;
+            var ordering = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od => od.Product).FirstOrDefaultAsync(o => o.Username.Equals(username));
 
             if (ordering == null)
             {
@@ -42,6 +44,24 @@ namespace SHOPii.Controllers
 
             return ordering;
         }
+
+        [HttpGet("cart")]
+        public async Task<ActionResult<Ordering>> GetCurrentCart()
+        {
+            var username = User.Identity.Name;
+            var cart = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od => od.Product).Where(o => o.Username.Equals(username) && o.Status == 0).FirstOrDefaultAsync();
+            if(cart == null)
+            {
+                 cart = new Ordering();
+                cart.Username = username;
+                cart.Status = 0;
+                _context.Ordering.Add(cart);
+                await _context.SaveChangesAsync();
+
+            }
+            return cart;
+        }
+
 
         // PUT: api/Orderings/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
@@ -102,7 +122,7 @@ namespace SHOPii.Controllers
         public async Task<ActionResult<Ordering>> PostOrdering(DoOrderModel doOrderModel)
         {
             String username = User.Identity.Name;
-            var currentOrdering = await _context.Ordering.Include(o => o.OrderingDetail).FirstOrDefaultAsync(o => o.Username.Equals(username) && o.Status == 0);
+            var currentOrdering = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od=>od.Product).FirstOrDefaultAsync(o => o.Username.Equals(username) && o.Status == 0);
             if (currentOrdering != null)
             {
                 //get ordering detail via ordering id && product id
@@ -122,7 +142,7 @@ namespace SHOPii.Controllers
                     OrderingDetail detailTemp = new OrderingDetail();
                     detailTemp.OrderingId = currentOrdering.Id;
                     detailTemp.ProductId = doOrderModel.productID;
-                    //detailTemp.Product = await _context.Product.Include(p => p.ProductImage).FirstOrDefaultAsync(p => p.Id == doOrderModel.productID);
+                    detailTemp.Product = await _context.Product.Include(p => p.ProductImage).FirstOrDefaultAsync(p => p.Id == doOrderModel.productID);
                     detailTemp.Count = doOrderModel.count;
                     if (detailTemp.Count < 0)
                     {
@@ -144,7 +164,7 @@ namespace SHOPii.Controllers
                 OrderingDetail detailTemp = new OrderingDetail();
                 detailTemp.OrderingId = orderingTemp.Id;
                 detailTemp.ProductId = doOrderModel.productID;
-                //detailTemp.Product = await _context.Product.Include(p => p.ProductImage).FirstOrDefaultAsync(p => p.Id == doOrderModel.productID);
+                detailTemp.Product = await _context.Product.FirstOrDefaultAsync(p => p.Id == doOrderModel.productID);
                 detailTemp.Count = doOrderModel.count;
                 if (detailTemp.Count < 0)
                 {
@@ -153,8 +173,9 @@ namespace SHOPii.Controllers
                 _context.OrderingDetail.Add(detailTemp);
 
                 await _context.SaveChangesAsync();
+                orderingTemp = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od => od.Product).FirstOrDefaultAsync(o => o.Id == orderingTemp.Id);
 
-                
+
                 return Ok(orderingTemp);
             }
 

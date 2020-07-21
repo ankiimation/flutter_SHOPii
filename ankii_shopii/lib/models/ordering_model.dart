@@ -1,5 +1,5 @@
-
 import 'package:ankiishopii/models/account_model.dart';
+import 'package:ankiishopii/models/product_model.dart';
 
 class OrderingModel {
   int id;
@@ -8,20 +8,13 @@ class OrderingModel {
   DeliveryAddressModel delivery;
   List<OrderingDetailModel> orderingDetail;
 
-  OrderingModel(
-      {this.id,
-        this.deliveryId,
-        this.status,
-        this.delivery,
-        this.orderingDetail});
+  OrderingModel({this.id, this.deliveryId, this.status, this.delivery, this.orderingDetail});
 
   OrderingModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     deliveryId = json['deliveryId'];
     status = json['status'];
-    delivery = json['delivery'] != null
-        ? new DeliveryAddressModel.fromJson(json['delivery'])
-        : null;
+    delivery = json['delivery'] != null ? new DeliveryAddressModel.fromJson(json['delivery']) : null;
     if (json['orderingDetail'] != null) {
       orderingDetail = new List<OrderingDetailModel>();
       json['orderingDetail'].forEach((v) {
@@ -39,8 +32,7 @@ class OrderingModel {
       data['delivery'] = this.delivery.toJson();
     }
     if (this.orderingDetail != null) {
-      data['orderingDetail'] =
-          this.orderingDetail.map((v) => v.toJson()).toList();
+      data['orderingDetail'] = this.orderingDetail.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -50,13 +42,17 @@ class OrderingDetailModel {
   int id;
   int orderingId;
   int productId;
+  int count;
+  ProductModel product;
 
-  OrderingDetailModel({this.id, this.orderingId, this.productId});
+  OrderingDetailModel({this.id, this.orderingId, this.productId, this.product, this.count = 0});
 
   OrderingDetailModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     orderingId = json['orderingId'];
     productId = json['productId'];
+    count = json['count'];
+    product = json['product'] != null ? new ProductModel.fromJson(json['product']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -64,6 +60,10 @@ class OrderingDetailModel {
     data['id'] = this.id;
     data['orderingId'] = this.orderingId;
     data['productId'] = this.productId;
+    data['count'] = this.count;
+    if (this.product != null) {
+      data['product'] = this.product.toJson();
+    }
     return data;
   }
 }

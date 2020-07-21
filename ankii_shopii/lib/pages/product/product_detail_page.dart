@@ -1,11 +1,18 @@
 import 'dart:async';
 
+import 'package:ankiishopii/blocs/cart_bloc/bloc.dart';
+import 'package:ankiishopii/blocs/cart_bloc/event.dart';
 import 'package:ankiishopii/blocs/product_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/product_bloc/event.dart';
 import 'package:ankiishopii/blocs/product_bloc/state.dart';
+import 'package:ankiishopii/global/global_function.dart';
+import 'package:ankiishopii/global/global_variable.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/models/product_model.dart';
+import 'package:ankiishopii/pages/account/login_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
+import 'package:ankiishopii/widgets/add_to_cart_effect.dart';
+import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -24,7 +31,11 @@ class ProductDetailPage extends StatefulWidget {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  GlobalKey cartIconKey = GlobalKey();
   ProductBloc bloc = ProductBloc(ProductLoading());
+
+  //CartBloc cartBloc;
   StreamController _scrollStreamController = StreamController();
   ScrollController _scrollController = ScrollController();
 
@@ -32,6 +43,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    // cartBloc = BlocProvider.of<CartBloc>(context);
     bloc.add(GetProductById(widget.product.id));
     _scrollController.addListener(() {
       bool isScrollUp = _scrollController.position.userScrollDirection == ScrollDirection.reverse;
@@ -49,6 +61,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: FOREGROUND_COLOR,
       body: BlocBuilder(
           bloc: bloc,
@@ -56,7 +69,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             if (state is ProductLoaded) {
               return Stack(
                 children: <Widget>[
-                  buildAvatar(state.product),
+                  Container(child: buildAvatar(state.product)),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: SingleChildScrollView(
@@ -68,7 +81,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     alignment: Alignment.bottomCenter,
                     child: buildFloatingBottomBar(state.product),
                   ),
-                  buildNavigator()
+                  buildAppBar(state.product)
                 ],
               );
             } else if (state is ProductLoadingError) {
@@ -164,38 +177,30 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  Widget buildNavigator() {
+  Widget buildAppBar(ProductModel productModel) {
     return Container(
-        margin: EdgeInsets.only(top: ScreenHelper.getPaddingTop(context)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios,
-                  size: 20,
-                ),
-                color: PRIMARY_COLOR,
-                onPressed: () {
-                  print('test');
-                  Navigator.pop(context);
-                }),
-            IconButton(
-                icon: Icon(
-                  Icons.shopping_cart,
-                  size: 20,
-                  color: PRIMARY_COLOR,
-                ),
-                onPressed: () {}),
-          ],
-        ));
+      decoration: BoxDecoration(
+          color: BACKGROUND_COLOR.withOpacity(0.5),
+          borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25))),
+      child: InPageAppBar(
+        showBackground: true,
+        cartIconKey: cartIconKey,
+        title: productModel.name,
+        leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            onPressed: () {
+              Navigator.pop(context);
+            }),
+      ),
+    );
   }
 
   Widget buildAvatar(ProductModel productModel) {
     return Container(
         alignment: Alignment.topCenter,
+        padding: EdgeInsets.only(bottom: ScreenHelper.getHeight(context) * 0.6),
         child: Container(
-          height: ScreenHelper.getHeight(context) * 0.35,
+          height: ScreenHelper.getHeight(context),
           width: ScreenHelper.getWidth(context),
           //  decoration: BoxDecoration(image: DecorationImage(image: CachedNetworkImageProvider(productModel.image))),
           child: Image.network(
@@ -207,24 +212,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   Widget buildInfo(ProductModel productModel) {
     return Container(
-      constraints: BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.7),
+      constraints: BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.65),
       margin: EdgeInsets.only(top: ScreenHelper.getPaddingTop(context) + 180),
-      padding: EdgeInsets.only(bottom: 50, left: 10, right: 10),
+      padding: EdgeInsets.only(bottom: 100, left: 10, right: 10),
       decoration: BoxDecoration(
           boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(0, -2), blurRadius: 2)],
           color: BACKGROUND_COLOR,
           borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
       child: Column(
         children: <Widget>[
-          Container(
-              width: double.maxFinite,
-              margin: EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  productModel.name,
-                  style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-                ),
-              )),
           Container(
               width: double.maxFinite,
               child: Theme(
@@ -304,6 +300,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Widget buildFloatingBottomBar(ProductModel productModel) {
+    double radius = 25;
     return StreamBuilder(
         stream: _scrollStreamController.stream,
         builder: (context, snapshot) {
@@ -313,47 +310,281 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ? null
                 : Container(
                     height: 50,
-                    margin: EdgeInsets.only(bottom: 10, left: 20, right: 20),
+                    // margin: EdgeInsets.only(bottom: 10, left: 20, right: 20),
+                    decoration: BoxDecoration(
+                      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 3, offset: Offset(0, -3))],
+                      borderRadius:
+                          BorderRadius.only(topLeft: Radius.circular(radius), topRight: Radius.circular(radius)),
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround, //
                       children: <Widget>[
                         GestureDetector(
                           onTap: () {
+                            if (currentLogin == null) {
+                              Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
+                              return;
+                            }
                             bloc.add(DoFavorite(productModel, isDoFromListProducts: false));
                             bloc.add(GetProductById(widget.product.id));
                           },
                           child: Container(
-                              width: 50,
-                              alignment: Alignment.center,
-                              margin: EdgeInsets.only(right: 10),
+                              width: ScreenHelper.getWidth(context) * 0.25,
+                              // alignment: Alignment.center,
+                              //margin: EdgeInsets.only(right: 10),
+                              padding: EdgeInsets.all(15),
                               decoration: BoxDecoration(
                                   color: BACKGROUND_COLOR,
-                                  boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(-2, -2), blurRadius: 3)],
-                                  borderRadius:
-                                      BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30))),
+                                  //  boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(-2, -2), blurRadius: 3)],
+                                  borderRadius: BorderRadius.only(topLeft: Radius.circular(radius))),
                               child: Icon(
                                 productModel.isFavoriteByCurrentUser ? Icons.favorite : Icons.favorite_border,
                                 color: PRIMARY_COLOR,
                               )),
                         ),
                         Expanded(
-                            child: Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    color: FOREGROUND_COLOR,
-                                    boxShadow: [
-                                      BoxShadow(color: Colors.black26, offset: Offset(-2, -2), blurRadius: 3)
-                                    ],
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(30), bottomRight: Radius.circular(30))),
-                                child: Text(
-                                  'Get it',
-                                  textAlign: TextAlign.center,
-                                  style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20),
-                                )))
+                            child: GestureDetector(
+                          onTap: () {
+                            if (currentLogin == null) {
+                              Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
+                              return;
+                            }
+                            showMyModalBottomSheet(productModel);
+                          },
+                          child: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  color: FOREGROUND_COLOR,
+                                  //  boxShadow: [
+//                                      BoxShadow(color: Colors.black26, offset: Offset(-2, -2), blurRadius: 3)
+//                                    ],
+                                  borderRadius: BorderRadius.only(topRight: Radius.circular(radius))),
+                              child: Text(
+                                'Get it',
+                                textAlign: TextAlign.center,
+                                style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20),
+                              )),
+                        ))
                       ],
                     ),
                   ),
+          );
+        });
+  }
+
+  showMyModalBottomSheet(ProductModel productModel) {
+    var quantityController = TextEditingController();
+    quantityController.text = 1.toString();
+    showModalBottomSheet(
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))),
+        context: context,
+        builder: (_) {
+          return Container(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 10),
+            margin: EdgeInsets.symmetric(horizontal: 20),
+            //   height: ScreenHelper.getHeight(context) * 0.4,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          child: CircleAvatar(
+                            backgroundColor: FOREGROUND_COLOR,
+                            radius: 45,
+                            backgroundImage: CachedNetworkImageProvider(widget.product.image),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Expanded(
+                          child: Text(
+                            widget.product.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text('Quantity'),
+                        SizedBox(
+                          width: 30,
+                        ),
+                        Container(
+                          child: Row(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  int quantity = int.parse(quantityController.text);
+
+                                  // print(quantity);
+                                  if (quantity > 1) {
+                                    quantity--;
+                                    setState(() {
+                                      quantityController.text = quantity.toString();
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(horizontal: 5),
+                                  decoration:
+                                      BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(15)),
+                                  child: Icon(Icons.arrow_left),
+                                ),
+                              ),
+                              Center(
+                                child: Container(
+                                  width: 50,
+                                  padding: EdgeInsets.symmetric(vertical: 5),
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: PRIMARY_COLOR.withOpacity(0.1), borderRadius: BorderRadius.circular(15)),
+                                  child: TextFormField(
+                                    controller: quantityController,
+                                    keyboardType: TextInputType.number,
+                                    textAlign: TextAlign.center,
+                                    style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                                    cursorColor: FOREGROUND_COLOR,
+                                    decoration: InputDecoration.collapsed()
+                                        .copyWith(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 5)),
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  int quantity = int.parse(quantityController.text);
+
+                                  // print(quantity);
+
+                                  quantity++;
+                                  setState(() {
+                                    quantityController.text = quantity.toString();
+                                  });
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(horizontal: 5),
+                                  decoration:
+                                      BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(15)),
+                                  child: Icon(Icons.arrow_right),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text('Size'),
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              width: 30,
+                              height: 30,
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.all(5),
+                              margin: EdgeInsets.only(left: 5),
+                              decoration:
+                                  BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(30)),
+                              child: Text('S'),
+                            ),
+                            Container(
+                              width: 30,
+                              height: 30,
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.all(5),
+                              margin: EdgeInsets.only(left: 5),
+                              decoration:
+                                  BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(30)),
+                              child: Text('M'),
+                            ),
+                            Container(
+                              width: 30,
+                              height: 30,
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.all(5),
+                              margin: EdgeInsets.only(left: 5),
+                              decoration:
+                                  BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(30)),
+                              child: Text('L'),
+                            ),
+                            Container(
+                              width: 30,
+                              height: 30,
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.all(5),
+                              margin: EdgeInsets.only(left: 5),
+                              decoration:
+                                  BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(30)),
+                              child: Text('XL'),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      updateCartIconPosition(cartIconKey: cartIconKey);
+                      addToCart(context, productID: productModel.id, count: int.parse(quantityController.text));
+                      await showAddToCartAnimation(context,
+                          overlayWidget: CircleAvatar(
+                            backgroundColor: BACKGROUND_COLOR,
+                            radius: 10,
+                            child: Text(
+                              quantityController.text,
+                              style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          start: CustomPosition(
+                              ScreenHelper.getWidth(context) * 0.7, ScreenHelper.getHeight(context) * 0.9),
+                          end: CustomPosition(cartIconPositionDx, cartIconPositionDy));
+
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: FOREGROUND_COLOR,
+                          //  boxShadow: [
+//                                      BoxShadow(color: Colors.black26, offset: Offset(-2, -2), blurRadius: 3)
+//                                    ],
+                        ),
+                        child: Text(
+                          'Add To Cart',
+                          textAlign: TextAlign.center,
+                          style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20),
+                        )),
+                  )
+                ],
+              ),
+            ),
           );
         });
   }

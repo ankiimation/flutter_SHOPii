@@ -1,6 +1,7 @@
 import 'package:ankiishopii/blocs/product_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/product_bloc/event.dart';
 import 'package:ankiishopii/blocs/product_bloc/state.dart';
+import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/models/product_model.dart';
 import 'package:ankiishopii/pages/product/product_detail_page.dart';
@@ -23,6 +24,7 @@ class FavoritePage extends StatefulWidget {
 }
 
 class _FavoritePageState extends State<FavoritePage> {
+  GlobalKey cartIconKey = GlobalKey();
   ProductBloc bloc = ProductBloc(ProductLoading());
 
   @override
@@ -46,6 +48,7 @@ class _FavoritePageState extends State<FavoritePage> {
       body: Column(
         children: <Widget>[
           InPageAppBar(
+            cartIconKey: cartIconKey,
             title: 'Favorite',
           ),
           Expanded(
@@ -93,6 +96,7 @@ class _FavoritePageState extends State<FavoritePage> {
                 child: Column(
                     children: favoriteProducts
                         .map((favoriteProduct) => CustomProductListItem(
+                              cartIconKey: cartIconKey,
                               onTap: () async {
                                 await Navigator.push(
                                     context, MaterialPageRoute(builder: (b) => ProductDetailPage(favoriteProduct)));
@@ -102,9 +106,10 @@ class _FavoritePageState extends State<FavoritePage> {
                                 bloc.add(DoFavorite(favoriteProduct));
                                 bloc.add(GetAllProducts());
                               },
-                              image: NetworkImage(favoriteProduct.image),
-                              title: favoriteProduct.name,
-                              price: favoriteProduct.price.toString(),
+                              onAddToCart: () {
+                                addToCart(context, productID: favoriteProduct.id, count: 1);
+                              },
+                              product: favoriteProduct,
                               priceTextColor: Colors.red,
                               isFavorite: favoriteProduct.isFavoriteByCurrentUser,
                               backgroundColor: FOREGROUND_COLOR,

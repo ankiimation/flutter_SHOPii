@@ -2,6 +2,7 @@ import 'package:ankiishopii/blocs/account_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/account_bloc/event.dart';
 import 'package:ankiishopii/blocs/account_bloc/state.dart';
 import 'package:ankiishopii/blocs/login_bloc/service.dart';
+import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/models/account_model.dart';
 import 'package:ankiishopii/pages/account/login_page.dart';
@@ -151,6 +152,7 @@ class _AccountPageState extends State<AccountPage> {
       elevation: 0,
       onPressed: () async {
         await LoginService().logOut();
+        refeshLogin(context);
         bloc.add(GetLocalAccount());
       },
       color: FOREGROUND_COLOR,

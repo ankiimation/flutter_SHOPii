@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:ankiishopii/blocs/bloc_service.dart';
 import 'package:ankiishopii/blocs/favorite_bloc/service.dart';
+import 'package:ankiishopii/global/global_variable.dart';
 import 'package:ankiishopii/helpers/http_helper.dart';
 import 'package:ankiishopii/models/favorite_model.dart';
 import 'package:ankiishopii/models/product_model.dart';
@@ -72,7 +73,7 @@ class ProductService extends BlocService<ProductModel> {
   Future<ProductModel> doFavorite(ProductModel productModel) async {
     var favorite = await FavoriteService().doFavorite(productID: productModel.id);
     var rs = _checkIsFavoriteByFavoriteModel(productModel: productModel, favoriteModel: favorite);
-   // print(jsonEncode(rs.isFavoriteByCurrentUser));
+    // print(jsonEncode(rs.isFavoriteByCurrentUser));
     return rs;
   }
 }

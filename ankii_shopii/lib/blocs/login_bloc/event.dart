@@ -17,5 +17,7 @@ class LoginNow extends LoginEvent {
   List<Object> get props => [username, password];
 }
 
+class GetCurrentLogin extends LoginEvent{}
+
 class LogOutNow extends LoginEvent{
 }

@@ -21,6 +21,12 @@ class LoginService extends BlocService<LoginModel> {
     throw UnimplementedError();
   }
 
+  Future<LoginModel> getCurrentLogin() async {
+    var rs = await LocalHelper.getAccountFromLocal();
+    currentLogin = rs;
+    return currentLogin;
+  }
+
   Future<LoginModel> logIn(String username, String password) async {
     Map<String, String> accountInput = {"username": username, "password": password};
     var rs = await HttpHelper.post(LOGIN_ENDPOINT, accountInput);

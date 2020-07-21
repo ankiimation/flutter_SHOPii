@@ -1,6 +1,7 @@
 import 'package:ankiishopii/blocs/product_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/product_bloc/event.dart';
 import 'package:ankiishopii/blocs/product_bloc/state.dart';
+import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/models/category_model.dart';
 import 'package:ankiishopii/models/product_model.dart';
 import 'package:ankiishopii/pages/product/product_detail_page.dart';
@@ -22,6 +23,7 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
+  GlobalKey cartGlobalKey = GlobalKey();
   ProductBloc bloc = ProductBloc(ProductLoading());
 
   void refresh() {
@@ -54,6 +56,7 @@ class _ProductPageState extends State<ProductPage> {
         child: Column(
           children: <Widget>[
             InPageAppBar(
+              cartIconKey: cartGlobalKey,
               leading: GestureDetector(
                   child: Icon(
                     Icons.arrow_back_ios,
@@ -88,13 +91,12 @@ class _ProductPageState extends State<ProductPage> {
   Widget buildProducts(List<ProductModel> products) {
     List<Widget> children = products
         .map<Widget>((product) => CustomProductListItem(
+              cartIconKey: cartGlobalKey,
               onTap: () async {
                 await Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
                 refresh();
               },
-              image: CachedNetworkImageProvider(product.image),
-              title: product.name,
-              price: product.price.toString() + "đ",
+              product: product,
               priceTextColor: Colors.red,
               backgroundColor: FOREGROUND_COLOR,
               isFavorite: product.isFavoriteByCurrentUser,
@@ -102,6 +104,9 @@ class _ProductPageState extends State<ProductPage> {
                 bloc.add(DoFavorite(product));
 
                 refresh();
+              },
+              onAddToCart: () {
+                addToCart(context, productID: product.id);
               },
             ))
         .toList();
