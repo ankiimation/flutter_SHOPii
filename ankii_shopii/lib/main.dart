@@ -21,7 +21,7 @@ main() {
   runApp(MyApp());
 }
 
-
+GlobalKey navigatorPagedKey = GlobalKey();
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -30,8 +30,8 @@ class MyApp extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     return MultiBlocProvider(
         providers: [
-           BlocProvider<CartBloc>(create:   (context) => CartBloc()..add(LoadCart())),
-          BlocProvider<LoginBloc>(create:   (context) => LoginBloc()..add(GetCurrentLogin())),
+          BlocProvider<CartBloc>(create: (context) => CartBloc()..add(LoadCart())),
+          BlocProvider<LoginBloc>(create: (context) => LoginBloc()..add(GetCurrentLogin())),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -62,6 +62,8 @@ class MyApp extends StatelessWidget {
 }
 
 class LoadingScreen extends StatefulWidget {
+  static const routeName = 'loading';
+
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
 }
@@ -73,7 +75,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
     super.initState();
     load().then((value) {
       if (value) {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (b) => NavigatorPage()));
+//        Navigator.of(context).pushReplacementNamed('navigatorPage');
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (b) => NavigatorPage(
+                      key: navigatorPagedKey,
+                    )));
       }
     });
   }

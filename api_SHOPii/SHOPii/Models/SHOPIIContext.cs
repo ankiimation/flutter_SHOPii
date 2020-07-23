@@ -157,6 +157,11 @@ namespace SHOPii.Models
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnName("CREATED_DATE")
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.DeliveryId)
                     .HasColumnName("DELIVERY_ID")
                     .HasDefaultValueSql("((-1))");

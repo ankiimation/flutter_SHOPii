@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CategoriesPage extends StatefulWidget {
-  static const String routeName = "/categoriesPage";
+  static const String routeName = "categoriesPage";
   final ScrollController scrollController;
 
   CategoriesPage(this.scrollController);

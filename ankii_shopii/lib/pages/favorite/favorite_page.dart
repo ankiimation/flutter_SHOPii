@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class FavoritePage extends StatefulWidget {
-  static const String pageRoute = '/favoritePage';
+  static const String pageRoute = 'favoritePage';
   final ScrollController scrollController;
 
   FavoritePage(this.scrollController);

@@ -27,7 +27,9 @@ namespace SHOPii.Controllers
         public async Task<ActionResult<IEnumerable<Ordering>>> GetOrdering()
         {
             var username = User.Identity.Name;
-            return await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od=>od.Product).Where(o => o.Username.Equals(username)).ToListAsync();
+            var orders = await _context.Ordering.Include(o => o.OrderingDetail).Where(o => o.Username.Equals(username)).ToListAsync();
+         
+            return Ok(orders);
         }
 
         // GET: api/Orderings/5
@@ -35,7 +37,7 @@ namespace SHOPii.Controllers
         public async Task<ActionResult<Ordering>> GetOrdering(int id)
         {
             var username = User.Identity.Name;
-            var ordering = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od => od.Product).FirstOrDefaultAsync(o => o.Username.Equals(username));
+            var ordering = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od => od.Product).FirstOrDefaultAsync(o => o.Username.Equals(username) && o.Id == id);
 
             if (ordering == null)
             {
@@ -50,9 +52,9 @@ namespace SHOPii.Controllers
         {
             var username = User.Identity.Name;
             var cart = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od => od.Product).Where(o => o.Username.Equals(username) && o.Status == 0).FirstOrDefaultAsync();
-            if(cart == null)
+            if (cart == null)
             {
-                 cart = new Ordering();
+                cart = new Ordering();
                 cart.Username = username;
                 cart.Status = 0;
                 _context.Ordering.Add(cart);
@@ -111,18 +113,52 @@ namespace SHOPii.Controllers
             public int productID;
             public int count;
 
-            public DoOrderModel(int productID,int count)
+            public DoOrderModel(int productID, int count)
             {
                 this.productID = productID;
                 this.count = count;
             }
         }
 
-        [HttpPost("addToCart")]
-        public async Task<ActionResult<Ordering>> PostOrdering(DoOrderModel doOrderModel)
+        public class CheckOutHelperModel
+        {
+            public int orderingId;
+            public int? deliveryId;
+            public int status;
+
+            public CheckOutHelperModel(int orderingId, int? deliveryId, int status)
+            {
+                this.orderingId = orderingId;
+                this.deliveryId = deliveryId;
+                this.status = status;
+            }
+        }
+
+        [HttpPost("checkout")]
+        public async Task<ActionResult<Ordering>> checkOut(CheckOutHelperModel checkOutHelper)
+        {
+            var ordering = await _context.Ordering.FirstOrDefaultAsync(o => o.Id == checkOutHelper.orderingId);
+            if (ordering != null)
+            {
+
+                ordering.DeliveryId = checkOutHelper.deliveryId ?? -1;
+                ordering.Status = checkOutHelper.status;
+
+
+                _context.Ordering.Update(ordering);
+                await _context.SaveChangesAsync();
+                return Ok(ordering);
+
+            }
+            return NotFound();
+        }
+
+
+        [HttpPost("cart")]
+        public async Task<ActionResult<Ordering>> addToCart(DoOrderModel doOrderModel)
         {
             String username = User.Identity.Name;
-            var currentOrdering = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od=>od.Product).FirstOrDefaultAsync(o => o.Username.Equals(username) && o.Status == 0);
+            var currentOrdering = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od => od.Product).FirstOrDefaultAsync(o => o.Username.Equals(username) && o.Status == 0);
             if (currentOrdering != null)
             {
                 //get ordering detail via ordering id && product id
@@ -130,7 +166,7 @@ namespace SHOPii.Controllers
                 if (currentOrderingDetail != null)
                 {
                     currentOrderingDetail.Count += doOrderModel.count;
-                    if(currentOrderingDetail.Count < 0)
+                    if (currentOrderingDetail.Count < 0)
                     {
                         currentOrderingDetail.Count = 0;
                     }

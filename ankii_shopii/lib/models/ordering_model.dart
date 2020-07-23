@@ -6,6 +6,7 @@ class OrderingModel {
   int deliveryId;
   int status;
   DeliveryAddressModel delivery;
+  String createdDate;
   List<OrderingDetailModel> orderingDetail;
 
   OrderingModel({this.id, this.deliveryId, this.status, this.delivery, this.orderingDetail});
@@ -14,6 +15,7 @@ class OrderingModel {
     id = json['id'];
     deliveryId = json['deliveryId'];
     status = json['status'];
+    createdDate = json['createdDate'];
     delivery = json['delivery'] != null ? new DeliveryAddressModel.fromJson(json['delivery']) : null;
     if (json['orderingDetail'] != null) {
       orderingDetail = new List<OrderingDetailModel>();
@@ -28,6 +30,7 @@ class OrderingModel {
     data['id'] = this.id;
     data['deliveryId'] = this.deliveryId;
     data['status'] = this.status;
+    data['createdDate'] = this.createdDate;
     if (this.delivery != null) {
       data['delivery'] = this.delivery.toJson();
     }

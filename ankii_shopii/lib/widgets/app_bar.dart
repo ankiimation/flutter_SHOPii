@@ -3,6 +3,7 @@ import 'package:ankiishopii/blocs/cart_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/cart_bloc/state.dart';
 import 'package:ankiishopii/blocs/login_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/login_bloc/state.dart';
+import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/global/global_variable.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/pages/cart/cart_page.dart';
@@ -131,6 +132,7 @@ class CartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    refreshCart(context);
     return Container(
       margin: EdgeInsets.only(left: 15),
       child: Column(

@@ -5,6 +5,7 @@ import 'package:ankiishopii/widgets/notification_item.dart';
 import 'package:flutter/material.dart';
 
 class NotificationPage extends StatefulWidget {
+  static const String routeName = 'notificationPage';
   final ScrollController scrollController;
 
   NotificationPage(this.scrollController);

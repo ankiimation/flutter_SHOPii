@@ -10,6 +10,8 @@ const LOGIN_ENDPOINT = DOMAIN + 'login';
 const FAVORITE_ENDPOINT = DOMAIN + 'favorites';
 const ORDERING_ENDPOINT = DOMAIN + 'orderings';
 const CART_ENDPOINT = DOMAIN + 'orderings/cart';
+const CHECKOUT_ENDPOINT = DOMAIN + 'orderings/checkout';
+const DELIVERY_ADDRESS_ENDPOINT = DOMAIN + 'deliveryaddresses';
 
 class HttpHelper {
   static Future<http.Response> post(String url, Map<String, dynamic> body,{String bearerToken}) async {

@@ -35,7 +35,9 @@ dependencies:
   equatable:
   shared_preferences:
 
+
   #ui
+  intl:
   google_fonts:
   carousel_slider:
   cached_network_image:

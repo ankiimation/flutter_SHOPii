@@ -152,7 +152,7 @@ class _AccountPageState extends State<AccountPage> {
       elevation: 0,
       onPressed: () async {
         await LoginService().logOut();
-        refeshLogin(context);
+        refreshLogin(context);
         bloc.add(GetLocalAccount());
       },
       color: FOREGROUND_COLOR,

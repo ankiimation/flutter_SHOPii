@@ -5,6 +5,7 @@ import 'package:ankiishopii/global/global_variable.dart';
 import 'package:ankiishopii/helpers/http_helper.dart';
 import 'package:ankiishopii/helpers/shared_preferences_helper.dart';
 import 'package:ankiishopii/models/account_model.dart';
+import 'package:ankiishopii/models/login_model.dart';
 
 class AccountService extends BlocService<AccountModel> {
   @override
@@ -24,5 +25,12 @@ class AccountService extends BlocService<AccountModel> {
     currentLogin = login;
     if (login != null) return login.account;
     return null;
+  }
+
+  Future<AccountModel> updateAccountInfoToLocal(AccountModel accountModel) async {
+    var login = await LocalHelper.getAccountFromLocal();
+    login.account = accountModel;
+    var account = await LocalHelper.saveAccountToLocal(login);
+    return account;
   }
 }

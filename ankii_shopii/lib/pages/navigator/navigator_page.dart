@@ -8,7 +8,9 @@ import 'package:ankiishopii/pages/categories/categories_page.dart';
 import 'package:ankiishopii/pages/favorite/favorite_page.dart';
 import 'package:ankiishopii/pages/home/home_page.dart';
 import 'package:ankiishopii/pages/notification/notification_page.dart';
+import 'package:ankiishopii/pages/ordering/ordering_page.dart';
 import 'package:ankiishopii/pages/search/search_page.dart';
+import 'package:ankiishopii/routes.dart';
 import 'package:ankiishopii/themes/app_icon.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
@@ -21,10 +23,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../themes/constant.dart';
 import '../../themes/constant.dart';
 
-GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
 
 class NavigatorPage extends StatefulWidget {
-  static const String routeName = "/";
+
+  static const String routeName = "navigatorPage";
+  final int initPageIndex;
+
+  const NavigatorPage({Key key, this.initPageIndex = 0}):super(key:key );
 
   @override
   _NavigatorPageState createState() => _NavigatorPageState();
@@ -44,7 +50,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
     Navigator.pushNamed(context, SearchPage.routeName);
   }
 
-  void _changePage(int index) {
+  void changePage(int index) {
     if (index < 0 || index >= pages.length) {
       index = 0;
     }
@@ -66,6 +72,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     _scrollStreamController.stream.listen((isScrollUp) {
       hideTopBottomBar(isScrollUp);
     });
@@ -78,9 +85,10 @@ class _NavigatorPageState extends State<NavigatorPage> {
       HomePage(scrollController),
       CategoriesPage(scrollController),
       FavoritePage(scrollController),
-      NotificationPage(scrollController),
-     AccountPage(scrollController)
+      OrderingPage(scrollController),
+      AccountPage(scrollController)
     ];
+    _currentIndex = widget.initPageIndex;
   }
 
   @override
@@ -94,13 +102,12 @@ class _NavigatorPageState extends State<NavigatorPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
         backgroundColor: BACKGROUND_COLOR,
-       // appBar: buildAppBar(),
+        // appBar: buildAppBar(),
         drawer: buildDrawer(),
         body: PageView(
           onPageChanged: (index) {
-            _changePage(index);
+            changePage(index);
             setState(() {
               _isHideTopBottomBar = false;
             });
@@ -120,12 +127,13 @@ class _NavigatorPageState extends State<NavigatorPage> {
         currentIndex: _currentIndex,
         onChange: (index) {
           _pageController.animateToPage(index, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+
         },
         children: [
           CustomBottomNavigationItem(icon: Icons.store, label: 'Home', color: PRIMARY_COLOR),
           CustomBottomNavigationItem(icon: Icons.receipt, label: 'Categories', color: PRIMARY_COLOR),
           CustomBottomNavigationItem(icon: Icons.favorite, label: 'Favorite', color: PRIMARY_COLOR),
-          CustomBottomNavigationItem(icon: Icons.notifications, label: 'Notification', color: PRIMARY_COLOR),
+          CustomBottomNavigationItem(icon: Icons.reorder, label: 'Orders', color: PRIMARY_COLOR),
           CustomBottomNavigationItem(icon: Icons.account_circle, label: 'Account', color: PRIMARY_COLOR),
         ],
       ),
@@ -135,10 +143,10 @@ class _NavigatorPageState extends State<NavigatorPage> {
   Widget buildAppBar() {
     return CustomAppBar(
       backgroundColor: BACKGROUND_COLOR,
-     // padding: EdgeInsets.only(left: 5, right: 5),
+      // padding: EdgeInsets.only(left: 5, right: 5),
       appBar: AppBar(
         centerTitle: true,
-        elevation:0,
+        elevation: 0,
         backgroundColor: BACKGROUND_COLOR,
         title: AnimatedSwitcher(
           duration: Duration(milliseconds: 200),
@@ -184,7 +192,6 @@ class _NavigatorPageState extends State<NavigatorPage> {
             ),
           ),
           onTap: () {
-            _scaffoldKey.currentState.openDrawer();
           },
         ),
       ),

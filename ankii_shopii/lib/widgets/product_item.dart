@@ -376,3 +376,88 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
     );
   }
 }
+
+class CustomProductCheckOutItem extends StatelessWidget {
+  final OrderingDetailModel cartItem;
+  final Color priceTextColor;
+  final Color quickActionColor;
+
+  final Function onTap;
+  final Function onAddToCart;
+  final Function onFavourite;
+  final Color backgroundColor;
+  final bool isFavorite;
+
+  CustomProductCheckOutItem(
+      {this.backgroundColor = BACKGROUND_COLOR,
+      this.cartItem,
+      this.onTap,
+      this.onAddToCart,
+      this.onFavourite,
+      this.quickActionColor = PRIMARY_COLOR,
+      this.priceTextColor = Colors.red,
+      this.isFavorite = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        margin: EdgeInsets.only(left: 10, right: 10, top: 10),
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(100)),
+        child: Row(
+          children: <Widget>[
+            CircleAvatar(
+              radius: 40,
+              backgroundImage: CachedNetworkImageProvider(cartItem.product.image),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.only(right: 30),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      cartItem.product.name,
+                      style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text('Price:', style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                        Text('${cartItem.product.price}',
+                            textAlign: TextAlign.end,
+                            style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text('Quantity:',
+                            style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                        Text('x ${cartItem.count}',
+                            textAlign: TextAlign.end,
+                            style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text('Total:', style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                        Text('${cartItem.count * cartItem.product.price}',
+                            textAlign: TextAlign.end,
+                            style: DEFAULT_TEXT_STYLE.copyWith(
+                                fontSize: 18, fontWeight: FontWeight.bold, color: priceTextColor)),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            )
+          ],
+        ));
+  }
+}

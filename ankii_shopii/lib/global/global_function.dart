@@ -2,7 +2,9 @@ import 'package:ankiishopii/blocs/cart_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/cart_bloc/event.dart';
 import 'package:ankiishopii/blocs/login_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/login_bloc/event.dart';
+import 'package:ankiishopii/blocs/product_bloc/service.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
+import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/add_to_cart_effect.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,8 +19,37 @@ refreshCart(BuildContext context) async {
   BlocProvider.of<CartBloc>(context).add(LoadCart());
 }
 
-refeshLogin(BuildContext context) async {
+refreshLogin(BuildContext context) async {
   BlocProvider.of<LoginBloc>(context).add(GetCurrentLogin());
+}
+
+countOrderTotal(OrderingModel orderingModel) {
+  var total = 0;
+  for (var orderDetail in orderingModel.orderingDetail) {
+
+    total += orderDetail.count * orderDetail.product.price;
+  }
+  return total;
+}
+
+String getOrderStatus(OrderingModel orderingModel) {
+  var statusCode = orderingModel.status;
+  switch (statusCode) {
+    case 1:
+      return "Processing";
+      break;
+    case 2:
+      return "Delivering";
+      break;
+    case 3:
+      return "Complete";
+      break;
+    case 4:
+      return "Cancelled";
+      break;
+    default:
+      return "Unknown";
+  }
 }
 
 showAddToCartAnimation(BuildContext context,
@@ -33,10 +64,7 @@ showAddToCartAnimation(BuildContext context,
           start: start,
           end: end,
         );
-        return AddToCartAnimationOverlay(
-          start: CustomPosition(ScreenHelper.getWidth(context) - 100, ScreenHelper.getPaddingTop(context) + 100),
-          end: CustomPosition(ScreenHelper.getWidth(context) - 50, ScreenHelper.getPaddingTop(context)),
-        );
+//
       });
   await Future.delayed(Duration(milliseconds: 500));
   Navigator.pop(context);

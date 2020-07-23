@@ -22,6 +22,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProductDetailPage extends StatefulWidget {
+  static const String routeName = 'productDetailPage';
   final ProductModel product;
 
   ProductDetailPage(this.product);

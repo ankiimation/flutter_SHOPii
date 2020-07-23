@@ -5,6 +5,8 @@ import 'package:ankiishopii/blocs/cart_bloc/event.dart';
 import 'package:ankiishopii/blocs/cart_bloc/state.dart';
 import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:ankiishopii/models/product_model.dart';
+import 'package:ankiishopii/pages/checkout/check_out_page.dart';
+import 'package:ankiishopii/pages/product/product_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
@@ -15,6 +17,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CartPage extends StatefulWidget {
+  static const String routeName = 'cart';
   @override
   _CartPageState createState() => _CartPageState();
 }
@@ -29,10 +32,10 @@ class _CartPageState extends State<CartPage> {
     // TODO: implement initState
     super.initState();
     bloc = BlocProvider.of<CartBloc>(context);
-//    _scrollController.addListener(() {
-//      bool isScrollUp = _scrollController.position.userScrollDirection == ScrollDirection.reverse;
-//      _scrollStreamController.sink.add(isScrollUp);
-//    });
+    _scrollController.addListener(() {
+      bool isScrollUp = _scrollController.position.userScrollDirection == ScrollDirection.reverse;
+      _scrollStreamController.sink.add(isScrollUp);
+    });
   }
 
   @override
@@ -56,6 +59,7 @@ class _CartPageState extends State<CartPage> {
                     child: Container(
                       child: SingleChildScrollView(
                         controller: _scrollController,
+                        physics: AlwaysScrollableScrollPhysics(),
                         child: Column(
                           children: <Widget>[buildAppBar(), buildCartDetail(state.cart.orderingDetail)],
                         ),
@@ -115,7 +119,9 @@ class _CartPageState extends State<CartPage> {
                     ),
                   )),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () async {
+                      Navigator.push(context, MaterialPageRoute(builder: (b) => CheckOutPage(cart)));
+                    },
                     child: Container(
                       padding: EdgeInsets.all(10),
                       height: 55,
@@ -155,6 +161,9 @@ class _CartPageState extends State<CartPage> {
           children: orderingDetail.map<Widget>((od) {
             var product = od.product;
             return CustomProductCartItem(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+              },
               onDelete: () {
                 _removeFromCartConfirmDialog(
                     product: product,

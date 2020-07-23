@@ -155,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
           LoadingDialog.hideLoadingDialog(context);
           if (account != null) {
             refreshCart(context);
-            refeshLogin(context);
+            refreshLogin(context);
             Navigator.pop(context);
           } else {
             await showDialog(

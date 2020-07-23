@@ -21,7 +21,7 @@ const double _leftRightMargin = 20;
 const double _topBottomMargin = 10;
 
 class HomePage extends StatefulWidget {
-  static const String routeName = "/homePage";
+  static const String routeName = "homePage";
   final ScrollController scrollController;
 
   HomePage(this.scrollController);
