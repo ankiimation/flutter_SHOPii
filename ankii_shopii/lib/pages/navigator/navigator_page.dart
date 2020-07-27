@@ -14,6 +14,7 @@ import 'package:ankiishopii/routes.dart';
 import 'package:ankiishopii/themes/app_icon.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/bottom_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -160,7 +161,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
           ),
         ),
         actions: <Widget>[
-          GestureDetector(
+          CustomOnTapWidget(
             child: Container(
               margin: EdgeInsets.only(right: 20),
               child: Icon(
@@ -172,7 +173,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
               _openCloseSearchInput();
             },
           ),
-          GestureDetector(
+          CustomOnTapWidget(
             child: Container(
               margin: EdgeInsets.only(right: 5),
               child: Icon(
@@ -183,7 +184,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
             onTap: () {},
           )
         ],
-        leading: GestureDetector(
+        leading: CustomOnTapWidget(
           child: Container(
             margin: EdgeInsets.only(right: 5),
             child: Icon(

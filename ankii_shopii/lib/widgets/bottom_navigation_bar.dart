@@ -1,6 +1,8 @@
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:flutter/material.dart';
 
+import 'base/custom_ontap_widget.dart';
+
 class CustomBottomNavigationBar extends StatefulWidget {
   final bool barShadow;
   final Color backgroundColor;
@@ -49,7 +51,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           var icon = item.icon;
           var label = item.label;
           int index = widget.children.indexOf(item);
-          return GestureDetector(
+          return CustomOnTapWidget(
             onTap: () {
               _changeIndex(index);
             },

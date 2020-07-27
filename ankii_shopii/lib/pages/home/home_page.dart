@@ -176,7 +176,7 @@ class _HomePageState extends State<HomePage> {
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.center,
                                         style: DEFAULT_TEXT_STYLE.copyWith(
-                                          color: Colors.red,
+                                          color: PRICE_COLOR,
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),

@@ -1,4 +1,5 @@
 import 'package:ankiishopii/global/global_function.dart';
+import 'package:ankiishopii/helpers/string_helper.dart';
 import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +66,7 @@ class CustomOrderItem extends StatelessWidget {
         statusColor = Colors.green;
         break;
       case 4:
-        statusColor = Colors.red;
+        statusColor = PRICE_COLOR;
         break;
       default:
         statusColor = Colors.black26;
@@ -77,39 +78,83 @@ class CustomOrderItem extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                'Order: ${orderingModel.id}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
-              ),
-              Text(
-                'Created date: ${DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.parse(orderingModel.createdDate))}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.end,
-                style: DEFAULT_TEXT_STYLE.copyWith(
-                    fontWeight: FontWeight.bold, fontSize: 10, color: PRIMARY_COLOR.withOpacity(0.5)),
-              ),
-              Text(
-                'Total: ${countOrderTotal(orderingModel)}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20),
-              ),
-              Text(
-                'Status: ${getOrderStatus(orderingModel)}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.end,
-                style: DEFAULT_TEXT_STYLE.copyWith(
-                    fontWeight: FontWeight.bold, fontSize: 12, color: PRIMARY_COLOR,letterSpacing: 1.2),
-              )
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      'Order: ',
+                      style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
+                    ),
+                    Text(
+                      '${orderingModel.id}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      'Created: ',
+                      style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                    Text(
+                      ' ${DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.parse(orderingModel.createdDate))}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: DEFAULT_TEXT_STYLE.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: PRIMARY_COLOR.withOpacity(0.5),
+                          letterSpacing: 1.2),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      'Total: ',
+                      style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      '${numberToMoneyString(countOrderTotal(orderingModel))}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, fontWeight: FontWeight.bold, color: PRICE_COLOR),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      'Status: ',
+                      style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      '${getOrderStatus(orderingModel)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: DEFAULT_TEXT_STYLE.copyWith(
+                          fontWeight: FontWeight.bold, fontSize: 14, color: PRIMARY_COLOR, letterSpacing: 1.2),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            width: 20,
           ),
           CircleAvatar(
             radius: 20,

@@ -196,7 +196,7 @@ class _LoginPageState extends State<LoginPage> {
             icon: Icon(
               FontAwesomeIcons.google,
               size: 30,
-              color: Colors.redAccent,
+              color: PRICE_COLOR,
             ),
             onPressed: () {}),
       ],

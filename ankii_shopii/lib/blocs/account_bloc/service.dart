@@ -27,10 +27,21 @@ class AccountService extends BlocService<AccountModel> {
     return null;
   }
 
-  Future<AccountModel> updateAccountInfoToLocal(AccountModel accountModel) async {
+  Future<AccountModel> _updateAccountInfoToLocal(AccountModel accountModel) async {
     var login = await LocalHelper.getAccountFromLocal();
     login.account = accountModel;
     var account = await LocalHelper.saveAccountToLocal(login);
+    currentLogin = login;
     return account;
+  }
+
+  Future<AccountModel> updateDefaultDeliveryId(int deliveryId) async {
+    var rs = await HttpHelper.put(ACCOUNT_ENDPOINT + "/defaultDeliveryId", {"deliveryId": deliveryId}, bearerToken: currentLogin.token);
+    if (rs.statusCode == 200) {
+      var jsonObject = jsonDecode(rs.body);
+      var currentAccount = AccountModel.fromJson(jsonObject);
+      return await _updateAccountInfoToLocal(currentAccount);
+    }
+    return null;
   }
 }

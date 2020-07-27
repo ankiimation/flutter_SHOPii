@@ -6,6 +6,7 @@ import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:ankiishopii/pages/ordering/ordering_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
 import 'package:ankiishopii/widgets/notification_item.dart';
 import 'package:flutter/material.dart';
@@ -42,30 +43,34 @@ class _OrderingPageState extends State<OrderingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: BACKGROUND_COLOR,
-      body: BlocBuilder(
-          bloc: bloc,
-          builder: (context, state) {
-            if (state is AllOrderingLoaded) {
-              return SingleChildScrollView(
-                  controller: widget.scrollController,
-                  child: Column(
-                    children: <Widget>[
-                      InPageAppBar(
-                        title: 'Orders',
+      body: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        controller: widget.scrollController,
+        child: Column(
+          children: <Widget>[
+            InPageAppBar(
+              title: 'Orders',
+            ),
+            BlocBuilder(
+                cubit: bloc,
+                builder: (context, state) {
+                  if (state is AllOrderingLoaded) {
+                    return buildOrders(state.orderings);
+                  } else if (state is AllOrderingLoadError) {
+                    return Center(
+                      child: CustomErrorWidget(
+                        error: state.error,
                       ),
-                      buildOrders(state.orderings),
-                    ],
-                  ));
-            } else if (state is AllOrderingLoadError) {
-              return Center(
-                child: CustomErrorWidget(),
-              );
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          }),
+                    );
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                }),
+          ],
+        ),
+      ),
     );
   }
 
@@ -75,7 +80,7 @@ class _OrderingPageState extends State<OrderingPage> {
       margin: EdgeInsets.only(left: 20, right: 20),
       child: Column(
         children: orders.map((o) {
-          return GestureDetector(
+          return CustomOnTapWidget(
             onTap: () async {
               await Navigator.push(context, MaterialPageRoute(builder: (b) => OrderingDetailPage(o)));
             },

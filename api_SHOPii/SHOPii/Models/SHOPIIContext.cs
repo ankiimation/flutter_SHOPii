@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Configuration;
 
 namespace SHOPii.Models
 {
@@ -30,7 +29,7 @@ namespace SHOPii.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("Database")["ConnectionString"]);
+                optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=SHOPII;Integrated Security=True");
             }
         }
 
@@ -49,6 +48,10 @@ namespace SHOPii.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Address).HasColumnName("ADDRESS");
+
+                entity.Property(e => e.DefaultDeliveryId)
+                    .HasColumnName("DEFAULT_DELIVERY_ID")
+                    .HasDefaultValueSql("((-1))");
 
                 entity.Property(e => e.Fullname).HasColumnName("FULLNAME");
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:ankiishopii/blocs/account_bloc/service.dart';
 import 'package:ankiishopii/blocs/checkout_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/checkout_bloc/event.dart';
 import 'package:ankiishopii/blocs/checkout_bloc/service.dart';
@@ -8,13 +9,19 @@ import 'package:ankiishopii/blocs/delivery_address_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/delivery_address_bloc/event.dart';
 import 'package:ankiishopii/blocs/delivery_address_bloc/state.dart';
 import 'package:ankiishopii/global/global_function.dart';
+import 'package:ankiishopii/global/global_variable.dart';
+import 'package:ankiishopii/helpers/media_query_helper.dart';
+import 'package:ankiishopii/helpers/string_helper.dart';
 import 'package:ankiishopii/models/account_model.dart';
 import 'package:ankiishopii/models/ordering_model.dart';
+import 'package:ankiishopii/pages/delivery_address/delivery_address_page.dart';
 import 'package:ankiishopii/pages/navigator/navigator_page.dart';
 import 'package:ankiishopii/pages/ordering/ordering_detail_page.dart';
 import 'package:ankiishopii/pages/product/product_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
+import 'package:ankiishopii/widgets/loading_dialog.dart';
 import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +50,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
     // TODO: implement initState
     super.initState();
     bloc.add(GetCheckout(widget.cart));
-    deliveryAddressBloc.add(GetDeliveryAddress(widget.cart.deliveryId));
+
+    deliveryAddressBloc.add(GetDeliveryAddress(
+        widget.cart.deliveryId != -1 ? widget.cart.deliveryId : currentLogin.account.defaultDeliveryId));
     _scrollController.addListener(() {
       bool isScrollUp = _scrollController.position.userScrollDirection == ScrollDirection.reverse;
       _scrollStreamController.sink.add(isScrollUp);
@@ -61,42 +70,45 @@ class _CheckOutPageState extends State<CheckOutPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: BACKGROUND_COLOR,
-      body: BlocBuilder(
-          bloc: bloc,
-          builder: (context, state) {
-            if (state is CheckoutLoaded) {
-              return Stack(
-                children: <Widget>[
-                  Column(
-                    children: <Widget>[
-                      Expanded(
-                          child: SingleChildScrollView(
-                        controller: _scrollController,
-                        physics: AlwaysScrollableScrollPhysics(),
-                        child: Column(
-                          children: <Widget>[
-                            buildAppBar(),
-                            buildDivider(),
-                            buildDelivery(state.checkoutModel),
-                            buildDivider(),
-                            buildPaymentMethod(),
-                            buildDivider(),
-                            buildListOrderDetail(state.checkoutModel.orderingDetail),
-                          ],
-                        ),
-                      ))
-                    ],
-                  ),
-                  buildBottomBar(state.checkoutModel)
-                ],
+    return WillPopScope(
+      onWillPop: () {},
+      child: Scaffold(
+        backgroundColor: BACKGROUND_COLOR,
+        body: BlocBuilder(
+            cubit: bloc,
+            builder: (context, state) {
+              if (state is CheckoutLoaded) {
+                return Stack(
+                  children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Expanded(
+                            child: SingleChildScrollView(
+                          controller: _scrollController,
+                          physics: AlwaysScrollableScrollPhysics(),
+                          child: Column(
+                            children: <Widget>[
+                              buildAppBar(),
+                              buildDivider(),
+                              buildDelivery(state.checkoutModel),
+                              buildDivider(),
+                              buildPaymentMethod(),
+                              buildDivider(),
+                              buildListOrderDetail(state.checkoutModel.orderingDetail),
+                            ],
+                          ),
+                        ))
+                      ],
+                    ),
+                    buildBottomBar(state.checkoutModel)
+                  ],
+                );
+              }
+              return Center(
+                child: Text('error'),
               );
-            }
-            return Center(
-              child: Text('error'),
-            );
-          }),
+            }),
+      ),
     );
   }
 
@@ -104,7 +116,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
     return InPageAppBar(
       title: 'Check Out',
       showCartButton: false,
-      leading: GestureDetector(
+      leading: CustomOnTapWidget(
         onTap: () {
           Navigator.pop(context);
         },
@@ -143,18 +155,22 @@ class _CheckOutPageState extends State<CheckOutPage> {
                           style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          '$total đ',
+                          '${numberToMoneyString(total)} đ',
                           style: DEFAULT_TEXT_STYLE.copyWith(
-                              fontWeight: FontWeight.bold, fontSize: 20, color: Colors.redAccent),
+                              fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR),
                         )
                       ],
                     ),
                   )),
-                  orderingModel.deliveryId == -1 || orderingModel.status > 0
+                  (orderingModel.deliveryId == -1 && currentLogin.account.defaultDeliveryId == -1) ||
+                          orderingModel.status > 0
                       ? Container()
-                      : GestureDetector(
+                      : CustomOnTapWidget(
                           onTap: () {
-                            if (!_isDoingCheckoutConfirm) confirmCheckout(orderingModel);
+                            if (!_isDoingCheckoutConfirm) {
+                              LoadingDialog.showLoadingDialog(context, text: 'Processing...', hideOnBackButton: false);
+                              confirmCheckout(orderingModel);
+                            }
                           },
                           child: Container(
                             padding: EdgeInsets.all(10),
@@ -162,7 +178,10 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             width: 110,
                             color: FOREGROUND_COLOR,
                             child: _isDoingCheckoutConfirm
-                                ? Center(child: CircularProgressIndicator())
+                                ? Center(
+                                    child: CircularProgressIndicator(
+                                    backgroundColor: PRIMARY_COLOR,
+                                  ))
                                 : Icon(
                                     Icons.check,
                                     size: 25,
@@ -195,7 +214,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
   }
 
   Widget buildDelivery(OrderingModel orderingModel) {
-    return GestureDetector(
+    return CustomOnTapWidget(
       onTap: () {
         showAddressChooserDialog(orderingModel);
       },
@@ -203,9 +222,10 @@ class _CheckOutPageState extends State<CheckOutPage> {
         margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         padding: EdgeInsets.all(10),
         child: BlocBuilder(
-            bloc: deliveryAddressBloc,
+            cubit: deliveryAddressBloc,
             builder: (context, state) {
               if (state is DeliveryAddressLoaded) {
+                orderingModel.deliveryId = state.deliveryAddress.id;
                 return Row(
                   children: <Widget>[
                     Expanded(
@@ -310,8 +330,14 @@ class _CheckOutPageState extends State<CheckOutPage> {
   }
 
   showAddressChooserDialog(OrderingModel orderingModel) async {
-    var rs =
-        await showDialog(context: context, barrierDismissible: false, child: Dialog(child: AddressChooserDialog()));
+    var rs = await showDialog(
+      builder: (_) {
+        return Dialog(
+            child: AddressChooserDialog(orderingModel));
+      },
+      context: context,
+      barrierDismissible: false,
+    );
     if (rs != null && rs is DeliveryAddressModel) {
       await CheckoutService().checkOut(orderingModel, deliveryId: rs.id);
       deliveryAddressBloc.add(GetDeliveryAddress(rs.id));
@@ -337,135 +363,5 @@ class _CheckOutPageState extends State<CheckOutPage> {
     }
 
     return isCheckOutOk;
-  }
-}
-
-class AddressChooserDialog extends StatefulWidget {
-  @override
-  _AddressChooserDialogState createState() => _AddressChooserDialogState();
-}
-
-class _AddressChooserDialogState extends State<AddressChooserDialog> {
-  DeliveryAddressBloc bloc = DeliveryAddressBloc();
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    bloc.add(GetAllDeliveryAddresses());
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    bloc.close();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: BACKGROUND_COLOR,
-      body: Container(
-        child: SingleChildScrollView(
-          child: BlocBuilder(
-              bloc: bloc,
-              builder: (context, state) {
-                if (state is AllDeliveryAddressesLoaded) {
-                  return buildListAddress(state.deliveryAddresses);
-                } else if (state is DeliveryAddressLoading) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                return Center(
-                  child: Text('You dont have any addresses!!'),
-                );
-              }),
-        ),
-      ),
-    );
-  }
-
-  Widget buildListAddress(List<DeliveryAddressModel> deliveryAddresses) {
-    return Column(children: deliveryAddresses.map<Widget>((address) => addressItem(address)).toList());
-  }
-
-  Widget addressItem(DeliveryAddressModel deliveryAddressModel) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pop(context, deliveryAddressModel);
-      },
-      child: Container(
-          margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: FOREGROUND_COLOR,
-          ),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Expanded(flex: 1, child: Text('Name:')),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            deliveryAddressModel.fullname,
-                            textAlign: TextAlign.right,
-                            style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Expanded(flex: 1, child: Text('Address:')),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            deliveryAddressModel.address,
-                            textAlign: TextAlign.right,
-                            style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Expanded(flex: 1, child: Text('Phone:')),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            deliveryAddressModel.phoneNumber,
-                            textAlign: TextAlign.right,
-                            style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              )
-            ],
-          )),
-    );
   }
 }

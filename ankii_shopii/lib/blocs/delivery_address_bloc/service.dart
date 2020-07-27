@@ -27,4 +27,19 @@ class DeliveryAddressService extends BlocService<DeliveryAddressModel> {
     }
     return null;
   }
+
+  Future<DeliveryAddressModel> addDeliveryAddress(DeliveryAddressModel deliveryAddressModel) async {
+    var rs = await HttpHelper.post(DELIVERY_ADDRESS_ENDPOINT, {
+      "fullname":deliveryAddressModel.fullname,
+      "address":deliveryAddressModel.address,
+      "phoneNumber":deliveryAddressModel.phoneNumber
+    },
+        bearerToken: currentLogin.token);
+   // print(rs.body);
+    if (rs.statusCode == 200) {
+      var jsonObject = jsonDecode(rs.body);
+      return DeliveryAddressModel.fromJson(jsonObject);
+    }
+    return null;
+  }
 }

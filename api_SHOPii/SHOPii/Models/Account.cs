@@ -18,6 +18,7 @@ namespace SHOPii.Models
         public string Fullname { get; set; }
         public string Address { get; set; }
         public string Image { get; set; }
+        public int DefaultDeliveryId { get; set; }
 
         public virtual ICollection<DeliveryAddress> DeliveryAddress { get; set; }
         public virtual ICollection<Favorite> Favorite { get; set; }

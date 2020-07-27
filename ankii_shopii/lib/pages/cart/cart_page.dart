@@ -3,13 +3,17 @@ import 'dart:async';
 import 'package:ankiishopii/blocs/cart_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/cart_bloc/event.dart';
 import 'package:ankiishopii/blocs/cart_bloc/state.dart';
+import 'package:ankiishopii/helpers/media_query_helper.dart';
+import 'package:ankiishopii/helpers/string_helper.dart';
 import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:ankiishopii/models/product_model.dart';
 import 'package:ankiishopii/pages/checkout/check_out_page.dart';
 import 'package:ankiishopii/pages/product/product_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
+import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +22,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CartPage extends StatefulWidget {
   static const String routeName = 'cart';
+
   @override
   _CartPageState createState() => _CartPageState();
 }
@@ -50,7 +55,7 @@ class _CartPageState extends State<CartPage> {
     return Scaffold(
       backgroundColor: BACKGROUND_COLOR,
       body: BlocBuilder(
-          bloc: bloc,
+          cubit: bloc,
           builder: (context, state) {
             if (state is CartLoaded) {
               return Column(
@@ -111,14 +116,14 @@ class _CartPageState extends State<CartPage> {
                           style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          total.toString() + "d",
+                          numberToMoneyString(total) + "d",
                           style: DEFAULT_TEXT_STYLE.copyWith(
-                              fontWeight: FontWeight.bold, fontSize: 20, color: Colors.redAccent),
+                              fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR),
                         )
                       ],
                     ),
                   )),
-                  GestureDetector(
+                  CustomOnTapWidget(
                     onTap: () async {
                       Navigator.push(context, MaterialPageRoute(builder: (b) => CheckOutPage(cart)));
                     },
@@ -145,7 +150,7 @@ class _CartPageState extends State<CartPage> {
     return InPageAppBar(
       title: 'Cart',
       showCartButton: false,
-      leading: GestureDetector(
+      leading: CustomOnTapWidget(
         onTap: () {
           Navigator.pop(context);
         },
@@ -155,6 +160,7 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget buildCartDetail(List<OrderingDetailModel> orderingDetail) {
+    // and later, before the timer goes off...
     if (orderingDetail.length > 0) {
       return Container(
         child: Column(
@@ -172,7 +178,8 @@ class _CartPageState extends State<CartPage> {
                     });
               },
               onIncreaseQuantity: () {
-                bloc.add(AddToCart(productID: product.id, count: 1));
+                _onIncreaseItem(od);
+                //   bloc.add(AddToCart(productID: product.id, count: 1));
               },
               onDecreaseQuantity: () {
                 if (od.count - 1 <= 0) {
@@ -182,7 +189,8 @@ class _CartPageState extends State<CartPage> {
                         bloc.add(AddToCart(productID: product.id, count: -1));
                       });
                 } else {
-                  bloc.add(AddToCart(productID: product.id, count: -1));
+                  _onDecreaseItem(od);
+                  //     bloc.add(AddToCart(productID: product.id, count: -1));
                 }
               },
               backgroundColor: FOREGROUND_COLOR,
@@ -195,9 +203,45 @@ class _CartPageState extends State<CartPage> {
         ),
       );
     }
-    return Center(
-      child: Text('Nothing here :)'),
+    return Container(
+      height: ScreenHelper.getSafeHeight(context),
+      alignment: Alignment.center,
+      child: CustomEmptyWidget(
+        backgroundColor: FOREGROUND_COLOR,
+        title: Icon(
+          Icons.remove_shopping_cart,
+          color: PRIMARY_COLOR,
+          size: 50,
+        ),
+      ),
     );
+  }
+
+  Timer _increaseTimer;
+  _onIncreaseItem(OrderingDetailModel od) {
+    setState(() {
+      od.count++;
+    });
+    if (_increaseTimer != null) {
+      _increaseTimer.cancel();
+    }
+    _increaseTimer = Timer(Duration(seconds: 1), () {
+      bloc.add(AddToCart(productID: od.product.id, count: 1));
+    });
+  }
+
+  Timer _decreaseTimer;
+
+  _onDecreaseItem(OrderingDetailModel od) {
+    setState(() {
+      od.count--;
+    });
+    if (_increaseTimer != null) {
+      _increaseTimer.cancel();
+    }
+    _increaseTimer = Timer(Duration(seconds: 1), () {
+      bloc.add(AddToCart(productID: od.product.id, count: -1));
+    });
   }
 
   _removeFromCartConfirmDialog({@required ProductModel product, @required Function onYes}) {

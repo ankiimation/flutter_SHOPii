@@ -11,74 +11,19 @@ class CustomPosition {
   CustomPosition(this.left, this.top);
 }
 
+
 class AddToCartAnimationOverlay extends StatefulWidget {
+  final Widget overlayWidget;
   final CustomPosition start;
   final CustomPosition end;
 
-  AddToCartAnimationOverlay({@required this.start, @required this.end});
+  AddToCartAnimationOverlay({@required this.start, @required this.end, this.overlayWidget});
 
   @override
   _AddToCartAnimationOverlayState createState() => _AddToCartAnimationOverlayState();
 }
 
-class _AddToCartAnimationOverlayState extends State<AddToCartAnimationOverlay> {
-  double top;
-
-  double left;
-
-  @override
-  void initState() {
-    super.initState();
-    top = widget.start.top;
-    left = widget.start.left;
-    Future.delayed(Duration(milliseconds: 100), () {
-      setState(() {
-        top = widget.end.top;
-        left = widget.end.left;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
-        children: <Widget>[
-          Container(),
-          AnimatedPositioned(
-              duration: Duration(milliseconds: 500),
-              top: top,
-              left: left,
-              width: 30,
-              height: 30,
-              child: Icon(
-                Icons.add_shopping_cart,
-                color: FOREGROUND_COLOR,
-              )),
-        ],
-      ),
-    );
-  }
-}
-
-class AddToCartAnimationOverlayTest extends StatefulWidget {
-  final Widget overlayWidget;
-  final CustomPosition start;
-  final CustomPosition end;
-
-  AddToCartAnimationOverlayTest({@required this.start, @required this.end, this.overlayWidget});
-
-  @override
-  _AddToCartAnimationOverlayTestState createState() => _AddToCartAnimationOverlayTestState();
-}
-
-class _AddToCartAnimationOverlayTestState extends State<AddToCartAnimationOverlayTest>
+class _AddToCartAnimationOverlayState extends State<AddToCartAnimationOverlay>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
   Animation _animation;

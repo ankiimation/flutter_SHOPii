@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import 'base/custom_ontap_widget.dart';
+
 class CustomTabView extends StatefulWidget {
   final bool barShadow;
   final Color backgroundColor;
@@ -79,7 +81,7 @@ class _CustomTabViewState extends State<CustomTabView> {
               var label = child.label;
               var index = widget.children.indexOf(child);
 
-              return GestureDetector(
+              return CustomOnTapWidget(
                   onTap: () {
                     onTapChangePage(index);
                   },

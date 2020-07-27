@@ -34,6 +34,7 @@ dependencies:
   dio:
   equatable:
   shared_preferences:
+  rxdart:
 
 
   #ui
@@ -42,6 +43,8 @@ dependencies:
   carousel_slider:
   cached_network_image:
   font_awesome_flutter:
+
+  #local
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +67,8 @@ flutter:
     - family: Jura
       fonts:
         - asset: assets/fonts/Jura.ttf
+  assets:
+    - assets/cliparts/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

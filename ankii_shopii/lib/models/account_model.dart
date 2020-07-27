@@ -7,6 +7,7 @@ class AccountModel {
   String fullname;
   String address;
   String image;
+  int defaultDeliveryId;
   List<DeliveryAddressModel> deliveryAddress;
   List<FavoriteModel> favorite;
 
@@ -18,7 +19,7 @@ class AccountModel {
       this.fullname,
       this.address,
       this.image,
-      this.deliveryAddress});
+      this.deliveryAddress,this.defaultDeliveryId});
 
   AccountModel.fromJson(Map<String, dynamic> json) {
     username = json['username'];
@@ -26,6 +27,7 @@ class AccountModel {
     phoneNumber = json['phoneNumber'];
     fullname = json['fullname'];
     image = json['image'];
+    defaultDeliveryId = json['defaultDeliveryId'];
     address = json['address'];
     if (json['deliveryAddress'] != null) {
       deliveryAddress = new List<DeliveryAddressModel>();
@@ -49,6 +51,7 @@ class AccountModel {
     data['fullname'] = this.fullname;
     data['address'] = this.address;
     data['image'] = this.image;
+    data['defaultDeliveryId'] = this.defaultDeliveryId;
     if (this.deliveryAddress != null) {
       data['deliveryAddress'] = this.deliveryAddress.map((v) => v.toJson()).toList();
     }

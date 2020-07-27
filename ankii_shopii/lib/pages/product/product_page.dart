@@ -7,6 +7,7 @@ import 'package:ankiishopii/models/product_model.dart';
 import 'package:ankiishopii/pages/product/product_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
 import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -24,7 +25,7 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  GlobalKey cartGlobalKey = GlobalKey();
+  GlobalKey<CartWidgetState> cartGlobalKey = GlobalKey();
   ProductBloc bloc = ProductBloc(ProductLoading());
 
   void refresh() {
@@ -58,7 +59,7 @@ class _ProductPageState extends State<ProductPage> {
           children: <Widget>[
             InPageAppBar(
               cartIconKey: cartGlobalKey,
-              leading: GestureDetector(
+              leading: CustomOnTapWidget(
                   child: Icon(
                     Icons.arrow_back_ios,
                     size: 20,
@@ -69,7 +70,7 @@ class _ProductPageState extends State<ProductPage> {
               title: widget.category != null ? widget.category.name : 'Tất cả',
             ),
             BlocBuilder(
-                bloc: bloc,
+                cubit: bloc,
                 builder: (context, state) {
                   if (state is ProductLoadingError) {
                     return Center(
@@ -98,7 +99,7 @@ class _ProductPageState extends State<ProductPage> {
                 refresh();
               },
               product: product,
-              priceTextColor: Colors.red,
+              priceTextColor: PRICE_COLOR,
               backgroundColor: FOREGROUND_COLOR,
               isFavorite: product.isFavoriteByCurrentUser,
               onFavourite: () {

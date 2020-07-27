@@ -9,7 +9,7 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="SHOPii"
         android:icon="@mipmap/ic_launcher">
-        <activity
+    <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
@@ -43,5 +43,6 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
     </application>
 </manifest>

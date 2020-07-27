@@ -27,11 +27,14 @@ class OrderingBloc extends Bloc<OrderingEvent, OrderingState> {
   }
 
   Stream<OrderingState> mapGetAllOrderingToState(GetAllOrdering event) async* {
+    try{
     var rs = await OrderingService().getAll();
     if (rs != null) {
       yield AllOrderingLoaded(rs);
     } else {
-      yield AllOrderingLoadError();
+      yield AllOrderingLoadError('Null');
+    }}catch(e){
+      yield AllOrderingLoadError('Not Logged In');
     }
   }
 }

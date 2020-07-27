@@ -1,0 +1,235 @@
+import 'package:ankiishopii/blocs/delivery_address_bloc/bloc.dart';
+import 'package:ankiishopii/blocs/delivery_address_bloc/event.dart';
+import 'package:ankiishopii/blocs/delivery_address_bloc/state.dart';
+import 'package:ankiishopii/global/global_variable.dart';
+import 'package:ankiishopii/models/account_model.dart';
+import 'package:ankiishopii/models/ordering_model.dart';
+import 'package:ankiishopii/pages/delivery_address/add_delivery_address_page.dart';
+import 'package:ankiishopii/themes/constant.dart';
+import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class AddressChooserDialog extends StatefulWidget {
+  final OrderingModel currentCheckout;
+
+  AddressChooserDialog(this.currentCheckout);
+
+  @override
+  _AddressChooserDialogState createState() => _AddressChooserDialogState();
+}
+
+class _AddressChooserDialogState extends State<AddressChooserDialog> {
+  DeliveryAddressBloc bloc = DeliveryAddressBloc();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    bloc.add(GetAllDeliveryAddresses());
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    bloc.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: BACKGROUND_COLOR,
+      body: Container(
+        child: SingleChildScrollView(
+          child: BlocBuilder(
+              cubit: bloc,
+              builder: (context, state) {
+                if (state is AllDeliveryAddressesLoaded) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      buildAddNewAddressButton(),
+                      buildListAddress(state.deliveryAddresses),
+                    ],
+                  );
+                } else if (state is DeliveryAddressLoading) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return Center(
+                  child: Text('You dont have any addresses!!'),
+                );
+              }),
+        ),
+      ),
+    );
+  }
+
+  Widget buildAddNewAddressButton() {
+    return CustomOnTapWidget(
+      onTap: () async {
+        await Navigator.push(context, MaterialPageRoute(builder: (b) => AddDeliveryAddressPage()));
+        bloc.add(GetAllDeliveryAddresses());
+      },
+      child: Container(
+          color: PRIMARY_COLOR,
+          width: double.maxFinite,
+          height: 50,
+          padding: EdgeInsets.all(10),
+          child: Icon(
+            Icons.add,
+            color: FOREGROUND_COLOR,
+          )),
+    );
+  }
+
+  Widget buildListAddress(List<DeliveryAddressModel> deliveryAddresses) {
+    return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: deliveryAddresses
+            .map<Widget>((address) =>
+                Container(margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10), child: addressItem(address)))
+            .toList());
+  }
+
+  Widget addressItem(DeliveryAddressModel deliveryAddressModel) {
+    bool isDefault = deliveryAddressModel.id == currentLogin.account.defaultDeliveryId;
+    return Column(
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: CustomOnTapWidget(
+                onTap: () async {
+                  // AccountService accountService = AccountService();
+                  if (isDefault) {
+                    isDefault = false;
+                    bloc.add(SetDefaultDeliveryAddress(-1));
+                    //bloc.add(GetAllDeliveryAddresses());
+                  } else {
+                    isDefault = true;
+                    bloc.add(SetDefaultDeliveryAddress(deliveryAddressModel.id));
+                    // bloc.add(GetAllDeliveryAddresses());
+                  }
+                  //   print('Current: ' + currentLogin.account.defaultDeliveryId.toString());
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: double.maxFinite,
+                  height: 30,
+                  color: isDefault ? PRIMARY_COLOR : PRIMARY_COLOR.withOpacity(0.1),
+                  child: isDefault
+                      ? Text(
+                          'Default Address',
+                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, color: FOREGROUND_COLOR),
+                        )
+                      : Text(
+                          'Tap to set default delivery address',
+                          style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 12),
+                        ),
+                ),
+              ),
+            ),
+            Row(
+              children: <Widget>[
+                CustomOnTapWidget(
+                    onTap: () {},
+                    child: Container(
+                      height: 30,
+                      width: 30,
+                      color: FOREGROUND_COLOR,
+                      child: Icon(
+                        Icons.edit,
+                        size: 20,
+                      ),
+                    )),
+                CustomOnTapWidget(
+                    onTap: () {},
+                    child: Container(
+                      height: 30,
+                      width: 30,
+                      color: PRICE_COLOR,
+                      child: Icon(
+                        Icons.delete,
+                        color: BACKGROUND_COLOR,
+                        size: 20,
+                      ),
+                    )),
+              ],
+            )
+          ],
+        ),
+        CustomOnTapWidget(
+          onTap: () {
+            Navigator.pop(context, deliveryAddressModel);
+          },
+          child: Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: FOREGROUND_COLOR,
+              ),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(flex: 1, child: Text('Name:')),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          deliveryAddressModel.fullname,
+                          textAlign: TextAlign.right,
+                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(flex: 1, child: Text('Address:')),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          deliveryAddressModel.address,
+                          textAlign: TextAlign.right,
+                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(flex: 1, child: Text('Phone:')),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          deliveryAddressModel.phoneNumber,
+                          textAlign: TextAlign.right,
+                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              )),
+        ),
+      ],
+    );
+  }
+}

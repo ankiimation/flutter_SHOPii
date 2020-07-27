@@ -12,6 +12,7 @@ import 'package:ankiishopii/blocs/ordering_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/ordering_bloc/event.dart';
 import 'package:ankiishopii/blocs/ordering_bloc/state.dart';
 import 'package:ankiishopii/global/global_function.dart';
+import 'package:ankiishopii/helpers/string_helper.dart';
 import 'package:ankiishopii/main.dart';
 import 'package:ankiishopii/models/account_model.dart';
 import 'package:ankiishopii/models/ordering_model.dart';
@@ -19,6 +20,7 @@ import 'package:ankiishopii/pages/navigator/navigator_page.dart';
 import 'package:ankiishopii/pages/product/product_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -69,7 +71,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
     return Scaffold(
       backgroundColor: BACKGROUND_COLOR,
       body: BlocBuilder(
-          bloc: bloc,
+          cubit: bloc,
           builder: (context, state) {
             if (state is OrderingLoaded) {
               return Column(
@@ -107,7 +109,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
     return InPageAppBar(
       title: 'Order: ${orderingModel.id.toString()}',
       showCartButton: false,
-      leading: GestureDetector(
+      leading: CustomOnTapWidget(
         onTap: () {
 //          navigatorPagedKey.currentState.currentIndex = 3;
           Navigator.popUntil(context, (route) => route.isFirst);
@@ -192,9 +194,9 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                   style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '$total đ',
+                  '${numberToMoneyString(total)} đ',
                   style:
-                      DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.redAccent),
+                      DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR),
                 )
               ],
             ),
@@ -227,7 +229,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       padding: EdgeInsets.all(10),
       child: BlocBuilder(
-          bloc: deliveryAddressBloc,
+          cubit: deliveryAddressBloc,
           builder: (context, state) {
             if (state is DeliveryAddressLoaded) {
               return Row(

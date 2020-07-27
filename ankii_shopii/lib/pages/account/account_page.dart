@@ -7,6 +7,7 @@ import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/models/account_model.dart';
 import 'package:ankiishopii/pages/account/login_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,41 +34,49 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: BACKGROUND_COLOR,
-      body: BlocBuilder(
-          bloc: bloc,
-          builder: (context, state) {
-            if (state is AccountLoaded) {
-              return Stack(
-                children: <Widget>[
-                  buildAvatar(),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child:
-                        SingleChildScrollView(controller: widget.scrollController, child: buildProfile(state.account)),
-                  )
-                ],
-              );
-            } else if (state is AccountLoadingFailed) {
-              return Center(child: buildLogInButton());
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          }),
+      backgroundColor: FOREGROUND_COLOR,
+      body: Container(
+        padding: EdgeInsets.only(top: ScreenHelper.getPaddingTop(context)),
+        child: BlocBuilder(
+            cubit: bloc,
+            builder: (context, state) {
+              if (state is AccountLoaded) {
+                return Stack(
+                  children: <Widget>[
+                    buildAvatar(state.account),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: SingleChildScrollView(
+                          controller: widget.scrollController, child: buildProfile(state.account)),
+                    )
+                  ],
+                );
+              } else if (state is AccountLoadingFailed) {
+                return Center(child: buildLogInButton());
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            }),
+      ),
     );
   }
 
-  Widget buildAvatar() {
+  Widget buildAvatar(AccountModel accountModel) {
     return Container(
       padding: EdgeInsets.all(30),
       alignment: Alignment.topCenter,
-      decoration: BoxDecoration(color: FOREGROUND_COLOR),
       child: CircleAvatar(
         radius: 70,
-        backgroundImage: NetworkImage(
-            'https://upload.wikimedia.org/wikipedia/vi/thumb/b/b0/Avatar-Teaser-Poster.jpg/220px-Avatar-Teaser-Poster.jpg'),
+        backgroundImage: accountModel.image != null ? CachedNetworkImageProvider(accountModel.image) : null,
+        child: accountModel.image != null
+            ? null
+            : Icon(
+                Icons.account_circle,
+                size: 70,
+                color: FOREGROUND_COLOR,
+              ),
       ),
     );
   }
@@ -139,9 +148,12 @@ class _AccountPageState extends State<AccountPage> {
         await Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
         bloc.add(GetLocalAccount());
       },
-      color: FOREGROUND_COLOR,
+      color: BACKGROUND_COLOR,
       child: Container(
-        child: Text('Log In'),
+        child: Text(
+          'Log In',
+          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+        ),
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
     );

@@ -8,11 +8,13 @@ import 'package:ankiishopii/blocs/product_bloc/state.dart';
 import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/global/global_variable.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
+import 'package:ankiishopii/helpers/string_helper.dart';
 import 'package:ankiishopii/models/product_model.dart';
 import 'package:ankiishopii/pages/account/login_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/add_to_cart_effect.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -20,6 +22,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rxdart/rxdart.dart';
 
 class ProductDetailPage extends StatefulWidget {
   static const String routeName = 'productDetailPage';
@@ -33,11 +36,11 @@ class ProductDetailPage extends StatefulWidget {
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-  GlobalKey cartIconKey = GlobalKey();
+  GlobalKey<CartWidgetState> cartIconKey = GlobalKey();
   ProductBloc bloc = ProductBloc(ProductLoading());
 
   //CartBloc cartBloc;
-  StreamController _scrollStreamController = StreamController();
+  StreamController _scrollStreamController = BehaviorSubject();
   ScrollController _scrollController = ScrollController();
 
   @override
@@ -65,7 +68,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       key: _scaffoldKey,
       backgroundColor: FOREGROUND_COLOR,
       body: BlocBuilder(
-          bloc: bloc,
+          cubit: bloc,
           builder: (context, state) {
             if (state is ProductLoaded) {
               return Stack(
@@ -107,7 +110,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           scrollDirection: Axis.horizontal,
           children: products
               .map(
-                (product) => GestureDetector(
+                (product) => CustomOnTapWidget(
                   onTap: () {
                     Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
                   },
@@ -155,12 +158,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               ),
                               Expanded(
                                 child: Text(
-                                  product.price.toString(),
+                                  numberToMoneyString(product.price),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.center,
                                   style: DEFAULT_TEXT_STYLE.copyWith(
-                                    color: Colors.red,
+                                    color: PRICE_COLOR,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -179,21 +182,31 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Widget buildAppBar(ProductModel productModel) {
-    return Container(
-      decoration: BoxDecoration(
-          color: BACKGROUND_COLOR.withOpacity(0.5),
-          borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25))),
-      child: InPageAppBar(
-        showBackground: true,
-        cartIconKey: cartIconKey,
-        title: productModel.name,
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () {
-              Navigator.pop(context);
-            }),
-      ),
-    );
+    return StreamBuilder(
+        stream: _scrollStreamController.stream,
+        builder: (context, snapshot) {
+          return AnimatedSwitcher(
+            duration: Duration(milliseconds: 100),
+            child: snapshot.hasData && snapshot.data == true
+                ? null
+                : Container(
+                    decoration: BoxDecoration(
+                        color: BACKGROUND_COLOR.withOpacity(0.8),
+                        borderRadius:
+                            BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25))),
+                    child: InPageAppBar(
+                      showBackground: true,
+                      cartIconKey: cartIconKey,
+                      title: productModel.name,
+                      leading: IconButton(
+                          icon: Icon(Icons.arrow_back_ios),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          }),
+                    ),
+                  ),
+          );
+        });
   }
 
   Widget buildAvatar(ProductModel productModel) {
@@ -222,6 +235,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
       child: Column(
         children: <Widget>[
+          Container(
+              width: double.maxFinite,
+              child: Container(
+                margin: EdgeInsets.all(20),
+                child: Text(
+                  numberToMoneyString(productModel.price),
+                  style: DEFAULT_TEXT_STYLE.copyWith(color: PRICE_COLOR, fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+              )),
           Container(
               width: double.maxFinite,
               child: Theme(
@@ -320,7 +342,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround, //
                       children: <Widget>[
-                        GestureDetector(
+                        CustomOnTapWidget(
                           onTap: () {
                             if (currentLogin == null) {
                               Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
@@ -344,7 +366,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               )),
                         ),
                         Expanded(
-                            child: GestureDetector(
+                            child: CustomOnTapWidget(
                           onTap: () {
                             if (currentLogin == null) {
                               Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
@@ -376,6 +398,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   showMyModalBottomSheet(ProductModel productModel) {
     var quantityController = TextEditingController();
     quantityController.text = 1.toString();
+    int quantity = int.parse(quantityController.text);
     showModalBottomSheet(
         isScrollControlled: true,
         shape: RoundedRectangleBorder(
@@ -409,11 +432,23 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           width: 20,
                         ),
                         Expanded(
-                          child: Text(
-                            widget.product.name,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                widget.product.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                numberToMoneyString(widget.product.price),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: DEFAULT_TEXT_STYLE.copyWith(
+                                    fontSize: 20, fontWeight: FontWeight.bold, color: PRICE_COLOR),
+                              ),
+                            ],
                           ),
                         )
                       ],
@@ -430,23 +465,22 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         Container(
                           child: Row(
                             children: <Widget>[
-                              GestureDetector(
+                              CustomOnTapWidget(
                                 onTap: () {
-                                  int quantity = int.parse(quantityController.text);
-
                                   // print(quantity);
                                   if (quantity > 1) {
-                                    quantity--;
                                     setState(() {
+                                      quantity--;
                                       quantityController.text = quantity.toString();
                                     });
                                   }
                                 },
                                 child: Container(
                                   margin: EdgeInsets.symmetric(horizontal: 5),
+                                  padding: EdgeInsets.all(3),
                                   decoration:
-                                      BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(15)),
-                                  child: Icon(Icons.arrow_left),
+                                      BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(50)),
+                                  child: Icon(Icons.remove),
                                 ),
                               ),
                               Center(
@@ -457,6 +491,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   decoration: BoxDecoration(
                                       color: PRIMARY_COLOR.withOpacity(0.1), borderRadius: BorderRadius.circular(15)),
                                   child: TextFormField(
+                                    enabled: false,
                                     controller: quantityController,
                                     keyboardType: TextInputType.number,
                                     textAlign: TextAlign.center,
@@ -467,22 +502,21 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   ),
                                 ),
                               ),
-                              GestureDetector(
+                              CustomOnTapWidget(
                                 onTap: () {
-                                  int quantity = int.parse(quantityController.text);
-
                                   // print(quantity);
 
-                                  quantity++;
                                   setState(() {
+                                    quantity++;
                                     quantityController.text = quantity.toString();
                                   });
                                 },
                                 child: Container(
                                   margin: EdgeInsets.symmetric(horizontal: 5),
+                                  padding: EdgeInsets.all(3),
                                   decoration:
-                                      BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(15)),
-                                  child: Icon(Icons.arrow_right),
+                                      BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(50)),
+                                  child: Icon(Icons.add),
                                 ),
                               ),
                             ],
@@ -549,7 +583,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  CustomOnTapWidget(
                     onTap: () async {
                       updateCartIconPosition(cartIconKey: cartIconKey);
                       addToCart(context, productID: productModel.id, count: int.parse(quantityController.text));

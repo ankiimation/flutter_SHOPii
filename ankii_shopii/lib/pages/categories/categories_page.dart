@@ -7,6 +7,7 @@ import 'package:ankiishopii/models/category_model.dart';
 import 'package:ankiishopii/pages/product/product_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                       );
                     }
                   },
-                  bloc: bloc,
+                  cubit: bloc,
                 )
               ],
             ),
@@ -73,7 +74,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   Widget _buildCategoryItem(CategoryModel category) {
-    return GestureDetector(
+    return CustomOnTapWidget(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (b) => ProductPage(category: category)));
       },

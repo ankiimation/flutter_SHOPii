@@ -13,6 +13,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'base/custom_ontap_widget.dart';
+
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final EdgeInsets padding;
   final Color primaryColor;
@@ -49,7 +51,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class InPageAppBar extends StatelessWidget {
-  final GlobalKey cartIconKey;
+  final GlobalKey<CartWidgetState> cartIconKey;
   final String title;
   final Widget titleWidget;
   final Widget leading;
@@ -90,7 +92,7 @@ class InPageAppBar extends StatelessWidget {
                 ),
                 Row(
                   children: <Widget>[
-                    GestureDetector(
+                    CustomOnTapWidget(
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (b) => SearchPage()));
                       },
@@ -101,10 +103,10 @@ class InPageAppBar extends StatelessWidget {
                     ),
                     showCartButton
                         ? BlocBuilder(
-                            bloc: BlocProvider.of<LoginBloc>(context),
+                            cubit: BlocProvider.of<LoginBloc>(context),
                             builder: (context, state) {
                               if (state is LoginSuccessfully) {
-                                return GestureDetector(
+                                return CustomOnTapWidget(
                                   onTap: () {
                                     Navigator.push(context, MaterialPageRoute(builder: (b) => CartPage()));
                                   },
@@ -125,21 +127,39 @@ class InPageAppBar extends StatelessWidget {
   }
 }
 
-class CartWidget extends StatelessWidget {
+class CartWidget extends StatefulWidget {
   final GlobalKey cartKey;
 
-  CartWidget(this.cartKey);
+  CartWidget(this.cartKey) : super(key: cartKey);
+
+  @override
+  CartWidgetState createState() => CartWidgetState();
+}
+
+class CartWidgetState extends State<CartWidget> {
+  bool _inProcess = false;
+
+  onAddToCart({Duration duration}) {
+    setState(() {
+      _inProcess = true;
+    });
+    Future.delayed(duration ?? Duration(milliseconds: 600), () {
+      refreshCart(context);
+      setState(() {
+        _inProcess = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    refreshCart(context);
     return Container(
       margin: EdgeInsets.only(left: 15),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           BlocBuilder(
-              bloc: BlocProvider.of<CartBloc>(context),
+              cubit: BlocProvider.of<CartBloc>(context),
               builder: (_, state) {
                 if (state is CartLoaded) {
                   var totalCount = 0;
@@ -157,8 +177,9 @@ class CartWidget extends StatelessWidget {
               }),
           Icon(
             Icons.shopping_cart,
-            key: cartKey,
+            //  key: widget.cartKey,
             color: PRIMARY_COLOR,
+            size: _inProcess ? 35 : 25,
           ),
         ],
       ),

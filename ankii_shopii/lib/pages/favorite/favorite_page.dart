@@ -8,6 +8,7 @@ import 'package:ankiishopii/pages/product/product_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
+import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:ankiishopii/widgets/tab_view.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +54,7 @@ class _FavoritePageState extends State<FavoritePage> {
           ),
           Expanded(
               child: BlocBuilder(
-                  bloc: bloc,
+                  cubit: bloc,
                   builder: (context, state) {
                     if (state is ListProductsLoaded)
                       return buildFavorite(state.products);
@@ -80,8 +81,10 @@ class _FavoritePageState extends State<FavoritePage> {
 
     if (categories.isEmpty) {
       return Center(
-        child: Text('<No Favorite>'),
-      );
+          child: Text(
+        'No favorite!',
+        style: DEFAULT_TEXT_STYLE.copyWith(fontStyle: FontStyle.italic),
+      ));
     }
     return CustomTabView(
         barShadow: false,
@@ -110,7 +113,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                 addToCart(context, productID: favoriteProduct.id, count: 1);
                               },
                               product: favoriteProduct,
-                              priceTextColor: Colors.red,
+                              priceTextColor: PRICE_COLOR,
                               isFavorite: favoriteProduct.isFavoriteByCurrentUser,
                               backgroundColor: FOREGROUND_COLOR,
                             ))

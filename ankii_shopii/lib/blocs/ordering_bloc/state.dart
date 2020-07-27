@@ -36,7 +36,12 @@ class AllOrderingLoaded extends OrderingState {
 }
 
 class AllOrderingLoadError extends OrderingState{
+  final String error;
 
+  AllOrderingLoadError(this.error);
+  @override
+  // TODO: implement props
+  List<Object> get props => [error];
 }
 class AllOrderingLoading extends OrderingState{
 

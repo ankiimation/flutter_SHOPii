@@ -1,7 +1,16 @@
+import 'dart:async';
+
 import 'package:ankiishopii/blocs/cart_bloc/event.dart';
 import 'package:ankiishopii/blocs/cart_bloc/service.dart';
 import 'package:ankiishopii/blocs/cart_bloc/state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+Timer _cartChangingTimer;
+
+onCartChange(Function onAddToCart) {
+  if (_cartChangingTimer != null) _cartChangingTimer.cancel();
+  _cartChangingTimer = Timer(Duration(seconds: 2), onAddToCart);
+}
 
 class CartBloc extends Bloc<CartEvent, CartState> {
   CartBloc() : super(CartLoading());

@@ -1,6 +1,7 @@
 import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/global/global_variable.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
+import 'package:ankiishopii/helpers/string_helper.dart';
 import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:ankiishopii/models/product_model.dart';
 import 'package:ankiishopii/pages/account/login_page.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../themes/constant.dart';
+import 'base/custom_ontap_widget.dart';
 
 class CustomProductListItem extends StatelessWidget {
   final GlobalKey cartIconKey;
@@ -33,7 +35,7 @@ class CustomProductListItem extends StatelessWidget {
       this.onAddToCart,
       this.onFavourite,
       this.quickActionColor = PRIMARY_COLOR,
-      this.priceTextColor = Colors.red,
+      this.priceTextColor = PRICE_COLOR,
       this.isFavorite = false});
 
   @override
@@ -41,7 +43,7 @@ class CustomProductListItem extends StatelessWidget {
     GlobalKey inkwellKey = GlobalKey();
     double height = 100;
     // TODO: implement build
-    return GestureDetector(
+    return CustomOnTapWidget(
       onTap: onTap,
       child: Container(
         height: height,
@@ -74,7 +76,7 @@ class CustomProductListItem extends StatelessWidget {
                           ),
                           Expanded(
                             child: Text(
-                              product.price.toString() ?? '0đ',
+                              numberToMoneyString(product.price) ?? '0đ',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -128,7 +130,7 @@ class CustomProductListItem extends StatelessWidget {
                                   final Offset position = box.globalToLocal(Offset.zero);
                                   var dx = position.dx * -1;
                                   var dy = position.dy * -1;
-                                  print(dx.toString() + " - " + dy.toString());
+                                  //print(dx.toString() + " - " + dy.toString());
 
                                   updateCartIconPosition(cartIconKey: cartIconKey);
                                   showAddToCartAnimation(context,
@@ -192,7 +194,7 @@ class CustomProductCartItem extends StatefulWidget {
     this.onIncreaseQuantity,
     this.onDelete,
     this.quickActionColor = PRIMARY_COLOR,
-    this.priceTextColor = Colors.red,
+    this.priceTextColor = PRICE_COLOR,
   });
 
   @override
@@ -213,7 +215,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
     double height = 150;
     quantityController.text = widget.cartItem.count.toString();
     // TODO: implement build
-    return GestureDetector(
+    return CustomOnTapWidget(
       onTap: widget.onTap,
       child: Container(
         height: height,
@@ -279,7 +281,9 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                     children: <Widget>[
                                       Container(
                                         child: Text(
-                                          (widget.cartItem.product.price * widget.cartItem.count).toString() ?? '0đ',
+                                          numberToMoneyString(widget.cartItem.product.price * widget.cartItem.count)
+                                                  .toString() ??
+                                              '0đ',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
@@ -294,12 +298,20 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                       ),
                                       Row(
                                         children: <Widget>[
-                                          GestureDetector(
+                                          CustomOnTapWidget(
                                             onTap: widget.onDecreaseQuantity,
                                             child: Container(
+                                              padding: EdgeInsets.all(2),
+                                              margin: EdgeInsets.only(right: 5),
                                               decoration: BoxDecoration(
-                                                  color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(15)),
-                                              child: Icon(Icons.arrow_left),
+                                                  color: BACKGROUND_COLOR.withOpacity(0.5),
+                                                  borderRadius: BorderRadius.circular(15)),
+                                              child: widget.cartItem.count > 1
+                                                  ? Icon(Icons.remove)
+                                                  : Icon(
+                                                      Icons.delete_outline,
+                                                      color: PRICE_COLOR,
+                                                    ),
                                             ),
                                           ),
                                           Center(
@@ -312,6 +324,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                                   borderRadius: BorderRadius.circular(15)),
                                               child: TextFormField(
                                                 controller: quantityController,
+                                                enabled: false,
                                                 keyboardType: TextInputType.number,
                                                 textAlign: TextAlign.center,
                                                 style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
@@ -321,12 +334,15 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                               ),
                                             ),
                                           ),
-                                          GestureDetector(
+                                          CustomOnTapWidget(
                                             onTap: widget.onIncreaseQuantity,
                                             child: Container(
+                                              padding: EdgeInsets.all(2),
+                                              margin: EdgeInsets.only(left: 5),
                                               decoration: BoxDecoration(
-                                                  color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(15)),
-                                              child: Icon(Icons.arrow_right),
+                                                  color: BACKGROUND_COLOR.withOpacity(0.5),
+                                                  borderRadius: BorderRadius.circular(15)),
+                                              child: Icon(Icons.add),
                                             ),
                                           ),
                                         ],
@@ -357,7 +373,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                 ),
               ),
             ),
-            GestureDetector(
+            CustomOnTapWidget(
               onTap: widget.onDelete,
               child: Align(
                   alignment: Alignment.topRight,
@@ -395,69 +411,72 @@ class CustomProductCheckOutItem extends StatelessWidget {
       this.onAddToCart,
       this.onFavourite,
       this.quickActionColor = PRIMARY_COLOR,
-      this.priceTextColor = Colors.red,
+      this.priceTextColor = PRICE_COLOR,
       this.isFavorite = false});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        margin: EdgeInsets.only(left: 10, right: 10, top: 10),
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(100)),
-        child: Row(
-          children: <Widget>[
-            CircleAvatar(
-              radius: 40,
-              backgroundImage: CachedNetworkImageProvider(cartItem.product.image),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.only(right: 30),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      cartItem.product.name,
-                      style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text('Price:', style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
-                        Text('${cartItem.product.price}',
-                            textAlign: TextAlign.end,
-                            style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text('Quantity:',
-                            style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
-                        Text('x ${cartItem.count}',
-                            textAlign: TextAlign.end,
-                            style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text('Total:', style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
-                        Text('${cartItem.count * cartItem.product.price}',
-                            textAlign: TextAlign.end,
-                            style: DEFAULT_TEXT_STYLE.copyWith(
-                                fontSize: 18, fontWeight: FontWeight.bold, color: priceTextColor)),
-                      ],
-                    )
-                  ],
-                ),
+    return CustomOnTapWidget(
+      onTap: onTap,
+      child: Container(
+          margin: EdgeInsets.only(left: 10, right: 10, top: 10),
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(100)),
+          child: Row(
+            children: <Widget>[
+              CircleAvatar(
+                radius: 40,
+                backgroundImage: CachedNetworkImageProvider(cartItem.product.image),
               ),
-            )
-          ],
-        ));
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.only(right: 30),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        cartItem.product.name,
+                        style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('Price:', style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                          Text('${numberToMoneyString(cartItem.product.price)}',
+                              textAlign: TextAlign.end,
+                              style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('Quantity:',
+                              style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                          Text('x ${cartItem.count}',
+                              textAlign: TextAlign.end,
+                              style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('Total:', style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                          Text('${numberToMoneyString(cartItem.count * cartItem.product.price)}',
+                              textAlign: TextAlign.end,
+                              style: DEFAULT_TEXT_STYLE.copyWith(
+                                  fontSize: 18, fontWeight: FontWeight.bold, color: priceTextColor)),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              )
+            ],
+          )),
+    );
   }
 }
