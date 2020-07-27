@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:ankiishopii/blocs/product_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/product_bloc/event.dart';
+import 'package:ankiishopii/blocs/product_bloc/service.dart';
 import 'package:ankiishopii/blocs/product_bloc/state.dart';
 import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/models/category_model.dart';
@@ -9,6 +12,7 @@ import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
+import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +32,7 @@ class _ProductPageState extends State<ProductPage> {
   GlobalKey<CartWidgetState> cartGlobalKey = GlobalKey();
   ProductBloc bloc = ProductBloc(ProductLoading());
 
-  void refresh() {
+  void _refresh() {
     if (widget.category == null) {
       bloc.add(GetAllProducts());
     } else {
@@ -36,11 +40,19 @@ class _ProductPageState extends State<ProductPage> {
     }
   }
 
+  Future _doFavorite(ProductModel product) async {
+    setState(() {
+      product.isFavoriteByCurrentUser = !product.isFavoriteByCurrentUser;
+    });
+    await ProductService().doFavorite(product);
+    _refresh();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    refresh();
+    _refresh();
   }
 
   @override
@@ -80,7 +92,7 @@ class _ProductPageState extends State<ProductPage> {
                     return buildProducts(state.products);
                   } else {
                     return Center(
-                      child: CircularProgressIndicator(),
+                      child: CustomDotLoading(),
                     );
                   }
                 }),
@@ -95,17 +107,18 @@ class _ProductPageState extends State<ProductPage> {
         .map<Widget>((product) => CustomProductListItem(
               cartIconKey: cartGlobalKey,
               onTap: () async {
-                await Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
-                refresh();
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (b) => ProductDetailPage(product)));
+                _refresh();
               },
               product: product,
               priceTextColor: PRICE_COLOR,
               backgroundColor: FOREGROUND_COLOR,
               isFavorite: product.isFavoriteByCurrentUser,
-              onFavourite: () {
-                bloc.add(DoFavorite(product));
-
-                refresh();
+              onFavourite: () async {
+                _doFavorite(product);
               },
               onAddToCart: () {
                 addToCart(context, productID: product.id);

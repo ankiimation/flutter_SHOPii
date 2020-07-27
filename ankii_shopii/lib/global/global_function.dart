@@ -1,5 +1,6 @@
 import 'package:ankiishopii/blocs/cart_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/cart_bloc/event.dart';
+import 'package:ankiishopii/blocs/cart_bloc/service.dart';
 import 'package:ankiishopii/blocs/login_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/login_bloc/event.dart';
 import 'package:ankiishopii/blocs/product_bloc/service.dart';
@@ -12,8 +13,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-addToCart(BuildContext context, {@required int productID, int count = 1}) async {
-  BlocProvider.of<CartBloc>(context).add(AddToCart(productID: productID, count: count));
+addToCart(BuildContext context,
+    {@required int productID, int count = 1}) async {
+  BlocProvider.of<CartBloc>(context)
+      .add(AddToCart(productID: productID, count: count));
+//  await CartService().addToCart(productID, count);
+//  refreshCart(context);
 }
 
 refreshCart(BuildContext context) async {
@@ -53,7 +58,10 @@ String getOrderStatus(OrderingModel orderingModel) {
 }
 
 showAddToCartAnimation(BuildContext context,
-    {@required CustomPosition start, @required CustomPosition end, Widget overlayWidget, Duration duration}) async {
+    {@required CustomPosition start,
+    @required CustomPosition end,
+    Widget overlayWidget,
+    Duration duration}) async {
   showGeneralDialog(
       transitionDuration: Duration(milliseconds: 100),
       barrierDismissible: false,
@@ -73,7 +81,8 @@ showAddToCartAnimation(BuildContext context,
 double cartIconPositionDx = 0;
 double cartIconPositionDy = 0;
 
-updateCartIconPosition({GlobalKey<CartWidgetState> cartIconKey, Duration duration}) {
+updateCartIconPosition(
+    {GlobalKey<CartWidgetState> cartIconKey, Duration duration}) {
   if (cartIconKey != null) {
     try {
       cartIconKey.currentState.onAddToCart(duration: duration);

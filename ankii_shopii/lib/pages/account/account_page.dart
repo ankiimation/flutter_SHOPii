@@ -6,7 +6,10 @@ import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/models/account_model.dart';
 import 'package:ankiishopii/pages/account/login_page.dart';
+import 'package:ankiishopii/pages/delivery_address/delivery_address_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
+import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
+import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +50,8 @@ class _AccountPageState extends State<AccountPage> {
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: SingleChildScrollView(
-                          controller: widget.scrollController, child: buildProfile(state.account)),
+                          controller: widget.scrollController,
+                          child: buildProfile(state.account)),
                     )
                   ],
                 );
@@ -55,7 +59,7 @@ class _AccountPageState extends State<AccountPage> {
                 return Center(child: buildLogInButton());
               } else {
                 return Center(
-                  child: CircularProgressIndicator(),
+                  child: CustomDotLoading(),
                 );
               }
             }),
@@ -69,7 +73,9 @@ class _AccountPageState extends State<AccountPage> {
       alignment: Alignment.topCenter,
       child: CircleAvatar(
         radius: 70,
-        backgroundImage: accountModel.image != null ? CachedNetworkImageProvider(accountModel.image) : null,
+        backgroundImage: accountModel.image != null
+            ? CachedNetworkImageProvider(accountModel.image)
+            : null,
         child: accountModel.image != null
             ? null
             : Icon(
@@ -85,34 +91,37 @@ class _AccountPageState extends State<AccountPage> {
     return Column(
       children: <Widget>[
         Container(
-          constraints: BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.7),
+          constraints:
+              BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.7),
           margin: EdgeInsets.only(top: 200),
           padding: EdgeInsets.only(top: 50, bottom: 50, left: 20, right: 20),
           decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black38, offset: Offset(0, -3), blurRadius: 5)],
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black38, offset: Offset(0, -3), blurRadius: 5)
+              ],
               color: BACKGROUND_COLOR,
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20), topRight: Radius.circular(20))),
           child: Column(
             children: <Widget>[
               _buildInfoItem(key: 'Username', value: account.username),
-              Container(
-                color: PRIMARY_COLOR.withOpacity(0.3),
-                height: 1.5,
-                margin: EdgeInsets.symmetric(vertical: 10),
-              ),
+              _buildDivider(),
               _buildInfoItem(key: 'Full Name', value: account.fullname),
-              Container(
-                color: PRIMARY_COLOR.withOpacity(0.3),
-                height: 1.5,
-                margin: EdgeInsets.symmetric(vertical: 10),
-              ),
+              _buildDivider(),
               _buildInfoItem(key: 'Phone', value: account.phoneNumber),
-              Container(
-                color: PRIMARY_COLOR.withOpacity(0.3),
-                height: 1.5,
-                margin: EdgeInsets.symmetric(vertical: 10),
-              ),
+              _buildDivider(),
               _buildInfoItem(key: 'Address', value: account.address),
+              _buildDivider(),
+              CustomOnTapWidget(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (b) => DeliveryAddressPage()));
+                  },
+                  child: _buildInfoItem(
+                      key: 'Delivery Addresses', value: '<Tap to view>')),
               SizedBox(
                 height: 50,
               ),
@@ -121,6 +130,14 @@ class _AccountPageState extends State<AccountPage> {
           ),
         )
       ],
+    );
+  }
+
+  Widget _buildDivider() {
+    return Container(
+      color: PRIMARY_COLOR.withOpacity(0),
+      height: 1,
+      margin: EdgeInsets.symmetric(vertical: 10),
     );
   }
 
@@ -145,7 +162,8 @@ class _AccountPageState extends State<AccountPage> {
     return RaisedButton(
       elevation: 0,
       onPressed: () async {
-        await Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
+        await Navigator.push(
+            context, MaterialPageRoute(builder: (b) => LoginPage()));
         bloc.add(GetLocalAccount());
       },
       color: BACKGROUND_COLOR,

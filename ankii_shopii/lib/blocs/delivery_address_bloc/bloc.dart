@@ -8,11 +8,13 @@ import 'package:ankiishopii/global/global_variable.dart';
 import 'package:ankiishopii/models/account_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DeliveryAddressBloc extends Bloc<DeliveryAddressEvent, DeliveryAddressState> {
+class DeliveryAddressBloc
+    extends Bloc<DeliveryAddressEvent, DeliveryAddressState> {
   DeliveryAddressBloc() : super(DeliveryAddressLoading());
 
   @override
-  Stream<DeliveryAddressState> mapEventToState(DeliveryAddressEvent event) async* {
+  Stream<DeliveryAddressState> mapEventToState(
+      DeliveryAddressEvent event) async* {
     // TODO: implement mapEventToState
     if (event is GetAllDeliveryAddresses) {
       yield* mapGetAllDeliveryAddressesToState(event);
@@ -23,7 +25,8 @@ class DeliveryAddressBloc extends Bloc<DeliveryAddressEvent, DeliveryAddressStat
     }
   }
 
-  Stream<DeliveryAddressState> mapGetAllDeliveryAddressesToState(GetAllDeliveryAddresses event) async* {
+  Stream<DeliveryAddressState> mapGetAllDeliveryAddressesToState(
+      GetAllDeliveryAddresses event) async* {
     var rs = await DeliveryAddressService().getAll();
     if (rs != null) {
       yield AllDeliveryAddressesLoaded(rs);
@@ -32,7 +35,8 @@ class DeliveryAddressBloc extends Bloc<DeliveryAddressEvent, DeliveryAddressStat
     }
   }
 
-  Stream<DeliveryAddressState> mapGetDeliveryAddressToState(GetDeliveryAddress event) async* {
+  Stream<DeliveryAddressState> mapGetDeliveryAddressToState(
+      GetDeliveryAddress event) async* {
     var rs = await DeliveryAddressService().get(event.id);
     if (rs != null) {
       yield DeliveryAddressLoaded(rs);
@@ -41,7 +45,9 @@ class DeliveryAddressBloc extends Bloc<DeliveryAddressEvent, DeliveryAddressStat
     }
   }
 
-  Stream<DeliveryAddressState> mapSetDefaultDeliveryAddressToState(SetDefaultDeliveryAddress event) async* {
+  Stream<DeliveryAddressState> mapSetDefaultDeliveryAddressToState(
+      SetDefaultDeliveryAddress event) async* {
+    await Future.delayed(Duration(seconds: 2));
     await AccountService().updateDefaultDeliveryId(event.id);
     var rs = await DeliveryAddressService().getAll();
     if (rs != null) {
@@ -50,5 +56,4 @@ class DeliveryAddressBloc extends Bloc<DeliveryAddressEvent, DeliveryAddressStat
       yield DeliveryAddressLoadFailed();
     }
   }
-
 }

@@ -8,6 +8,7 @@ import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
+import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:ankiishopii/widgets/notification_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -64,7 +65,7 @@ class _OrderingPageState extends State<OrderingPage> {
                     );
                   } else {
                     return Center(
-                      child: CircularProgressIndicator(),
+                      child: CustomDotLoading(),
                     );
                   }
                 }),
@@ -82,11 +83,13 @@ class _OrderingPageState extends State<OrderingPage> {
         children: orders.map((o) {
           return CustomOnTapWidget(
             onTap: () async {
-              await Navigator.push(context, MaterialPageRoute(builder: (b) => OrderingDetailPage(o)));
+              await Navigator.push(context,
+                  MaterialPageRoute(builder: (b) => OrderingDetailPage(o)));
             },
             child: Container(
               width: double.maxFinite,
-              margin: EdgeInsets.only(top: orders.indexOf(o) == 0 ? 10 : 0, bottom: 10),
+              margin: EdgeInsets.only(
+                  top: orders.indexOf(o) == 0 ? 10 : 0, bottom: 10),
               child: CustomOrderItem(
                 orderingModel: o,
               ),

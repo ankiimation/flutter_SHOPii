@@ -16,6 +16,7 @@ import 'package:ankiishopii/widgets/add_to_cart_effect.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
+import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -94,7 +95,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               );
             } else {
               return Center(
-                child: CircularProgressIndicator(),
+                child: CustomDotLoading(),
               );
             }
           }),

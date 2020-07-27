@@ -29,7 +29,9 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
   }
 
-  Stream<ProductState> mapGetAppProductsViaCategoryIdToState(GetAllProductsByCategoryId event) async* {
+  Stream<ProductState> mapGetAppProductsViaCategoryIdToState(
+      GetAllProductsByCategoryId event) async* {
+    await Future.delayed(Duration(seconds: 2));
     var rs = await ProductService().getAllWithCategoryId(event.categoryID);
     if (rs != null) {
       yield ListProductsLoaded(rs);

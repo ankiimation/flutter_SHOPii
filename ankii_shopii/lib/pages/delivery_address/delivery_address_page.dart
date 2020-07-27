@@ -1,26 +1,39 @@
+import 'package:ankiishopii/blocs/account_bloc/service.dart';
 import 'package:ankiishopii/blocs/delivery_address_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/delivery_address_bloc/event.dart';
 import 'package:ankiishopii/blocs/delivery_address_bloc/state.dart';
 import 'package:ankiishopii/global/global_variable.dart';
+import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/models/account_model.dart';
 import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:ankiishopii/pages/delivery_address/add_delivery_address_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
+import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
+import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AddressChooserDialog extends StatefulWidget {
+class DeliveryAddressPage extends StatefulWidget {
   final OrderingModel currentCheckout;
+  final bool isDialog;
 
-  AddressChooserDialog(this.currentCheckout);
+  DeliveryAddressPage({this.currentCheckout, this.isDialog = false});
 
   @override
-  _AddressChooserDialogState createState() => _AddressChooserDialogState();
+  _DeliveryAddressPageState createState() => _DeliveryAddressPageState();
 }
 
-class _AddressChooserDialogState extends State<AddressChooserDialog> {
+class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
   DeliveryAddressBloc bloc = DeliveryAddressBloc();
+
+  _setDefaultDeliveryAddress(int id) async {
+    setState(() {
+      currentLogin.account.defaultDeliveryId = id;
+    });
+   await AccountService().updateDefaultDeliveryId(id);
+   bloc.add(GetAllDeliveryAddresses());
+  }
 
   @override
   void initState() {
@@ -49,13 +62,25 @@ class _AddressChooserDialogState extends State<AddressChooserDialog> {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
+                      !widget.isDialog
+                          ? InPageAppBar(
+                              title: 'Delivery Addresses',
+                              showCartButton: false,
+                              leading: CustomOnTapWidget(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(Icons.arrow_back_ios),
+                              ),
+                            )
+                          : Container(),
                       buildAddNewAddressButton(),
                       buildListAddress(state.deliveryAddresses),
                     ],
                   );
                 } else if (state is DeliveryAddressLoading) {
                   return Center(
-                    child: CircularProgressIndicator(),
+                    child: CustomDotLoading(),
                   );
                 }
                 return Center(
@@ -70,7 +95,8 @@ class _AddressChooserDialogState extends State<AddressChooserDialog> {
   Widget buildAddNewAddressButton() {
     return CustomOnTapWidget(
       onTap: () async {
-        await Navigator.push(context, MaterialPageRoute(builder: (b) => AddDeliveryAddressPage()));
+        await Navigator.push(context,
+            MaterialPageRoute(builder: (b) => AddDeliveryAddressPage()));
         bloc.add(GetAllDeliveryAddresses());
       },
       child: Container(
@@ -89,13 +115,15 @@ class _AddressChooserDialogState extends State<AddressChooserDialog> {
     return Column(
         mainAxisSize: MainAxisSize.min,
         children: deliveryAddresses
-            .map<Widget>((address) =>
-                Container(margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10), child: addressItem(address)))
+            .map<Widget>((address) => Container(
+                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                child: addressItem(address)))
             .toList());
   }
 
   Widget addressItem(DeliveryAddressModel deliveryAddressModel) {
-    bool isDefault = deliveryAddressModel.id == currentLogin.account.defaultDeliveryId;
+    bool isDefault =
+        deliveryAddressModel.id == currentLogin.account.defaultDeliveryId;
     return Column(
       children: <Widget>[
         Row(
@@ -105,12 +133,11 @@ class _AddressChooserDialogState extends State<AddressChooserDialog> {
                 onTap: () async {
                   // AccountService accountService = AccountService();
                   if (isDefault) {
-                    isDefault = false;
-                    bloc.add(SetDefaultDeliveryAddress(-1));
+                    _setDefaultDeliveryAddress(-1);
                     //bloc.add(GetAllDeliveryAddresses());
                   } else {
-                    isDefault = true;
-                    bloc.add(SetDefaultDeliveryAddress(deliveryAddressModel.id));
+                    _setDefaultDeliveryAddress(deliveryAddressModel.id);
+
                     // bloc.add(GetAllDeliveryAddresses());
                   }
                   //   print('Current: ' + currentLogin.account.defaultDeliveryId.toString());
@@ -119,11 +146,15 @@ class _AddressChooserDialogState extends State<AddressChooserDialog> {
                   alignment: Alignment.center,
                   width: double.maxFinite,
                   height: 30,
-                  color: isDefault ? PRIMARY_COLOR : PRIMARY_COLOR.withOpacity(0.1),
+                  color: isDefault
+                      ? PRIMARY_COLOR
+                      : PRIMARY_COLOR.withOpacity(0.1),
                   child: isDefault
                       ? Text(
                           'Default Address',
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, color: FOREGROUND_COLOR),
+                          style: DEFAULT_TEXT_STYLE.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: FOREGROUND_COLOR),
                         )
                       : Text(
                           'Tap to set default delivery address',
@@ -185,7 +216,8 @@ class _AddressChooserDialogState extends State<AddressChooserDialog> {
                         child: Text(
                           deliveryAddressModel.fullname,
                           textAlign: TextAlign.right,
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: DEFAULT_TEXT_STYLE.copyWith(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       )
                     ],
@@ -203,7 +235,8 @@ class _AddressChooserDialogState extends State<AddressChooserDialog> {
                         child: Text(
                           deliveryAddressModel.address,
                           textAlign: TextAlign.right,
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: DEFAULT_TEXT_STYLE.copyWith(
+                              fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                       )
                     ],
@@ -221,7 +254,8 @@ class _AddressChooserDialogState extends State<AddressChooserDialog> {
                         child: Text(
                           deliveryAddressModel.phoneNumber,
                           textAlign: TextAlign.right,
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: DEFAULT_TEXT_STYLE.copyWith(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       )
                     ],

@@ -41,7 +41,8 @@ class _LoginPageState extends State<LoginPage> {
                       image: CachedNetworkImageProvider(
                           'https://i.pinimg.com/originals/2e/0a/ab/2e0aaba94a7e19d5792021915604bc23.jpg'))),
               child: Container(
-                padding: EdgeInsets.only(top: ScreenHelper.getPaddingTop(context) + 30),
+                padding: EdgeInsets.only(
+                    top: ScreenHelper.getPaddingTop(context) + 30),
                 height: double.maxFinite,
                 width: double.maxFinite,
                 color: PRIMARY_COLOR.withOpacity(0.5),
@@ -50,15 +51,15 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Icon(
-                      FontAwesomeIcons.carAlt,
+                      FontAwesomeIcons.cartArrowDown,
                       size: 50,
                       color: BACKGROUND_COLOR,
                     ),
                     SizedBox(
-                      width: 15,
+                      width: 20,
                     ),
                     Text(
-                      'Howdy!',
+                      'SHOPii!',
                       style: TextStyle(color: BACKGROUND_COLOR, fontSize: 45),
                     )
                   ],
@@ -77,12 +78,15 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget buildLoginPanel() {
     return Container(
-      margin: EdgeInsets.only(top: ScreenHelper.getPaddingTop(context) + 150, left: 10, right: 10),
+      margin: EdgeInsets.only(
+          top: ScreenHelper.getPaddingTop(context) + 150, left: 10, right: 10),
       decoration: BoxDecoration(
           //boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(0, -2), blurRadius: 2)],
           color: BACKGROUND_COLOR,
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30))),
-      constraints: BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.7),
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30), topRight: Radius.circular(30))),
+      constraints:
+          BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.7),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -130,7 +134,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Text(
               'Or login with',
               textAlign: TextAlign.center,
-              style: TextStyle(color: TEXT_COLOR.withOpacity(0.5), fontSize: 12),
+              style:
+                  TextStyle(color: TEXT_COLOR.withOpacity(0.5), fontSize: 12),
             ),
           ),
           buildSocialLogin(),
@@ -151,7 +156,8 @@ class _LoginPageState extends State<LoginPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         onPressed: () async {
           LoadingDialog.showLoadingDialog(context);
-          var account = await LoginService().logIn(usernameTextController.text, passwordTextController.text);
+          var account = await LoginService()
+              .logIn(usernameTextController.text, passwordTextController.text);
           LoadingDialog.hideLoadingDialog(context);
           if (account != null) {
             refreshCart(context);
@@ -171,7 +177,8 @@ class _LoginPageState extends State<LoginPage> {
             alignment: Alignment.center,
             child: Text(
               'Login',
-              style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+              style: DEFAULT_TEXT_STYLE.copyWith(
+                  fontSize: 16, fontWeight: FontWeight.bold),
             )),
       ),
     );
@@ -213,11 +220,13 @@ class _LoginPageState extends State<LoginPage> {
           child: RaisedButton(
             elevation: 0,
             shape: RoundedRectangleBorder(
-                side: BorderSide(color: FOREGROUND_COLOR, width: 2), borderRadius: BorderRadius.circular(10)),
+                side: BorderSide(color: FOREGROUND_COLOR, width: 2),
+                borderRadius: BorderRadius.circular(10)),
             onPressed: () {},
             color: BACKGROUND_COLOR,
             padding: EdgeInsets.all(10),
-            child: Container(alignment: Alignment.center, child: Text('Register')),
+            child:
+                Container(alignment: Alignment.center, child: Text('Register')),
           ),
         ),
       ],

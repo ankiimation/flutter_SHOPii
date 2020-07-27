@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ankiishopii/blocs/cart_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/cart_bloc/event.dart';
+import 'package:ankiishopii/blocs/cart_bloc/service.dart';
 import 'package:ankiishopii/blocs/cart_bloc/state.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/helpers/string_helper.dart';
@@ -38,7 +39,8 @@ class _CartPageState extends State<CartPage> {
     super.initState();
     bloc = BlocProvider.of<CartBloc>(context);
     _scrollController.addListener(() {
-      bool isScrollUp = _scrollController.position.userScrollDirection == ScrollDirection.reverse;
+      bool isScrollUp = _scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse;
       _scrollStreamController.sink.add(isScrollUp);
     });
   }
@@ -66,7 +68,10 @@ class _CartPageState extends State<CartPage> {
                         controller: _scrollController,
                         physics: AlwaysScrollableScrollPhysics(),
                         child: Column(
-                          children: <Widget>[buildAppBar(), buildCartDetail(state.cart.orderingDetail)],
+                          children: <Widget>[
+                            buildAppBar(),
+                            buildCartDetail(state.cart.orderingDetail)
+                          ],
                         ),
                       ),
                     ),
@@ -80,7 +85,7 @@ class _CartPageState extends State<CartPage> {
               );
             } else {
               return Center(
-                child: CircularProgressIndicator(),
+                child: CustomDotLoading(),
               );
             }
           }),
@@ -99,9 +104,10 @@ class _CartPageState extends State<CartPage> {
           builder: (context, snapshot) {
             return AnimatedContainer(
               duration: Duration(milliseconds: 100),
-              decoration: BoxDecoration(
-                  color: BACKGROUND_COLOR,
-                  boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(0, -3), blurRadius: 3)]),
+              decoration: BoxDecoration(color: BACKGROUND_COLOR, boxShadow: [
+                BoxShadow(
+                    color: Colors.black26, offset: Offset(0, -3), blurRadius: 3)
+              ]),
               height: snapshot.hasData && snapshot.data == true ? 0 : 55,
               child: Row(
                 children: <Widget>[
@@ -113,19 +119,25 @@ class _CartPageState extends State<CartPage> {
                       children: <Widget>[
                         Text(
                           'Total:',
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                          style: DEFAULT_TEXT_STYLE.copyWith(
+                              fontWeight: FontWeight.bold),
                         ),
                         Text(
                           numberToMoneyString(total) + "d",
                           style: DEFAULT_TEXT_STYLE.copyWith(
-                              fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: PRICE_COLOR),
                         )
                       ],
                     ),
                   )),
                   CustomOnTapWidget(
                     onTap: () async {
-                      Navigator.push(context, MaterialPageRoute(builder: (b) => CheckOutPage(cart)));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (b) => CheckOutPage(cart)));
                     },
                     child: Container(
                       padding: EdgeInsets.all(10),
@@ -168,13 +180,17 @@ class _CartPageState extends State<CartPage> {
             var product = od.product;
             return CustomProductCartItem(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (b) => ProductDetailPage(product)));
               },
               onDelete: () {
                 _removeFromCartConfirmDialog(
                     product: product,
                     onYes: () {
-                      bloc.add(AddToCart(productID: product.id, count: od.count * -1));
+                      bloc.add(AddToCart(
+                          productID: product.id, count: od.count * -1));
                     });
               },
               onIncreaseQuantity: () {
@@ -218,39 +234,54 @@ class _CartPageState extends State<CartPage> {
   }
 
   Timer _increaseTimer;
+  int _increasedValue = 0;
+
   _onIncreaseItem(OrderingDetailModel od) {
-    setState(() {
-      od.count++;
-    });
     if (_increaseTimer != null) {
       _increaseTimer.cancel();
+      _decreaseValue = 0;
     }
-    _increaseTimer = Timer(Duration(seconds: 1), () {
-      bloc.add(AddToCart(productID: od.product.id, count: 1));
+    setState(() {
+      od.count++;
+      _increasedValue++;
+    });
+    _increaseTimer = Timer(Duration(seconds: 1), () async {
+      print('CART ADD:' + _increasedValue.toString());
+//      bloc.add(AddToCart(productID: od.product.id, count: _increasedValue));
+      await CartService().addToCart(od.product.id, _increasedValue);
+      _increasedValue = 0;
     });
   }
 
   Timer _decreaseTimer;
+  int _decreaseValue = 0;
 
   _onDecreaseItem(OrderingDetailModel od) {
-    setState(() {
-      od.count--;
-    });
     if (_increaseTimer != null) {
       _increaseTimer.cancel();
+      _increasedValue = 0;
     }
-    _increaseTimer = Timer(Duration(seconds: 1), () {
-      bloc.add(AddToCart(productID: od.product.id, count: -1));
+    setState(() {
+      od.count--;
+      _decreaseValue--;
+    });
+    _increaseTimer = Timer(Duration(seconds: 1), () async {
+      print('CART DECREASED:' + _decreaseValue.toString());
+//      bloc.add(AddToCart(productID: od.product.id, count: _decreaseValue));
+      await CartService().addToCart(od.product.id, _decreaseValue);
+      _decreaseValue = 0;
     });
   }
 
-  _removeFromCartConfirmDialog({@required ProductModel product, @required Function onYes}) {
+  _removeFromCartConfirmDialog(
+      {@required ProductModel product, @required Function onYes}) {
     showDialog(
         context: context,
         builder: (_) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25), side: BorderSide(color: FOREGROUND_COLOR, width: 2)),
+                borderRadius: BorderRadius.circular(25),
+                side: BorderSide(color: FOREGROUND_COLOR, width: 2)),
             backgroundColor: BACKGROUND_COLOR,
             title: Text(product.name),
             content: Text('You wanna remove this item from cart?'),
@@ -267,7 +298,8 @@ class _CartPageState extends State<CartPage> {
                   },
                   child: Text(
                     'No',
-                    style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                    style: DEFAULT_TEXT_STYLE.copyWith(
+                        fontWeight: FontWeight.bold),
                   )),
             ],
           );

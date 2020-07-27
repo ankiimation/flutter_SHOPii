@@ -9,6 +9,7 @@ import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
+import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -55,7 +56,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                       );
                     } else {
                       return Center(
-                        child: CircularProgressIndicator(),
+                        child: CustomDotLoading(),
                       );
                     }
                   },

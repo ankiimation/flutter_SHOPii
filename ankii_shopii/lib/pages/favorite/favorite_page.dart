@@ -1,5 +1,6 @@
 import 'package:ankiishopii/blocs/product_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/product_bloc/event.dart';
+import 'package:ankiishopii/blocs/product_bloc/service.dart';
 import 'package:ankiishopii/blocs/product_bloc/state.dart';
 import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
@@ -25,8 +26,17 @@ class FavoritePage extends StatefulWidget {
 }
 
 class _FavoritePageState extends State<FavoritePage> {
-  GlobalKey cartIconKey = GlobalKey();
+  GlobalKey<CartWidgetState> cartIconKey = GlobalKey();
   ProductBloc bloc = ProductBloc(ProductLoading());
+
+  Future _doFavorite(ProductModel productModel) async {
+    setState(() {
+      productModel.isFavoriteByCurrentUser =
+          !productModel.isFavoriteByCurrentUser;
+    });
+    await ProductService().doFavorite(productModel);
+    bloc.add(GetAllProducts());
+  }
 
   @override
   void initState() {
@@ -64,7 +74,7 @@ class _FavoritePageState extends State<FavoritePage> {
                       );
                     else
                       return Center(
-                        child: CircularProgressIndicator(),
+                        child: CustomDotLoading(),
                       );
                   })),
         ],
@@ -90,8 +100,9 @@ class _FavoritePageState extends State<FavoritePage> {
         barShadow: false,
         backgroundColor: BACKGROUND_COLOR,
         children: categories.map((categoryName) {
-          var favoriteProducts =
-              products.where((product) => product.category.name == categoryName && product.isFavoriteByCurrentUser);
+          var favoriteProducts = products.where((product) =>
+              product.category.name == categoryName &&
+              product.isFavoriteByCurrentUser);
           return CustomTabViewItem(
               label: categoryName,
               icon: Icons.favorite,
@@ -102,19 +113,23 @@ class _FavoritePageState extends State<FavoritePage> {
                               cartIconKey: cartIconKey,
                               onTap: () async {
                                 await Navigator.push(
-                                    context, MaterialPageRoute(builder: (b) => ProductDetailPage(favoriteProduct)));
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (b) => ProductDetailPage(
+                                            favoriteProduct)));
                                 bloc.add(GetAllProducts());
                               },
                               onFavourite: () {
-                                bloc.add(DoFavorite(favoriteProduct));
-                                bloc.add(GetAllProducts());
+                                _doFavorite(favoriteProduct);
                               },
                               onAddToCart: () {
-                                addToCart(context, productID: favoriteProduct.id, count: 1);
+                                addToCart(context,
+                                    productID: favoriteProduct.id, count: 1);
                               },
                               product: favoriteProduct,
                               priceTextColor: PRICE_COLOR,
-                              isFavorite: favoriteProduct.isFavoriteByCurrentUser,
+                              isFavorite:
+                                  favoriteProduct.isFavoriteByCurrentUser,
                               backgroundColor: FOREGROUND_COLOR,
                             ))
                         .toList()),
