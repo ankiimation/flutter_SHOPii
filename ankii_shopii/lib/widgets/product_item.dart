@@ -120,7 +120,7 @@ class CustomProductListItem extends StatelessWidget {
                           Expanded(
                             child: InkWell(
                               key: inkwellKey,
-                              onTap: () {
+                              onTap: () async {
                                 if (currentLogin == null) {
                                   Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
                                   return;
@@ -133,7 +133,8 @@ class CustomProductListItem extends StatelessWidget {
                                   //print(dx.toString() + " - " + dy.toString());
 
                                   updateCartIconPosition(cartIconKey: cartIconKey);
-                                  showAddToCartAnimation(context,
+
+                                  await showAddToCartAnimation(context,
                                       start: CustomPosition(dx, dy),
                                       end: CustomPosition(cartIconPositionDx, cartIconPositionDy));
                                   onAddToCart();
@@ -184,6 +185,7 @@ class CustomProductCartItem extends StatefulWidget {
   final Function onDelete;
   final Function onIncreaseQuantity;
   final Function onDecreaseQuantity;
+  final Function(int) onTextSubmit;
   final Color backgroundColor;
 
   CustomProductCartItem({
@@ -193,6 +195,7 @@ class CustomProductCartItem extends StatefulWidget {
     this.onDecreaseQuantity,
     this.onIncreaseQuantity,
     this.onDelete,
+    this.onTextSubmit,
     this.quickActionColor = PRIMARY_COLOR,
     this.priceTextColor = PRICE_COLOR,
   });
@@ -324,13 +327,21 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                                   borderRadius: BorderRadius.circular(15)),
                                               child: TextFormField(
                                                 controller: quantityController,
-                                                enabled: false,
+                                                //enabled: false,
                                                 keyboardType: TextInputType.number,
+                                                onFieldSubmitted: (quantityString) {
+                                                  int quantity = int.parse(quantityString);
+                                                  if (widget.onTextSubmit != null) {
+                                                    widget.onTextSubmit(quantity);
+                                                  }
+                                                },
                                                 textAlign: TextAlign.center,
                                                 style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
                                                 cursorColor: FOREGROUND_COLOR,
-                                                decoration: InputDecoration.collapsed().copyWith(
-                                                    isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 5)),
+                                                decoration: InputDecoration.collapsed(hintText: '').copyWith(
+                                                    hintText: '',
+                                                    isDense: true,
+                                                    contentPadding: EdgeInsets.symmetric(horizontal: 5)),
                                               ),
                                             ),
                                           ),

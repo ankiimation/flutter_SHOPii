@@ -68,40 +68,43 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: BACKGROUND_COLOR,
-      body: BlocBuilder(
-          cubit: bloc,
-          builder: (context, state) {
-            if (state is OrderingLoaded) {
-              return Column(
-                children: <Widget>[
-                  Expanded(
-                      child: SingleChildScrollView(
-                    controller: _scrollController,
-                    physics: AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      children: <Widget>[
-                        buildAppBar(state.orderingModel),
-                        buildTotal(state.orderingModel),
-                        buildCreatedDate(state.orderingModel),
-                        buildStatus(state.orderingModel),
-                        buildDivider(),
-                        buildDelivery(state.orderingModel),
-                        buildDivider(),
-                        buildPaymentMethod(),
-                        buildDivider(),
-                        buildListOrderDetail(state.orderingModel.orderingDetail),
-                      ],
-                    ),
-                  ))
-                ],
+    return WillPopScope(
+      onWillPop: () async {},
+      child: Scaffold(
+        backgroundColor: BACKGROUND_COLOR,
+        body: BlocBuilder(
+            cubit: bloc,
+            builder: (context, state) {
+              if (state is OrderingLoaded) {
+                return Column(
+                  children: <Widget>[
+                    Expanded(
+                        child: SingleChildScrollView(
+                      controller: _scrollController,
+                      physics: AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        children: <Widget>[
+                          buildAppBar(state.orderingModel),
+                          buildTotal(state.orderingModel),
+                          buildCreatedDate(state.orderingModel),
+                          buildStatus(state.orderingModel),
+                          buildDivider(),
+                          buildDelivery(state.orderingModel),
+                          buildDivider(),
+                          buildPaymentMethod(),
+                          buildDivider(),
+                          buildListOrderDetail(state.orderingModel.orderingDetail),
+                        ],
+                      ),
+                    ))
+                  ],
+                );
+              }
+              return Center(
+                child: Text('error'),
               );
-            }
-            return Center(
-              child: Text('error'),
-            );
-          }),
+            }),
+      ),
     );
   }
 
@@ -195,8 +198,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                 ),
                 Text(
                   '${numberToMoneyString(total)} đ',
-                  style:
-                      DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR),
+                  style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR),
                 )
               ],
             ),

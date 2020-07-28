@@ -1,4 +1,4 @@
-package com.ankii.ankiishopii
+package com.ankii.shopii
 
 import io.flutter.embedding.android.FlutterActivity
 

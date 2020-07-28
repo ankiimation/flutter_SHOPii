@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:ankiishopii/blocs/cart_bloc/event.dart';
 import 'package:ankiishopii/blocs/cart_bloc/service.dart';
 import 'package:ankiishopii/blocs/cart_bloc/state.dart';
+import 'package:ankiishopii/main.dart';
+import 'package:ankiishopii/widgets/loading_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 Timer _cartChangingTimer;
@@ -35,6 +38,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   }
 
   Stream<CartState> mapAddToCartCartEventToState(AddToCart event) async* {
+    await Future.delayed(Duration(seconds: 2));
     var rs = await CartService().addToCart(event.productID, event.count);
     if (rs != null) {
       yield CartLoaded(rs);

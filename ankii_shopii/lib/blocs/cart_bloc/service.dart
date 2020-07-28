@@ -29,7 +29,7 @@ class CartService extends BlocService<OrderingModel> {
   }
 
   Future<OrderingModel> addToCart(int productId, int count) async {
-    await Future.delayed(Duration(seconds: 2));
+
     var rs = await HttpHelper.post(
         ORDERING_ENDPOINT + "/cart", {"productID": productId, "count": count},
         bearerToken: currentLogin.token);

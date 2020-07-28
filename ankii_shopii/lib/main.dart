@@ -16,6 +16,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'blocs/cart_bloc/bloc.dart';
 import 'pages/navigator/navigator_page.dart';
 
+BuildContext mainContext;
 main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());

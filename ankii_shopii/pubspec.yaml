@@ -36,6 +36,11 @@ dependencies:
   shared_preferences:
   rxdart:
 
+  #map
+  google_maps_flutter:
+  geolocator:
+  flutter_polyline_points:
+
 
   #ui
   intl:

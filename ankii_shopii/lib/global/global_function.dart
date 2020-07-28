@@ -9,16 +9,21 @@ import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/add_to_cart_effect.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/loading_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-addToCart(BuildContext context,
-    {@required int productID, int count = 1}) async {
-  BlocProvider.of<CartBloc>(context)
-      .add(AddToCart(productID: productID, count: count));
-//  await CartService().addToCart(productID, count);
-//  refreshCart(context);
+addToCart(BuildContext context, {@required int productID, int count = 1}) async {
+//  BlocProvider.of<CartBloc>(context).add(AddToCart(productID: productID, count: count));
+  LoadingDialog.showLoadingDialog(context);
+
+  await Future.delayed(Duration(milliseconds: 2000));
+  await CartService().addToCart(productID, count);
+
+  LoadingDialog.hideLoadingDialog(context);
+//
+  refreshCart(context);
 }
 
 refreshCart(BuildContext context) async {
@@ -58,10 +63,7 @@ String getOrderStatus(OrderingModel orderingModel) {
 }
 
 showAddToCartAnimation(BuildContext context,
-    {@required CustomPosition start,
-    @required CustomPosition end,
-    Widget overlayWidget,
-    Duration duration}) async {
+    {@required CustomPosition start, @required CustomPosition end, Widget overlayWidget, Duration duration}) async {
   showGeneralDialog(
       transitionDuration: Duration(milliseconds: 100),
       barrierDismissible: false,
@@ -81,8 +83,7 @@ showAddToCartAnimation(BuildContext context,
 double cartIconPositionDx = 0;
 double cartIconPositionDy = 0;
 
-updateCartIconPosition(
-    {GlobalKey<CartWidgetState> cartIconKey, Duration duration}) {
+updateCartIconPosition({GlobalKey<CartWidgetState> cartIconKey, Duration duration}) {
   if (cartIconKey != null) {
     try {
       cartIconKey.currentState.onAddToCart(duration: duration);

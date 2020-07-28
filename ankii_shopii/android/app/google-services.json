@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "203210645878",
+    "firebase_url": "https://shopii-c06aa.firebaseio.com",
+    "project_id": "shopii-c06aa",
+    "storage_bucket": "shopii-c06aa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203210645878:android:7479e5bd34303b28ad9a57",
+        "android_client_info": {
+          "package_name": "com.ankii.shopii"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "203210645878-rn430dfeiugpn0d5a2iei1314jvjq7kl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBztRkdhFSUrQRjpr3E7SwyBpEC-9xKqa4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "203210645878-rn430dfeiugpn0d5a2iei1314jvjq7kl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

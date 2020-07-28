@@ -17,6 +17,7 @@ import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
 import 'package:ankiishopii/widgets/graphic_widget.dart';
+import 'package:ankiishopii/widgets/image_viewer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -270,12 +271,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   initiallyExpanded: true,
                   title: Text('Images'),
                   children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.all(10),
-                      child: productModel.productImage != null && productModel.productImage.length > 0
-                          ? _buildCarousel(productModel.productImage)
-                          : Text('No Image'),
-                    )
+                    Container(margin: EdgeInsets.all(10), child: _buildCarousel(productModel.productImage))
                   ],
                 ),
               )),
@@ -311,16 +307,32 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Widget _buildCarousel(List<ProductImageModel> images) {
-    return CarouselSlider(
-        items: images
-            .map((image) => Container(
-                  margin: EdgeInsets.symmetric(vertical: 5),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      image: DecorationImage(image: CachedNetworkImageProvider(image.image))),
-                ))
-            .toList(),
-        options: CarouselOptions(enlargeCenterPage: true, autoPlay: true, autoPlayInterval: Duration(seconds: 2)));
+    if (widget.product.image != null) {
+      images.add(ProductImageModel(image: widget.product.image));
+    }
+    if (images != null && images.length > 0) {
+      return CustomOnTapWidget(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (b) => ImagesViewer(images.map((image) => Image.network(image.image)).toList())));
+        },
+        child: CarouselSlider(
+            items: images
+                .map((image) => Container(
+                      margin: EdgeInsets.symmetric(vertical: 5),
+                      decoration: BoxDecoration(image: DecorationImage(image: CachedNetworkImageProvider(image.image))),
+                    ))
+                .toList(),
+            options: CarouselOptions(enlargeCenterPage: true, autoPlay: true, autoPlayInterval: Duration(seconds: 2))),
+      );
+    } else {
+      return Container(
+        alignment: Alignment.center,
+        child: Text('No Image'),
+      );
+    }
   }
 
   Widget buildFloatingBottomBar(ProductModel productModel) {
@@ -492,7 +504,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   decoration: BoxDecoration(
                                       color: PRIMARY_COLOR.withOpacity(0.1), borderRadius: BorderRadius.circular(15)),
                                   child: TextFormField(
-                                    enabled: false,
+                                    // enabled: false,
                                     controller: quantityController,
                                     keyboardType: TextInputType.number,
                                     textAlign: TextAlign.center,
@@ -587,11 +599,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   CustomOnTapWidget(
                     onTap: () async {
                       updateCartIconPosition(cartIconKey: cartIconKey);
-                      addToCart(context, productID: productModel.id, count: int.parse(quantityController.text));
                       await showAddToCartAnimation(context,
-                          overlayWidget: CircleAvatar(
-                            backgroundColor: BACKGROUND_COLOR,
-                            radius: 10,
+                          overlayWidget: Container(
+                            padding: EdgeInsets.all(5),
+                            decoration:
+                                BoxDecoration(color: BACKGROUND_COLOR, borderRadius: BorderRadius.circular(100)),
                             child: Text(
                               quantityController.text,
                               style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
@@ -600,6 +612,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           start: CustomPosition(
                               ScreenHelper.getWidth(context) * 0.7, ScreenHelper.getHeight(context) * 0.9),
                           end: CustomPosition(cartIconPositionDx, cartIconPositionDy));
+                      await addToCart(context, productID: productModel.id, count: int.parse(quantityController.text));
 
                       Navigator.pop(context);
                     },

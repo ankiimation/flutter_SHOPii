@@ -31,8 +31,8 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
     setState(() {
       currentLogin.account.defaultDeliveryId = id;
     });
-   await AccountService().updateDefaultDeliveryId(id);
-   bloc.add(GetAllDeliveryAddresses());
+    await AccountService().updateDefaultDeliveryId(id);
+    bloc.add(GetAllDeliveryAddresses());
   }
 
   @override
@@ -95,8 +95,7 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
   Widget buildAddNewAddressButton() {
     return CustomOnTapWidget(
       onTap: () async {
-        await Navigator.push(context,
-            MaterialPageRoute(builder: (b) => AddDeliveryAddressPage()));
+        await Navigator.push(context, MaterialPageRoute(builder: (b) => AddDeliveryAddressPage()));
         bloc.add(GetAllDeliveryAddresses());
       },
       child: Container(
@@ -112,18 +111,17 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
   }
 
   Widget buildListAddress(List<DeliveryAddressModel> deliveryAddresses) {
+    deliveryAddresses = deliveryAddresses.reversed.toList();
     return Column(
         mainAxisSize: MainAxisSize.min,
         children: deliveryAddresses
-            .map<Widget>((address) => Container(
-                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                child: addressItem(address)))
+            .map<Widget>((address) =>
+                Container(margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10), child: addressItem(address)))
             .toList());
   }
 
   Widget addressItem(DeliveryAddressModel deliveryAddressModel) {
-    bool isDefault =
-        deliveryAddressModel.id == currentLogin.account.defaultDeliveryId;
+    bool isDefault = deliveryAddressModel.id == currentLogin.account.defaultDeliveryId;
     return Column(
       children: <Widget>[
         Row(
@@ -146,15 +144,11 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                   alignment: Alignment.center,
                   width: double.maxFinite,
                   height: 30,
-                  color: isDefault
-                      ? PRIMARY_COLOR
-                      : PRIMARY_COLOR.withOpacity(0.1),
+                  color: isDefault ? PRIMARY_COLOR : PRIMARY_COLOR.withOpacity(0.1),
                   child: isDefault
                       ? Text(
                           'Default Address',
-                          style: DEFAULT_TEXT_STYLE.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: FOREGROUND_COLOR),
+                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, color: FOREGROUND_COLOR),
                         )
                       : Text(
                           'Tap to set default delivery address',
@@ -216,8 +210,7 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                         child: Text(
                           deliveryAddressModel.fullname,
                           textAlign: TextAlign.right,
-                          style: DEFAULT_TEXT_STYLE.copyWith(
-                              fontWeight: FontWeight.bold, fontSize: 18),
+                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       )
                     ],
@@ -235,8 +228,7 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                         child: Text(
                           deliveryAddressModel.address,
                           textAlign: TextAlign.right,
-                          style: DEFAULT_TEXT_STYLE.copyWith(
-                              fontWeight: FontWeight.bold, fontSize: 14),
+                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                       )
                     ],
@@ -254,8 +246,7 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                         child: Text(
                           deliveryAddressModel.phoneNumber,
                           textAlign: TextAlign.right,
-                          style: DEFAULT_TEXT_STYLE.copyWith(
-                              fontWeight: FontWeight.bold, fontSize: 18),
+                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       )
                     ],

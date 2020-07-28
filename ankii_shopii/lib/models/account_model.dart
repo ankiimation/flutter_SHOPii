@@ -19,7 +19,8 @@ class AccountModel {
       this.fullname,
       this.address,
       this.image,
-      this.deliveryAddress,this.defaultDeliveryId});
+      this.deliveryAddress,
+      this.defaultDeliveryId});
 
   AccountModel.fromJson(Map<String, dynamic> json) {
     username = json['username'];
@@ -68,8 +69,11 @@ class DeliveryAddressModel {
   String phoneNumber;
   String fullname;
   String address;
+  String latitude;
+  String longitude;
 
-  DeliveryAddressModel({this.id, this.username, this.phoneNumber, this.fullname, this.address});
+  DeliveryAddressModel(
+      {this.id, this.username, this.phoneNumber, this.fullname, this.address, this.latitude, this.longitude});
 
   DeliveryAddressModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -77,6 +81,8 @@ class DeliveryAddressModel {
     phoneNumber = json['phoneNumber'];
     fullname = json['fullname'];
     address = json['address'];
+    latitude = json['latitude'];
+    longitude = json['longitude'];
   }
 
   Map<String, dynamic> toJson() {
@@ -86,6 +92,8 @@ class DeliveryAddressModel {
     data['phoneNumber'] = this.phoneNumber;
     data['fullname'] = this.fullname;
     data['address'] = this.address;
+    data['latitude'] = this.latitude;
+    data['longitude'] = this.longitude;
     return data;
   }
 }

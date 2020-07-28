@@ -29,13 +29,17 @@ class DeliveryAddressService extends BlocService<DeliveryAddressModel> {
   }
 
   Future<DeliveryAddressModel> addDeliveryAddress(DeliveryAddressModel deliveryAddressModel) async {
-    var rs = await HttpHelper.post(DELIVERY_ADDRESS_ENDPOINT, {
-      "fullname":deliveryAddressModel.fullname,
-      "address":deliveryAddressModel.address,
-      "phoneNumber":deliveryAddressModel.phoneNumber
-    },
+    var rs = await HttpHelper.post(
+        DELIVERY_ADDRESS_ENDPOINT,
+        {
+          "fullname": deliveryAddressModel.fullname,
+          "address": deliveryAddressModel.address,
+          "phoneNumber": deliveryAddressModel.phoneNumber,
+          "latitude": deliveryAddressModel.latitude,
+          "longitude": deliveryAddressModel.longitude
+        },
         bearerToken: currentLogin.token);
-   // print(rs.body);
+     print(rs.body);
     if (rs.statusCode == 200) {
       var jsonObject = jsonDecode(rs.body);
       return DeliveryAddressModel.fromJson(jsonObject);

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ankiishopii/blocs/product_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/product_bloc/state.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
+import 'package:ankiishopii/main.dart';
 import 'package:ankiishopii/pages/account/account_page.dart';
 import 'package:ankiishopii/pages/categories/categories_page.dart';
 import 'package:ankiishopii/pages/favorite/favorite_page.dart';

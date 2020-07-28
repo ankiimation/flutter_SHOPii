@@ -18,6 +18,7 @@ namespace SHOPii.Models
         public string Image { get; set; }
         public long Price { get; set; }
         public int CategoryId { get; set; }
+        public string ShopUsername { get; set; }
 
         public virtual Category Category { get; set; }
         public virtual ICollection<Favorite> Favorite { get; set; }

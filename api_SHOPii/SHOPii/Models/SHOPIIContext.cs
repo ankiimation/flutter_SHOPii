@@ -23,6 +23,7 @@ namespace SHOPii.Models
         public virtual DbSet<OrderingDetail> OrderingDetail { get; set; }
         public virtual DbSet<Product> Product { get; set; }
         public virtual DbSet<ProductImage> ProductImage { get; set; }
+        public virtual DbSet<ShopAccount> ShopAccount { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -102,6 +103,18 @@ namespace SHOPii.Models
                 entity.Property(e => e.Fullname)
                     .IsRequired()
                     .HasColumnName("FULLNAME");
+
+                entity.Property(e => e.Latitude)
+                    .IsRequired()
+                    .HasColumnName("LATITUDE")
+                    .IsUnicode(false)
+                    .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.Longitude)
+                    .IsRequired()
+                    .HasColumnName("LONGITUDE")
+                    .IsUnicode(false)
+                    .HasDefaultValueSql("('')");
 
                 entity.Property(e => e.PhoneNumber)
                     .IsRequired()
@@ -230,6 +243,12 @@ namespace SHOPii.Models
 
                 entity.Property(e => e.Price).HasColumnName("PRICE");
 
+                entity.Property(e => e.ShopUsername)
+                    .IsRequired()
+                    .HasColumnName("SHOP_USERNAME")
+                    .HasMaxLength(32)
+                    .IsUnicode(false);
+
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.Product)
                     .HasForeignKey(d => d.CategoryId)
@@ -254,6 +273,43 @@ namespace SHOPii.Models
                     .HasForeignKey(d => d.ProductId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__PRODUCT_I__PRODU__300424B4");
+            });
+
+            modelBuilder.Entity<ShopAccount>(entity =>
+            {
+                entity.HasKey(e => e.Username)
+                    .HasName("PK__SHOP_ACC__B15BE12FB7F1BC99");
+
+                entity.ToTable("SHOP_ACCOUNT");
+
+                entity.Property(e => e.Username)
+                    .HasColumnName("USERNAME")
+                    .HasMaxLength(32)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Address)
+                    .IsRequired()
+                    .HasColumnName("ADDRESS");
+
+                entity.Property(e => e.Image)
+                    .IsRequired()
+                    .HasColumnName("IMAGE");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasColumnName("NAME");
+
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasColumnName("PASSWORD")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PhoneNumber)
+                    .IsRequired()
+                    .HasColumnName("PHONE_NUMBER")
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);

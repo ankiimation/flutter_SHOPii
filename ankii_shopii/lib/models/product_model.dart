@@ -9,6 +9,7 @@ class ProductModel {
   String image;
   int price;
   int categoryId;
+  String shopUsername;
   CategoryModel category;
   List<ProductImageModel> productImage;
   List<FavoriteModel> favorite;
@@ -23,6 +24,7 @@ class ProductModel {
       this.categoryId,
       this.productImage,
       this.favorite,
+      this.shopUsername,
       this.category});
 
   ProductModel.fromJson(Map<String, dynamic> json) {
@@ -31,6 +33,7 @@ class ProductModel {
     description = json['description'];
     image = json['image'];
     price = json['price'];
+    shopUsername = json['shopUsername'];
     categoryId = json['categoryId'];
     if (json['productImage'] != null) {
       productImage = new List<ProductImageModel>();
@@ -44,9 +47,7 @@ class ProductModel {
         favorite.add(new FavoriteModel.fromJson(v));
       });
     }
-    category = json['category'] != null
-        ? new CategoryModel.fromJson(json['category'])
-        : null;
+    category = json['category'] != null ? new CategoryModel.fromJson(json['category']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -56,6 +57,7 @@ class ProductModel {
     data['description'] = this.description;
     data['image'] = this.image;
     data['price'] = this.price;
+    data['shopUsername'] = this.shopUsername;
     data['categoryId'] = this.categoryId;
     if (this.category != null) {
       data['category'] = this.category.toJson();

@@ -9266,19 +9266,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\anKiimation\\.nuget\\packages\\": {}
+    "C:\\Users\\khoaln\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\_Git\\flutter_SHOPii\\api_SHOPii\\SHOPii\\SHOPii.csproj",
+      "projectUniqueName": "D:\\Khoa_Projects\\_git\\SHOPii\\flutter_SHOPii\\api_SHOPii\\SHOPii\\SHOPii.csproj",
       "projectName": "SHOPii",
-      "projectPath": "D:\\_Git\\flutter_SHOPii\\api_SHOPii\\SHOPii\\SHOPii.csproj",
-      "packagesPath": "C:\\Users\\anKiimation\\.nuget\\packages\\",
-      "outputPath": "D:\\_Git\\flutter_SHOPii\\api_SHOPii\\SHOPii\\obj\\",
+      "projectPath": "D:\\Khoa_Projects\\_git\\SHOPii\\flutter_SHOPii\\api_SHOPii\\SHOPii\\SHOPii.csproj",
+      "packagesPath": "C:\\Users\\khoaln\\.nuget\\packages\\",
+      "outputPath": "D:\\Khoa_Projects\\_git\\SHOPii\\flutter_SHOPii\\api_SHOPii\\SHOPii\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\anKiimation\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\khoaln\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -9351,7 +9351,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.301\\RuntimeIdentifierGraph.json"
       }
     }
   },

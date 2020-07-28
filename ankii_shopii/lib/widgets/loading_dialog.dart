@@ -8,7 +8,7 @@ class LoadingDialog {
 
   static showLoadingDialog(BuildContext context, {String text, bool hideOnBackButton = false}) async {
     _isLoadingDialogShowing = true;
-    await showDialog(
+    showDialog(
         context: context,
         barrierDismissible: false,
         child: WillPopScope(
@@ -16,7 +16,8 @@ class LoadingDialog {
             return hideOnBackButton;
           },
           child: AlertDialog(
-            backgroundColor: BACKGROUND_COLOR.withOpacity(0.9),
+            elevation: 0,
+            backgroundColor: text == null ? Colors.transparent : BACKGROUND_COLOR.withOpacity(0.9),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -25,12 +26,14 @@ class LoadingDialog {
                   primaryColor: FOREGROUND_COLOR,
                 ),
                 SizedBox(
-                  height: 10,
+                  height: text == null ? 0 : 10,
                 ),
-                Text(
-                  text ?? '',
-                  style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
-                )
+                text == null
+                    ? Container()
+                    : Text(
+                        text ?? 'Processing...',
+                        style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                      )
               ],
             ),
           ),
@@ -40,6 +43,30 @@ class LoadingDialog {
   static hideLoadingDialog(BuildContext context, {String text}) async {
     if (_isLoadingDialogShowing) {
       Navigator.pop(context);
+      _isLoadingDialogShowing = false;
     }
+  }
+
+  static showMessage(BuildContext context, {String text}) async {
+    return await showDialog(
+        context: context,
+        child: AlertDialog(
+          backgroundColor: BACKGROUND_COLOR,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          content: Text(
+            text ?? '',
+            style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            )
+          ],
+        ));
   }
 }
