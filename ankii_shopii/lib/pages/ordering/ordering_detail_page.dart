@@ -115,6 +115,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
       leading: CustomOnTapWidget(
         onTap: () {
 //          navigatorPagedKey.currentState.currentIndex = 3;
+          changePageViewPage(3);
           Navigator.popUntil(context, (route) => route.isFirst);
         },
         child: Icon(Icons.arrow_back_ios),

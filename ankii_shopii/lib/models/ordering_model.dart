@@ -5,16 +5,28 @@ class OrderingModel {
   int id;
   int deliveryId;
   int status;
+  String username;
+  String shopUsername;
   DeliveryAddressModel delivery;
   String createdDate;
   List<OrderingDetailModel> orderingDetail;
 
-  OrderingModel({this.id, this.deliveryId, this.status, this.delivery, this.orderingDetail});
+  OrderingModel(
+      {this.id,
+      this.deliveryId,
+      this.status,
+      this.delivery,
+      this.orderingDetail,
+      this.shopUsername,
+      this.username,
+      this.createdDate});
 
   OrderingModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     deliveryId = json['deliveryId'];
     status = json['status'];
+    username = json['username'];
+    shopUsername = json['shopUsername'];
     createdDate = json['createdDate'];
     delivery = json['delivery'] != null ? new DeliveryAddressModel.fromJson(json['delivery']) : null;
     if (json['orderingDetail'] != null) {
@@ -31,6 +43,8 @@ class OrderingModel {
     data['deliveryId'] = this.deliveryId;
     data['status'] = this.status;
     data['createdDate'] = this.createdDate;
+    data['username'] = this.username;
+    data['shopUsername'] = this.shopUsername;
     if (this.delivery != null) {
       data['delivery'] = this.delivery.toJson();
     }

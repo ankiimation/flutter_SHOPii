@@ -13,30 +13,26 @@ const ORDERING_ENDPOINT = DOMAIN + 'orderings';
 const CART_ENDPOINT = DOMAIN + 'orderings/cart';
 const CHECKOUT_ENDPOINT = DOMAIN + 'orderings/checkout';
 const DELIVERY_ADDRESS_ENDPOINT = DOMAIN + 'deliveryaddresses';
+const SHOP_ACCOUNT_ENDPOINT = DOMAIN + 'shopaccounts';
 
 class HttpHelper {
-  static Future<http.Response> post(String url, Map<String, dynamic> body,{String bearerToken}) async {
-    return (await http.post(
-
-      url, body: jsonEncode(body), headers: {
+  static Future<http.Response> post(String url, Map<String, dynamic> body, {String bearerToken}) async {
+    return (await http.post(url, body: jsonEncode(body), headers: {
       HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
       HttpHeaders.acceptHeader: 'application/json',
-      HttpHeaders.authorizationHeader:'Bearer $bearerToken'
-    }));
-  }
-  static Future<http.Response> put(String url, Map<String, dynamic> body,{String bearerToken}) async {
-    return (await http.put(
-
-        url, body: jsonEncode(body), headers: {
-      HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-      HttpHeaders.acceptHeader: 'application/json',
-      HttpHeaders.authorizationHeader:'Bearer $bearerToken'
+      HttpHeaders.authorizationHeader: 'Bearer $bearerToken'
     }));
   }
 
-  static Future<http.Response> get(String url,{String bearerToken}) async {
-    return await http.get(url,headers: {
-      HttpHeaders.authorizationHeader:'Bearer $bearerToken'
-    });
+  static Future<http.Response> put(String url, Map<String, dynamic> body, {String bearerToken}) async {
+    return (await http.put(url, body: jsonEncode(body), headers: {
+      HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
+      HttpHeaders.acceptHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $bearerToken'
+    }));
+  }
+
+  static Future<http.Response> get(String url, {String bearerToken}) async {
+    return await http.get(url, headers: {HttpHeaders.authorizationHeader: 'Bearer $bearerToken'});
   }
 }

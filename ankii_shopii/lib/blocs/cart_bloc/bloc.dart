@@ -40,8 +40,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   Stream<CartState> mapAddToCartCartEventToState(AddToCart event) async* {
     await Future.delayed(Duration(seconds: 2));
     var rs = await CartService().addToCart(event.productID, event.count);
+    var refreshCart = await CartService().getCurrentCart();
     if (rs != null) {
-      yield CartLoaded(rs);
+      yield CartLoaded(refreshCart);
     } else {
       yield CartError();
     }

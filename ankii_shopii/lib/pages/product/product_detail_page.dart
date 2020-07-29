@@ -5,12 +5,16 @@ import 'package:ankiishopii/blocs/cart_bloc/event.dart';
 import 'package:ankiishopii/blocs/product_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/product_bloc/event.dart';
 import 'package:ankiishopii/blocs/product_bloc/state.dart';
+import 'package:ankiishopii/blocs/shop_bloc/bloc.dart';
+import 'package:ankiishopii/blocs/shop_bloc/event.dart';
+import 'package:ankiishopii/blocs/shop_bloc/state.dart';
 import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/global/global_variable.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/helpers/string_helper.dart';
 import 'package:ankiishopii/models/product_model.dart';
 import 'package:ankiishopii/pages/account/login_page.dart';
+import 'package:ankiishopii/pages/shop_account/shop_account_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/add_to_cart_effect.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
@@ -40,6 +44,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   GlobalKey<CartWidgetState> cartIconKey = GlobalKey();
   ProductBloc bloc = ProductBloc(ProductLoading());
+  ShopAccountBloc shopAccountBloc = ShopAccountBloc();
 
   //CartBloc cartBloc;
   StreamController _scrollStreamController = BehaviorSubject();
@@ -51,6 +56,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     super.initState();
     // cartBloc = BlocProvider.of<CartBloc>(context);
     bloc.add(GetProductById(widget.product.id));
+    shopAccountBloc.add(GetShopAccount(widget.product.shopUsername));
     _scrollController.addListener(() {
       bool isScrollUp = _scrollController.position.userScrollDirection == ScrollDirection.reverse;
       _scrollStreamController.sink.add(isScrollUp);
@@ -60,6 +66,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   void dispose() {
     // TODO: implement dispose
+    bloc.close();
+    shopAccountBloc.close();
     _scrollStreamController.close();
     super.dispose();
   }
@@ -237,6 +245,42 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
       child: Column(
         children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+            child: Row(
+              children: <Widget>[
+                Icon(
+                  Icons.store,
+                  size: 20,
+                  color: TEXT_COLOR,
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                BlocBuilder(
+                    cubit: shopAccountBloc,
+                    builder: (_, state) {
+                      if (state is ShopAccountLoaded) {
+                        return CustomOnTapWidget(
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (b) => ShopAccountDetailPage(state.shopAccountModel)));
+                          },
+                          child: Text(
+                            state.shopAccountModel.name,
+                            style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      } else {
+                        return CustomDotLoading(
+                          primaryColor: FOREGROUND_COLOR,
+                          secondaryColor: BACKGROUND_COLOR,
+                        );
+                      }
+                    }),
+              ],
+            ),
+          ),
           Container(
               width: double.maxFinite,
               child: Container(

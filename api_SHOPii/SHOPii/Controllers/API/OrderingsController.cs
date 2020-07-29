@@ -28,7 +28,7 @@ namespace SHOPii.Controllers
         {
             var username = User.Identity.Name;
             var orders = await _context.Ordering.Include(o => o.OrderingDetail).Where(o => o.Username.Equals(username)).ToListAsync();
-         
+
             return Ok(orders);
         }
 
@@ -48,19 +48,19 @@ namespace SHOPii.Controllers
         }
 
         [HttpGet("cart")]
-        public async Task<ActionResult<Ordering>> GetCurrentCart()
+        public async Task<ActionResult<IEnumerable<Ordering>>> GetCurrentCart()
         {
             var username = User.Identity.Name;
-            var cart = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od => od.Product).Where(o => o.Username.Equals(username) && o.Status == 0).FirstOrDefaultAsync();
-            if (cart == null)
-            {
-                cart = new Ordering();
-                cart.Username = username;
-                cart.Status = 0;
-                _context.Ordering.Add(cart);
-                await _context.SaveChangesAsync();
+            var cart = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od => od.Product).Where(o => o.Username.Equals(username) && o.Status == 0).ToListAsync();
+            //if (cart == null)
+            //{
+            //   var cartTemp = new Ordering();
+            //    cart.Username = username;
+            //    cart.Status = 0;
+            //    _context.Ordering.Add(cart);
+            //    await _context.SaveChangesAsync();
 
-            }
+            //}
             return cart;
         }
 
@@ -146,6 +146,29 @@ namespace SHOPii.Controllers
 
 
                 _context.Ordering.Update(ordering);
+
+                ////add to shop
+                //var orderingDetails = await _context.OrderingDetail.Include(od=>od.Product).Where(od => od.OrderingId == ordering.Id).ToListAsync();
+                //HashSet<String> setShopUsername = new HashSet<String>();
+                //if (orderingDetails.Count > 0)
+                //{
+
+                //    foreach(var orderingDetail in orderingDetails)
+                //    {
+                //        var shopUsername = orderingDetail.Product.ShopUsername;
+                //        setShopUsername.Add(shopUsername);
+                //    }
+                //    foreach(var shopUsername in setShopUsername)
+                //    {
+                //        var shopOrderingTemp = new ShopOrdering();
+                //        shopOrderingTemp.OrderingId = ordering.Id;
+                //        shopOrderingTemp.ShopUsername = shopUsername;
+                //        var addToShopOrderingResult = await _context.ShopOrdering.AddAsync(shopOrderingTemp);
+                //    }
+                //}
+
+
+
                 await _context.SaveChangesAsync();
                 return Ok(ordering);
 
@@ -158,7 +181,8 @@ namespace SHOPii.Controllers
         public async Task<ActionResult<Ordering>> addToCart(DoOrderModel doOrderModel)
         {
             String username = User.Identity.Name;
-            var currentOrdering = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od => od.Product).FirstOrDefaultAsync(o => o.Username.Equals(username) && o.Status == 0);
+            String shopUsername = (await _context.Product.FirstOrDefaultAsync(p => p.Id == doOrderModel.productID)).ShopUsername;
+            var currentOrdering = await _context.Ordering.Include(o => o.OrderingDetail).ThenInclude(od => od.Product).FirstOrDefaultAsync(o => o.Username.Equals(username) && o.ShopUsername.Equals(shopUsername) && o.Status == 0);
             if (currentOrdering != null)
             {
                 //get ordering detail via ordering id && product id
@@ -194,6 +218,7 @@ namespace SHOPii.Controllers
                 //ADD ORDER
                 Ordering orderingTemp = new Ordering();
                 orderingTemp.Username = username;
+                orderingTemp.ShopUsername = shopUsername;
                 _context.Ordering.Add(orderingTemp);
                 await _context.SaveChangesAsync();
                 //ADD ORDER  DETAIL

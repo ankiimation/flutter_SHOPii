@@ -21,18 +21,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rxdart/subjects.dart';
 
 import '../../themes/constant.dart';
 import '../../themes/constant.dart';
 
+StreamController navigationPageStreamController = BehaviorSubject();
+List<Widget> pages = [];
+var _pageController = PageController(keepPage: false);
+void changePageViewPage(int index){
+  _pageController.animateToPage(index, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+}
 
 
 class NavigatorPage extends StatefulWidget {
-
   static const String routeName = "navigatorPage";
   final int initPageIndex;
 
-  const NavigatorPage({Key key, this.initPageIndex = 0}):super(key:key );
+  const NavigatorPage({Key key, this.initPageIndex = 0}) : super(key: key);
 
   @override
   _NavigatorPageState createState() => _NavigatorPageState();
@@ -41,11 +47,11 @@ class NavigatorPage extends StatefulWidget {
 class _NavigatorPageState extends State<NavigatorPage> {
   var _scrollStreamController = StreamController();
   var scrollController = ScrollController();
-  var _pageController = PageController(keepPage: false);
+
   bool _isHideTopBottomBar = false;
 
-  int _currentIndex = 0;
-  List<Widget> pages = [];
+  //int _currentIndex = 0;
+
 
   void _openCloseSearchInput() {
     //print('open search page');
@@ -56,10 +62,10 @@ class _NavigatorPageState extends State<NavigatorPage> {
     if (index < 0 || index >= pages.length) {
       index = 0;
     }
-    setState(() {
-      _currentIndex = index;
-    });
+
+    navigationPageStreamController.sink.add(index);
   }
+
 
   void hideTopBottomBar(bool isScrollUp) {
     if (_isHideTopBottomBar != isScrollUp) {
@@ -90,7 +96,6 @@ class _NavigatorPageState extends State<NavigatorPage> {
       OrderingPage(scrollController),
       AccountPage(scrollController)
     ];
-    _currentIndex = widget.initPageIndex;
   }
 
   @override
@@ -103,33 +108,45 @@ class _NavigatorPageState extends State<NavigatorPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: BACKGROUND_COLOR,
-        // appBar: buildAppBar(),
-        drawer: buildDrawer(),
-        body: PageView(
-          onPageChanged: (index) {
-            changePage(index);
-            setState(() {
-              _isHideTopBottomBar = false;
-            });
-          },
-          controller: _pageController,
-          children: pages,
-        ),
-        bottomNavigationBar: buildBottomNavigator());
+    return WillPopScope(
+        onWillPop: () {},
+        child: StreamBuilder(
+          stream: navigationPageStreamController.stream,
+          builder: (context, snapshot) {
+            var index = 0;
+            if (snapshot.hasData)
+              index = snapshot.data;
+            return Scaffold(
+                backgroundColor: BACKGROUND_COLOR,
+                // appBar: buildAppBar(),
+                drawer: buildDrawer(),
+                body:
+
+                PageView(
+                  onPageChanged: (index) {
+                    changePage(index);
+                    setState(() {
+                      _isHideTopBottomBar = false;
+                    });
+                  },
+                  controller: _pageController,
+                  children: pages,
+                ),
+
+                bottomNavigationBar:
+                buildBottomNavigator(index));},)
+    );
   }
 
-  Widget buildBottomNavigator() {
+  Widget buildBottomNavigator(int currentIndex) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 200),
       height: _isHideTopBottomBar ? 0 : 60,
       child: CustomBottomNavigationBar(
         barShadow: true,
-        currentIndex: _currentIndex,
+        currentIndex: currentIndex,
         onChange: (index) {
-          _pageController.animateToPage(index, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
-
+          changePageViewPage(index);
         },
         children: [
           CustomBottomNavigationItem(icon: Icons.store, label: 'Home', color: PRIMARY_COLOR),
@@ -142,63 +159,62 @@ class _NavigatorPageState extends State<NavigatorPage> {
     );
   }
 
-  Widget buildAppBar() {
-    return CustomAppBar(
-      backgroundColor: BACKGROUND_COLOR,
-      // padding: EdgeInsets.only(left: 5, right: 5),
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: BACKGROUND_COLOR,
-        title: AnimatedSwitcher(
-          duration: Duration(milliseconds: 200),
-          child: Text(
-            _currentIndex == 1
-                ? 'Categories'
-                : _currentIndex == 2
-                    ? 'Favorite'
-                    : _currentIndex == 3 ? 'Notification' : _currentIndex == 4 ? 'Account' : 'SHOPii',
-            style: DEFAULT_TEXT_STYLE.copyWith(letterSpacing: 1.5, fontWeight: FontWeight.bold),
-          ),
-        ),
-        actions: <Widget>[
-          CustomOnTapWidget(
-            child: Container(
-              margin: EdgeInsets.only(right: 20),
-              child: Icon(
-                Icons.search,
-                color: PRIMARY_COLOR,
-              ),
-            ),
-            onTap: () {
-              _openCloseSearchInput();
-            },
-          ),
-          CustomOnTapWidget(
-            child: Container(
-              margin: EdgeInsets.only(right: 5),
-              child: Icon(
-                Icons.shopping_cart,
-                color: PRIMARY_COLOR,
-              ),
-            ),
-            onTap: () {},
-          )
-        ],
-        leading: CustomOnTapWidget(
-          child: Container(
-            margin: EdgeInsets.only(right: 5),
-            child: Icon(
-              Icons.menu,
-              color: PRIMARY_COLOR,
-            ),
-          ),
-          onTap: () {
-          },
-        ),
-      ),
-    );
-  }
+//  Widget buildAppBar() {
+//    return CustomAppBar(
+//      backgroundColor: BACKGROUND_COLOR,
+//      // padding: EdgeInsets.only(left: 5, right: 5),
+//      appBar: AppBar(
+//        centerTitle: true,
+//        elevation: 0,
+//        backgroundColor: BACKGROUND_COLOR,
+//        title: AnimatedSwitcher(
+//          duration: Duration(milliseconds: 200),
+//          child: Text(
+//            _currentIndex == 1
+//                ? 'Categories'
+//                : _currentIndex == 2
+//                    ? 'Favorite'
+//                    : _currentIndex == 3 ? 'Notification' : _currentIndex == 4 ? 'Account' : 'SHOPii',
+//            style: DEFAULT_TEXT_STYLE.copyWith(letterSpacing: 1.5, fontWeight: FontWeight.bold),
+//          ),
+//        ),
+//        actions: <Widget>[
+//          CustomOnTapWidget(
+//            child: Container(
+//              margin: EdgeInsets.only(right: 20),
+//              child: Icon(
+//                Icons.search,
+//                color: PRIMARY_COLOR,
+//              ),
+//            ),
+//            onTap: () {
+//              _openCloseSearchInput();
+//            },
+//          ),
+//          CustomOnTapWidget(
+//            child: Container(
+//              margin: EdgeInsets.only(right: 5),
+//              child: Icon(
+//                Icons.shopping_cart,
+//                color: PRIMARY_COLOR,
+//              ),
+//            ),
+//            onTap: () {},
+//          )
+//        ],
+//        leading: CustomOnTapWidget(
+//          child: Container(
+//            margin: EdgeInsets.only(right: 5),
+//            child: Icon(
+//              Icons.menu,
+//              color: PRIMARY_COLOR,
+//            ),
+//          ),
+//          onTap: () {},
+//        ),
+//      ),
+//    );
+//  }
 
   Widget buildDrawer() {
     return Drawer(

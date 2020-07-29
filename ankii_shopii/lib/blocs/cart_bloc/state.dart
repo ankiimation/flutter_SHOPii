@@ -8,10 +8,15 @@ class CartState extends Equatable {
 }
 
 class CartLoaded extends CartState {
-  final OrderingModel cart;
+  List<OrderingModel> cart;
 
-  CartLoaded(this.cart) {
-    this.cart.orderingDetail = this.cart.orderingDetail.where((od) => od.count > 0).toList();
+  CartLoaded(List<OrderingModel> cart) {
+    List<OrderingModel> cartTemp = [];
+    for (var ordering in cart) {
+      ordering.orderingDetail = ordering.orderingDetail.where((od) => od.count > 0).toList();
+      cartTemp.add(ordering);
+    }
+    this.cart = cartTemp;
   }
 
   @override

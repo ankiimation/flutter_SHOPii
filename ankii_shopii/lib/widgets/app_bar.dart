@@ -6,6 +6,7 @@ import 'package:ankiishopii/blocs/login_bloc/state.dart';
 import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/global/global_variable.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
+import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:ankiishopii/pages/cart/cart_page.dart';
 import 'package:ankiishopii/pages/search/search_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
@@ -163,8 +164,11 @@ class CartWidgetState extends State<CartWidget> {
               builder: (_, state) {
                 if (state is CartLoaded) {
                   var totalCount = 0;
-                  for (var item in state.cart.orderingDetail) {
-                    totalCount += item.count;
+                  for (OrderingModel ordering in state.cart) {
+                    for(var od in ordering.orderingDetail){
+                      totalCount += od.count;
+                    }
+
                   }
                   if (totalCount == 0) return Container();
                   return Text(

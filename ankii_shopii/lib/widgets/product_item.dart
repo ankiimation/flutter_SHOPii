@@ -404,6 +404,147 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
   }
 }
 
+class CustomProductGridItem extends StatelessWidget {
+  final GlobalKey cartIconKey;
+  final ProductModel product;
+  final Color priceTextColor;
+  final Color quickActionColor;
+  final double width;
+
+  final Function onTap;
+  final Function onAddToCart;
+  final Function onFavourite;
+  final Color backgroundColor;
+  final bool isFavorite;
+
+  CustomProductGridItem(
+      {this.cartIconKey,
+      this.product,
+      this.priceTextColor = PRICE_COLOR,
+      this.quickActionColor = TEXT_COLOR,
+      this.width = 150,
+      this.onTap,
+      this.onAddToCart,
+      this.onFavourite,
+      this.backgroundColor = BACKGROUND_COLOR,
+      this.isFavorite});
+
+  @override
+  Widget build(BuildContext context) {
+    GlobalKey addToCartIconKey = GlobalKey();
+    double height = width * 1.3;
+    return CustomOnTapWidget(
+      onTap: onTap,
+      child: Container(
+        width: width,
+        height: height,
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+//                              boxShadow: [
+//                                BoxShadow(
+//                                    color: Colors.black26,
+//                                    offset: Offset(5, 5),
+//                                    blurRadius: 5)
+//                              ],
+            color: FOREGROUND_COLOR,
+            borderRadius: BorderRadius.circular(30)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+//
+                    image: DecorationImage(image: NetworkImage(product.image), fit: BoxFit.cover),
+                    color: PRIMARY_COLOR,
+                    borderRadius: BorderRadius.circular(25)),
+              ),
+            ),
+            Column(
+              children: <Widget>[
+                Text(
+                  product.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: DEFAULT_TEXT_STYLE.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  numberToMoneyString(product.price),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: DEFAULT_TEXT_STYLE.copyWith(
+                    color: PRICE_COLOR,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    CustomOnTapWidget(
+                      onTap: () {
+                        if (currentLogin == null) {
+                          Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
+                          return;
+                        }
+                        if (onFavourite != null) {
+                          onFavourite();
+                        }
+                      },
+                      child: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        size: 20,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    CustomOnTapWidget(
+                      onTap: () async {
+                        if (currentLogin == null) {
+                          Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
+                          return;
+                        }
+                        if (onAddToCart != null) {
+                          final RenderBox box = addToCartIconKey.currentContext.findRenderObject();
+                          final Offset position = box.globalToLocal(Offset.zero);
+                          var dx = position.dx * -1;
+                          var dy = position.dy * -1;
+                          //print(dx.toString() + " - " + dy.toString());
+
+                          updateCartIconPosition(cartIconKey: cartIconKey);
+
+                          await showAddToCartAnimation(context,
+                              start: CustomPosition(dx, dy),
+                              end: CustomPosition(cartIconPositionDx, cartIconPositionDy));
+                          onAddToCart();
+                        }
+                      },
+                      child: Icon(
+                        Icons.add_shopping_cart,
+                        key: addToCartIconKey,
+                        size: 20,
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class CustomProductCheckOutItem extends StatelessWidget {
   final OrderingDetailModel cartItem;
   final Color priceTextColor;

@@ -69,7 +69,7 @@ class _CartPageState extends State<CartPage> {
                         controller: _scrollController,
                         physics: AlwaysScrollableScrollPhysics(),
                         child: Column(
-                          children: <Widget>[buildAppBar(), buildCartDetail(state.cart.orderingDetail)],
+                          children: <Widget>[buildAppBar(), buildCartDetail(state.cart)],
                         ),
                       ),
                     ),
@@ -90,10 +90,16 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  Widget buildNavigation(OrderingModel cart) {
-    if (cart.orderingDetail.length > 0) {
+  Widget buildNavigation(List<OrderingModel> cart) {
+    List<OrderingDetailModel> orderingDetail = [];
+    for (OrderingModel ordering in cart) {
+      for (var od in ordering.orderingDetail) {
+        orderingDetail.add(od);
+      }
+    }
+    if (orderingDetail.length > 0) {
       int total = 0;
-      for (var od in cart.orderingDetail) {
+      for (var od in orderingDetail) {
         var eachTotal = od.count * od.product.price;
         total += eachTotal;
       }
@@ -128,7 +134,7 @@ class _CartPageState extends State<CartPage> {
                   )),
                   CustomOnTapWidget(
                     onTap: () async {
-                      Navigator.push(context, MaterialPageRoute(builder: (b) => CheckOutPage(cart)));
+//                      Navigator.push(context, MaterialPageRoute(builder: (b) => CheckOutPage(cart)));
                     },
                     child: Container(
                       padding: EdgeInsets.all(10),
@@ -162,7 +168,14 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  Widget buildCartDetail(List<OrderingDetailModel> orderingDetail) {
+  Widget buildCartDetail(List<OrderingModel> cart) {
+    List<OrderingDetailModel> orderingDetail = [];
+    for (OrderingModel ordering in cart) {
+      for (var od in ordering.orderingDetail) {
+        orderingDetail.add(od);
+      }
+    }
+
     // and later, before the timer goes off...
     if (orderingDetail.length > 0) {
       return Container(

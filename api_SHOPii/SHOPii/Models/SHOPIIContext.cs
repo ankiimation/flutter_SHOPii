@@ -182,6 +182,12 @@ namespace SHOPii.Models
                     .HasColumnName("DELIVERY_ID")
                     .HasDefaultValueSql("((-1))");
 
+                entity.Property(e => e.ShopUsername)
+                    .IsRequired()
+                    .HasColumnName("SHOP_USERNAME")
+                    .HasMaxLength(32)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Status).HasColumnName("STATUS");
 
                 entity.Property(e => e.Username)
@@ -189,6 +195,12 @@ namespace SHOPii.Models
                     .HasColumnName("USERNAME")
                     .HasMaxLength(32)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.ShopUsernameNavigation)
+                    .WithMany(p => p.Ordering)
+                    .HasForeignKey(d => d.ShopUsername)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__ORDERING__shop_u__531856C7");
 
                 entity.HasOne(d => d.UsernameNavigation)
                     .WithMany(p => p.Ordering)
