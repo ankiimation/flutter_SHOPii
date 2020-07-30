@@ -32,7 +32,7 @@ class LoadingDialog {
                     ? Container()
                     : Text(
                         text ?? 'Processing...',
-                        style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                        style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
                       )
               ],
             ),
@@ -57,7 +57,7 @@ class LoadingDialog {
           ),
           content: Text(
             text ?? '',
-            style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+            style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
           ),
           actions: <Widget>[
             FlatButton(

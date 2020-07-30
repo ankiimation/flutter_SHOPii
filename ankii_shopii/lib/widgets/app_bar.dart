@@ -88,7 +88,7 @@ class InPageAppBar extends StatelessWidget {
                         title ?? '',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 30),
+                        style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 30),
                       ),
                 ),
                 Row(
@@ -99,7 +99,7 @@ class InPageAppBar extends StatelessWidget {
                       },
                       child: Icon(
                         Icons.search,
-                        color: PRIMARY_COLOR,
+                        color: PRIMARY_TEXT_COLOR,
                       ),
                     ),
                     showCartButton
@@ -165,15 +165,14 @@ class CartWidgetState extends State<CartWidget> {
                 if (state is CartLoaded) {
                   var totalCount = 0;
                   for (OrderingModel ordering in state.cart) {
-                    for(var od in ordering.orderingDetail){
+                    for (var od in ordering.orderingDetail) {
                       totalCount += od.count;
                     }
-
                   }
                   if (totalCount == 0) return Container();
                   return Text(
                     totalCount.toString(),
-                    style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                    style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
                   );
                 } else {
                   return Container();
@@ -182,7 +181,7 @@ class CartWidgetState extends State<CartWidget> {
           Icon(
             Icons.shopping_cart,
             //  key: widget.cartKey,
-            color: PRIMARY_COLOR,
+            color: PRIMARY_TEXT_COLOR,
             size: _inProcess ? 35 : 25,
           ),
         ],

@@ -122,19 +122,19 @@ class _CartPageState extends State<CartPage> {
                       children: <Widget>[
                         Text(
                           'Total:',
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           numberToMoneyString(total) + "d",
-                          style: DEFAULT_TEXT_STYLE.copyWith(
-                              fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR),
+                          style: TEXT_STYLE_PRIMARY.copyWith(
+                              fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR_PRIMARY),
                         )
                       ],
                     ),
                   )),
                   CustomOnTapWidget(
                     onTap: () async {
-//                      Navigator.push(context, MaterialPageRoute(builder: (b) => CheckOutPage(cart)));
+                      Navigator.push(context, MaterialPageRoute(builder: (b) => CheckOutPage(cart)));
                     },
                     child: Container(
                       padding: EdgeInsets.all(10),
@@ -144,6 +144,7 @@ class _CartPageState extends State<CartPage> {
                       child: Icon(
                         Icons.forward,
                         size: 25,
+                        color: FORE_TEXT_COLOR,
                       ),
                     ),
                   )
@@ -163,7 +164,10 @@ class _CartPageState extends State<CartPage> {
         onTap: () {
           Navigator.pop(context);
         },
-        child: Icon(Icons.arrow_back_ios),
+        child: Icon(
+          Icons.arrow_back_ios,
+          color: PRIMARY_TEXT_COLOR,
+        ),
       ),
     );
   }
@@ -180,73 +184,101 @@ class _CartPageState extends State<CartPage> {
     if (orderingDetail.length > 0) {
       return Container(
         child: Column(
-          children: orderingDetail.map<Widget>((od) {
-            var product = od.product;
-            return CustomProductCartItem(
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
-              },
-              onDelete: () {
-                _removeFromCartConfirmDialog(
-                    product: product,
-                    onYes: () async {
-//                      bloc.add(AddToCart(productID: product.id, count: od.count * -1));
-                      //  LoadingDialog.showLoadingDialog(context, text: 'Removing...');
-                      await addToCart(context, productID: product.id, count: od.count * -1);
-                      // LoadingDialog.hideLoadingDialog(context);
-                    });
-              },
-              onTextSubmit: (quantity) async {
-                int count = quantity - od.count;
-                if (od.count + count <= 0) {
-                  _removeFromCartConfirmDialog(
-                      product: product,
-                      onNo: () async {
-                        refreshCart(context);
+            children: cart.map<Widget>((ordering) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(left: 5),
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.store,
+                      color: PRIMARY_TEXT_COLOR,
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      ordering.shopUsername,
+                      style: TEXT_STYLE_PRIMARY,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                child: Column(
+                  children: orderingDetail.where((od) => od.orderingId == ordering.id).toList().map<Widget>((od) {
+                    var product = od.product;
+                    return CustomProductCartItem(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
                       },
-                      onYes: () async {
+                      onDelete: () {
+                        _removeFromCartConfirmDialog(
+                            product: product,
+                            onYes: () async {
+//                      bloc.add(AddToCart(productID: product.id, count: od.count * -1));
+                              //  LoadingDialog.showLoadingDialog(context, text: 'Removing...');
+                              await addToCart(context, productID: product.id, count: od.count * -1);
+                              // LoadingDialog.hideLoadingDialog(context);
+                            });
+                      },
+                      onTextSubmit: (quantity) async {
+                        int count = quantity - od.count;
+                        if (od.count + count <= 0) {
+                          _removeFromCartConfirmDialog(
+                              product: product,
+                              onNo: () async {
+                                refreshCart(context);
+                              },
+                              onYes: () async {
 //                        bloc.add(AddToCart(productID: product.id, count: -1));
-                        //    LoadingDialog.showLoadingDialog(context, text: 'Removing...');
-                        await addToCart(context, productID: product.id, count: od.count * -1);
-                        //  LoadingDialog.hideLoadingDialog(context);
-                      });
-                } else {
-                  await addToCart(context, productID: product.id, count: quantity - od.count);
-                }
-              },
-              onIncreaseQuantity: () async {
+                                //    LoadingDialog.showLoadingDialog(context, text: 'Removing...');
+                                await addToCart(context, productID: product.id, count: od.count * -1);
+                                //  LoadingDialog.hideLoadingDialog(context);
+                              });
+                        } else {
+                          await addToCart(context, productID: product.id, count: quantity - od.count);
+                        }
+                      },
+                      onIncreaseQuantity: () async {
 //                _onIncreaseItem(od);
 //                bloc.add(AddToCart(productID: product.id, count: 1));
-                //LoadingDialog.showLoadingDialog(context, text: 'Adding...');
-                await addToCart(context, productID: product.id, count: 1);
-                //  LoadingDialog.hideLoadingDialog(context);
-              },
-              onDecreaseQuantity: () async {
-                if (od.count - 1 <= 0) {
-                  _removeFromCartConfirmDialog(
-                      product: product,
-                      onYes: () async {
-//                        bloc.add(AddToCart(productID: product.id, count: -1));
-                        //    LoadingDialog.showLoadingDialog(context, text: 'Removing...');
-                        await addToCart(context, productID: product.id, count: -1);
+                        //LoadingDialog.showLoadingDialog(context, text: 'Adding...');
+                        await addToCart(context, productID: product.id, count: 1);
                         //  LoadingDialog.hideLoadingDialog(context);
-                      });
-                } else {
+                      },
+                      onDecreaseQuantity: () async {
+                        if (od.count - 1 <= 0) {
+                          _removeFromCartConfirmDialog(
+                              product: product,
+                              onYes: () async {
+//                        bloc.add(AddToCart(productID: product.id, count: -1));
+                                //    LoadingDialog.showLoadingDialog(context, text: 'Removing...');
+                                await addToCart(context, productID: product.id, count: -1);
+                                //  LoadingDialog.hideLoadingDialog(context);
+                              });
+                        } else {
 //                  _onDecreaseItem(od);
 //                  bloc.add(AddToCart(productID: product.id, count: -1));
-                  // LoadingDialog.showLoadingDialog(context, text: 'Removing...');
-                  await addToCart(context, productID: product.id, count: -1);
-                  //  LoadingDialog.hideLoadingDialog(context);
-                }
-              },
-              backgroundColor: FOREGROUND_COLOR,
-              cartItem: od,
-            );
-          }).toList()
-            ..add(Container(
-              height: 60,
-            )),
-        ),
+                          // LoadingDialog.showLoadingDialog(context, text: 'Removing...');
+                          await addToCart(context, productID: product.id, count: -1);
+                          //  LoadingDialog.hideLoadingDialog(context);
+                        }
+                      },
+                      backgroundColor: FOREGROUND_COLOR,
+                      cartItem: od,
+                    );
+                  }).toList()
+                    ..add(Container(
+                      height: 60,
+                    )),
+                ),
+              ),
+            ],
+          );
+        }).toList()),
       );
     }
     return Container(
@@ -326,7 +358,7 @@ class _CartPageState extends State<CartPage> {
                   },
                   child: Text(
                     'No',
-                    style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                    style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
                   )),
             ],
           );

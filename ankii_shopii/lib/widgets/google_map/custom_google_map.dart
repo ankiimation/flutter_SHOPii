@@ -247,7 +247,7 @@ class _DynamicGoogleMapState extends State<DynamicGoogleMap> {
                       children: <Widget>[
                         Text(
                           'Address:',
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
+                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         SizedBox(
                           width: 20,
@@ -255,7 +255,7 @@ class _DynamicGoogleMapState extends State<DynamicGoogleMap> {
                         Expanded(
                             child: Text(
                           '${_getFullAddressString(currentPlace)}',
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 16),
+                          style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 16),
                         )),
                         IconButton(
                             icon: Icon(Icons.directions),
@@ -290,7 +290,7 @@ class _DynamicGoogleMapState extends State<DynamicGoogleMap> {
                       children: <Widget>[
                         Text(
                           'Geo:',
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(
                           width: 20,
@@ -310,7 +310,10 @@ class _DynamicGoogleMapState extends State<DynamicGoogleMap> {
                         Expanded(
                             child: RaisedButton(
                                 color: BACKGROUND_COLOR,
-                                child: Text('Cancel'),
+                                child: Text(
+                                  'Cancel',
+                                  style: TEXT_STYLE_PRIMARY,
+                                ),
                                 onPressed: () {
                                   Navigator.pop(context);
                                 })),
@@ -322,7 +325,7 @@ class _DynamicGoogleMapState extends State<DynamicGoogleMap> {
                                 color: FOREGROUND_COLOR,
                                 child: Text(
                                   'OK',
-                                  style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                                  style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontWeight: FontWeight.bold),
                                 ),
                                 onPressed: () {
                                   Navigator.pop(context, currentPlace);

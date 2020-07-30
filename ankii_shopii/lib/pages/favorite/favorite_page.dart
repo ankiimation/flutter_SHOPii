@@ -93,11 +93,12 @@ class _FavoritePageState extends State<FavoritePage> {
       return Center(
           child: Text(
         'No favorite!',
-        style: DEFAULT_TEXT_STYLE.copyWith(fontStyle: FontStyle.italic),
+        style: TEXT_STYLE_PRIMARY.copyWith(fontStyle: FontStyle.italic),
       ));
     }
     return CustomTabView(
-        barShadow: false,
+        hideIcon: true,
+        barShadow: true,
         backgroundColor: BACKGROUND_COLOR,
         children: categories.map((categoryName) {
           var favoriteProducts =
@@ -119,12 +120,11 @@ class _FavoritePageState extends State<FavoritePage> {
                                 _doFavorite(favoriteProduct);
                               },
                               onAddToCart: () async {
-                               // LoadingDialog.showLoadingDialog(context);
+                                // LoadingDialog.showLoadingDialog(context);
                                 await addToCart(context, productID: favoriteProduct.id, count: 1);
                                 //LoadingDialog.hideLoadingDialog(context);
                               },
                               product: favoriteProduct,
-                              priceTextColor: PRICE_COLOR,
                               isFavorite: favoriteProduct.isFavoriteByCurrentUser,
                               backgroundColor: FOREGROUND_COLOR,
                             ))

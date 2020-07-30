@@ -50,8 +50,7 @@ class _AccountPageState extends State<AccountPage> {
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: SingleChildScrollView(
-                          controller: widget.scrollController,
-                          child: buildProfile(state.account)),
+                          controller: widget.scrollController, child: buildProfile(state.account)),
                     )
                   ],
                 );
@@ -73,9 +72,7 @@ class _AccountPageState extends State<AccountPage> {
       alignment: Alignment.topCenter,
       child: CircleAvatar(
         radius: 70,
-        backgroundImage: accountModel.image != null
-            ? CachedNetworkImageProvider(accountModel.image)
-            : null,
+        backgroundImage: accountModel.image != null ? CachedNetworkImageProvider(accountModel.image) : null,
         child: accountModel.image != null
             ? null
             : Icon(
@@ -91,18 +88,13 @@ class _AccountPageState extends State<AccountPage> {
     return Column(
       children: <Widget>[
         Container(
-          constraints:
-              BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.7),
+          constraints: BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.7),
           margin: EdgeInsets.only(top: 200),
           padding: EdgeInsets.only(top: 50, bottom: 50, left: 20, right: 20),
           decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black38, offset: Offset(0, -3), blurRadius: 5)
-              ],
+              boxShadow: [BoxShadow(color: Colors.black38, offset: Offset(0, -3), blurRadius: 5)],
               color: BACKGROUND_COLOR,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
           child: Column(
             children: <Widget>[
               _buildInfoItem(key: 'Username', value: account.username),
@@ -115,13 +107,9 @@ class _AccountPageState extends State<AccountPage> {
               _buildDivider(),
               CustomOnTapWidget(
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (b) => DeliveryAddressPage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (b) => DeliveryAddressPage()));
                   },
-                  child: _buildInfoItem(
-                      key: 'Delivery Addresses', value: '<Tap to view>')),
+                  child: _buildInfoItem(key: 'Delivery Addresses', value: '<Tap to view>')),
               SizedBox(
                 height: 50,
               ),
@@ -146,12 +134,10 @@ class _AccountPageState extends State<AccountPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text(
-            key ?? '',
-          ),
+          Text(key ?? '', style: TEXT_STYLE_PRIMARY),
           Text(
             value ?? '<empty>',
-            style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+            style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -162,15 +148,14 @@ class _AccountPageState extends State<AccountPage> {
     return RaisedButton(
       elevation: 0,
       onPressed: () async {
-        await Navigator.push(
-            context, MaterialPageRoute(builder: (b) => LoginPage()));
+        await Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
         bloc.add(GetLocalAccount());
       },
       color: BACKGROUND_COLOR,
       child: Container(
         child: Text(
           'Log In',
-          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
         ),
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
@@ -187,7 +172,7 @@ class _AccountPageState extends State<AccountPage> {
       },
       color: FOREGROUND_COLOR,
       child: Container(
-        child: Text('Log Out'),
+        child: Text('Log Out', style: TEXT_STYLE_ON_FOREGROUND),
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
     );

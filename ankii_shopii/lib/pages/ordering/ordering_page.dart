@@ -10,6 +10,8 @@ import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
 import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:ankiishopii/widgets/notification_item.dart';
+import 'package:ankiishopii/widgets/tab_view.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -44,33 +46,29 @@ class _OrderingPageState extends State<OrderingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: BACKGROUND_COLOR,
-      body: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        controller: widget.scrollController,
-        child: Column(
-          children: <Widget>[
-            InPageAppBar(
-              title: 'Orders',
-            ),
-            BlocBuilder(
-                cubit: bloc,
-                builder: (context, state) {
-                  if (state is AllOrderingLoaded) {
-                    return buildOrders(state.orderings);
-                  } else if (state is AllOrderingLoadError) {
-                    return Center(
-                      child: CustomErrorWidget(
-                        error: state.error,
-                      ),
-                    );
-                  } else {
-                    return Center(
-                      child: CustomDotLoading(),
-                    );
-                  }
-                }),
-          ],
-        ),
+      body: Column(
+        children: <Widget>[
+          InPageAppBar(
+            title: 'Orders',
+          ),
+          BlocBuilder(
+              cubit: bloc,
+              builder: (context, state) {
+                if (state is AllOrderingLoaded) {
+                  return Expanded(child: buildOrdersWithFilter(state.orderings));
+                } else if (state is AllOrderingLoadError) {
+                  return Center(
+                    child: CustomErrorWidget(
+                      error: state.error,
+                    ),
+                  );
+                } else {
+                  return Center(
+                    child: CustomDotLoading(),
+                  );
+                }
+              }),
+        ],
       ),
     );
   }
@@ -83,13 +81,11 @@ class _OrderingPageState extends State<OrderingPage> {
         children: orders.map((o) {
           return CustomOnTapWidget(
             onTap: () async {
-              await Navigator.push(context,
-                  MaterialPageRoute(builder: (b) => OrderingDetailPage(o)));
+              await Navigator.push(context, MaterialPageRoute(builder: (b) => OrderingDetailPage(o)));
             },
             child: Container(
               width: double.maxFinite,
-              margin: EdgeInsets.only(
-                  top: orders.indexOf(o) == 0 ? 10 : 0, bottom: 10),
+              margin: EdgeInsets.only(top: orders.indexOf(o) == 0 ? 10 : 0, bottom: 10),
               child: CustomOrderItem(
                 orderingModel: o,
               ),
@@ -97,6 +93,77 @@ class _OrderingPageState extends State<OrderingPage> {
           );
         }).toList(),
       ),
+    );
+  }
+
+  Widget buildOrdersWithFilter(List<OrderingModel> orders) {
+    orders = orders.reversed.toList();
+    var orderStatusList = orders.map<int>((order) => order.status).toSet().toList()
+      ..sort((int a, int b) {
+        return a.compareTo(b);
+      });
+    return Container(
+      child: CustomTabView(
+          alwaysShowLabel: true,
+          barShadow: true,
+          children: [
+            CustomTabViewItem(
+                icon: Icons.list,
+                label: 'All',
+                child: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  controller: widget.scrollController,
+                  child: Container(
+                    margin: EdgeInsets.only(bottom: 100),
+                    child: Column(
+                      children: orders
+                          .map<Widget>((o) => CustomOnTapWidget(
+                                onTap: () async {
+                                  await Navigator.push(
+                                      context, MaterialPageRoute(builder: (b) => OrderingDetailPage(o)));
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(left: 20, right: 20, top: 10),
+                                  child: CustomOrderItem(
+                                    orderingModel: o,
+                                  ),
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+                ))
+          ]..addAll(orderStatusList.map<CustomTabViewItem>((status) {
+              String label = status == 1 ? 'Processing' : status == 2 ? 'Delivering' : 'Complete';
+              IconData icon = status == 1 ? Icons.repeat : status == 2 ? Icons.local_shipping : Icons.check_circle;
+              return CustomTabViewItem(
+                  icon: icon,
+                  label: label,
+                  child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    controller: widget.scrollController,
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 100),
+                      child: Column(
+                        children: orders
+                            .where((o) => o.status == status)
+                            .map<Widget>((o) => CustomOnTapWidget(
+                                  onTap: () async {
+                                    await Navigator.push(
+                                        context, MaterialPageRoute(builder: (b) => OrderingDetailPage(o)));
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(left: 20, right: 20, top: 10),
+                                    child: CustomOrderItem(
+                                      orderingModel: o,
+                                    ),
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  ));
+            }).toList())),
     );
   }
 }

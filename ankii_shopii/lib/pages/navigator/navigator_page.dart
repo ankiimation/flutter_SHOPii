@@ -29,10 +29,10 @@ import '../../themes/constant.dart';
 StreamController navigationPageStreamController = BehaviorSubject();
 List<Widget> pages = [];
 var _pageController = PageController(keepPage: false);
-void changePageViewPage(int index){
+
+void changePageViewPage(int index) {
   _pageController.animateToPage(index, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
 }
-
 
 class NavigatorPage extends StatefulWidget {
   static const String routeName = "navigatorPage";
@@ -52,7 +52,6 @@ class _NavigatorPageState extends State<NavigatorPage> {
 
   //int _currentIndex = 0;
 
-
   void _openCloseSearchInput() {
     //print('open search page');
     Navigator.pushNamed(context, SearchPage.routeName);
@@ -65,7 +64,6 @@ class _NavigatorPageState extends State<NavigatorPage> {
 
     navigationPageStreamController.sink.add(index);
   }
-
 
   void hideTopBottomBar(bool isScrollUp) {
     if (_isHideTopBottomBar != isScrollUp) {
@@ -114,15 +112,12 @@ class _NavigatorPageState extends State<NavigatorPage> {
           stream: navigationPageStreamController.stream,
           builder: (context, snapshot) {
             var index = 0;
-            if (snapshot.hasData)
-              index = snapshot.data;
+            if (snapshot.hasData) index = snapshot.data;
             return Scaffold(
                 backgroundColor: BACKGROUND_COLOR,
                 // appBar: buildAppBar(),
                 drawer: buildDrawer(),
-                body:
-
-                PageView(
+                body: PageView(
                   onPageChanged: (index) {
                     changePage(index);
                     setState(() {
@@ -132,10 +127,9 @@ class _NavigatorPageState extends State<NavigatorPage> {
                   controller: _pageController,
                   children: pages,
                 ),
-
-                bottomNavigationBar:
-                buildBottomNavigator(index));},)
-    );
+                bottomNavigationBar: buildBottomNavigator(index));
+          },
+        ));
   }
 
   Widget buildBottomNavigator(int currentIndex) {
@@ -149,11 +143,11 @@ class _NavigatorPageState extends State<NavigatorPage> {
           changePageViewPage(index);
         },
         children: [
-          CustomBottomNavigationItem(icon: Icons.store, label: 'Home', color: PRIMARY_COLOR),
-          CustomBottomNavigationItem(icon: Icons.receipt, label: 'Categories', color: PRIMARY_COLOR),
-          CustomBottomNavigationItem(icon: Icons.favorite, label: 'Favorite', color: PRIMARY_COLOR),
-          CustomBottomNavigationItem(icon: Icons.reorder, label: 'Orders', color: PRIMARY_COLOR),
-          CustomBottomNavigationItem(icon: Icons.account_circle, label: 'Account', color: PRIMARY_COLOR),
+          CustomBottomNavigationItem(icon: Icons.store, label: 'Home'),
+          CustomBottomNavigationItem(icon: Icons.reorder, label: 'Categories'),
+          CustomBottomNavigationItem(icon: Icons.favorite, label: 'Favorite'),
+          CustomBottomNavigationItem(icon: Icons.receipt, label: 'Orders'),
+          CustomBottomNavigationItem(icon: Icons.account_circle, label: 'Account'),
         ],
       ),
     );

@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
             margin: EdgeInsets.only(left: 25, bottom: 10),
             child: Text(
               'For you',
-              style: DEFAULT_TEXT_STYLE.copyWith(
+              style: TEXT_STYLE_PRIMARY.copyWith(
                 color: PRIMARY_COLOR,
                 fontSize: 20,
                 letterSpacing: 1.2,
@@ -163,7 +163,7 @@ class _HomePageState extends State<HomePage> {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.center,
-                                        style: DEFAULT_TEXT_STYLE.copyWith(
+                                        style: TEXT_STYLE_PRIMARY.copyWith(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -175,8 +175,8 @@ class _HomePageState extends State<HomePage> {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.center,
-                                        style: DEFAULT_TEXT_STYLE.copyWith(
-                                          color: PRICE_COLOR,
+                                        style: TEXT_STYLE_PRIMARY.copyWith(
+                                          color: PRICE_COLOR_PRIMARY,
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),

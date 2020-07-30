@@ -30,7 +30,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CheckOutPage extends StatefulWidget {
   static const String routeName = 'checkoutPage';
-  final OrderingModel cart;
+  final List<OrderingModel> cart;
 
   CheckOutPage(this.cart);
 
@@ -44,19 +44,25 @@ class _CheckOutPageState extends State<CheckOutPage> {
   ScrollController _scrollController = ScrollController();
   StreamController _scrollStreamController = StreamController();
   bool _isDoingCheckoutConfirm = false;
+  int _choosenDeliveryId;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    bloc.add(GetCheckout(widget.cart));
+    // bloc.add(GetCheckout(widget.cart));
 
-    deliveryAddressBloc.add(GetDeliveryAddress(widget.cart.deliveryId != -1
-        ? widget.cart.deliveryId
-        : currentLogin.account.defaultDeliveryId));
+    var ordering = widget.cart.first;
+    if (ordering.deliveryId != -1) {
+      _choosenDeliveryId = ordering.deliveryId;
+      deliveryAddressBloc.add(GetDeliveryAddress(ordering.deliveryId));
+    } else {
+      _choosenDeliveryId = currentLogin.account.defaultDeliveryId;
+      deliveryAddressBloc.add(GetDeliveryAddress(currentLogin.account.defaultDeliveryId));
+    }
+
     _scrollController.addListener(() {
-      bool isScrollUp = _scrollController.position.userScrollDirection ==
-          ScrollDirection.reverse;
+      bool isScrollUp = _scrollController.position.userScrollDirection == ScrollDirection.reverse;
       _scrollStreamController.sink.add(isScrollUp);
     });
   }
@@ -75,43 +81,32 @@ class _CheckOutPageState extends State<CheckOutPage> {
     return WillPopScope(
       onWillPop: () {},
       child: Scaffold(
-        backgroundColor: BACKGROUND_COLOR,
-        body: BlocBuilder(
-            cubit: bloc,
-            builder: (context, state) {
-              if (state is CheckoutLoaded) {
-                return Stack(
-                  children: <Widget>[
-                    Column(
+          backgroundColor: BACKGROUND_COLOR,
+          body: Stack(
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Expanded(
+                      child: SingleChildScrollView(
+                    controller: _scrollController,
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Column(
                       children: <Widget>[
-                        Expanded(
-                            child: SingleChildScrollView(
-                          controller: _scrollController,
-                          physics: AlwaysScrollableScrollPhysics(),
-                          child: Column(
-                            children: <Widget>[
-                              buildAppBar(),
-                              buildDivider(),
-                              buildDelivery(state.checkoutModel),
-                              buildDivider(),
-                              buildPaymentMethod(),
-                              buildDivider(),
-                              buildListOrderDetail(
-                                  state.checkoutModel.orderingDetail),
-                            ],
-                          ),
-                        ))
+                        buildAppBar(),
+                        buildDivider(),
+                        buildDelivery(widget.cart),
+                        buildDivider(),
+                        buildPaymentMethod(),
+                        buildDivider(),
+                        buildListOrderDetail(widget.cart),
                       ],
                     ),
-                    buildBottomBar(state.checkoutModel)
-                  ],
-                );
-              }
-              return Center(
-                child: Text('error'),
-              );
-            }),
-      ),
+                  ))
+                ],
+              ),
+              buildBottomBar(widget.cart)
+            ],
+          )),
     );
   }
 
@@ -123,15 +118,32 @@ class _CheckOutPageState extends State<CheckOutPage> {
         onTap: () {
           Navigator.pop(context);
         },
-        child: Icon(Icons.arrow_back_ios),
+        child: Icon(
+          Icons.arrow_back_ios,
+          color: PRIMARY_TEXT_COLOR,
+        ),
       ),
     );
   }
 
-  Widget buildBottomBar(OrderingModel orderingModel) {
+  Widget buildBottomBar(List<OrderingModel> orderingModels) {
     var total = 0;
-    for (var orderDetail in orderingModel.orderingDetail) {
-      total += orderDetail.count * orderDetail.product.price;
+    List<OrderingDetailModel> orderingDetail = [];
+    for (OrderingModel ordering in orderingModels) {
+      for (var od in ordering.orderingDetail) {
+        orderingDetail.add(od);
+      }
+    }
+    for (var od in orderingDetail) {
+      var eachTotal = od.count * od.product.price;
+      total += eachTotal;
+    }
+
+    bool _canCheckout = true;
+    for (var ordering in orderingModels) {
+      if ((ordering.deliveryId == -1 && currentLogin.account.defaultDeliveryId == -1) || ordering.status > 0)
+        _canCheckout = false;
+      break;
     }
     return Align(
       alignment: Alignment.bottomCenter,
@@ -140,13 +152,10 @@ class _CheckOutPageState extends State<CheckOutPage> {
           builder: (context, snapshot) {
             return AnimatedContainer(
               duration: Duration(milliseconds: 100),
-              height: snapshot.hasData && snapshot.data == true
-                  ? 0
-                  : kBottomNavigationBarHeight,
-              decoration: BoxDecoration(color: BACKGROUND_COLOR, boxShadow: [
-                BoxShadow(
-                    color: Colors.black26, offset: Offset(0, -3), blurRadius: 3)
-              ]),
+              height: snapshot.hasData && snapshot.data == true ? 0 : kBottomNavigationBarHeight,
+              decoration: BoxDecoration(
+                  color: BACKGROUND_COLOR,
+                  boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(0, -3), blurRadius: 3)]),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -158,30 +167,24 @@ class _CheckOutPageState extends State<CheckOutPage> {
                       children: <Widget>[
                         Text(
                           'Total:',
-                          style: DEFAULT_TEXT_STYLE.copyWith(
-                              fontWeight: FontWeight.bold),
+                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${numberToMoneyString(total)} đ',
-                          style: DEFAULT_TEXT_STYLE.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                              color: PRICE_COLOR),
+                          style: TEXT_STYLE_PRIMARY.copyWith(
+                              fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR_PRIMARY),
                         )
                       ],
                     ),
                   )),
-                  (orderingModel.deliveryId == -1 &&
-                              currentLogin.account.defaultDeliveryId == -1) ||
-                          orderingModel.status > 0
+                  !_canCheckout
                       ? Container()
                       : CustomOnTapWidget(
                           onTap: () {
                             if (!_isDoingCheckoutConfirm) {
-                              LoadingDialog.showLoadingDialog(context,
-                                  text: 'Processing...',
-                                  hideOnBackButton: false);
-                              confirmCheckout(orderingModel);
+                              LoadingDialog.showLoadingDialog(context, text: 'Processing...', hideOnBackButton: false);
+
+                              confirmCheckout(orderingModels);
                             }
                           },
                           child: Container(
@@ -192,11 +195,12 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             child: _isDoingCheckoutConfirm
                                 ? Center(
                                     child: CircularProgressIndicator(
-                                    backgroundColor: PRIMARY_COLOR,
+                                    backgroundColor: FORE_TEXT_COLOR,
                                   ))
                                 : Icon(
                                     Icons.check,
                                     size: 25,
+                                    color: FORE_TEXT_COLOR,
                                   ),
                           ),
                         )
@@ -207,31 +211,57 @@ class _CheckOutPageState extends State<CheckOutPage> {
     );
   }
 
-  Widget buildListOrderDetail(List<OrderingDetailModel> listOrderingDetail) {
+  Widget buildListOrderDetail(List<OrderingModel> cart) {
+    List<OrderingDetailModel> listOrderingDetail = [];
+    for (OrderingModel ordering in cart) {
+      for (var od in ordering.orderingDetail) {
+        listOrderingDetail.add(od);
+      }
+    }
     return Container(
       margin: EdgeInsets.only(bottom: kBottomNavigationBarHeight + 10),
       child: Column(
-        children: listOrderingDetail.map<Widget>((od) {
-          var product = od.product;
-          return CustomProductCheckOutItem(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (b) => ProductDetailPage(product)));
-            },
-            backgroundColor: FOREGROUND_COLOR,
-            cartItem: od,
-          );
-        }).toList(),
-      ),
+          children: cart
+              .map<Widget>((ordering) => Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(left: 5, top: 10),
+                        child: Row(
+                          children: <Widget>[
+                            Icon(
+                              Icons.store,
+                              color: PRIMARY_TEXT_COLOR,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(ordering.shopUsername, style: TEXT_STYLE_PRIMARY),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        children: listOrderingDetail.where((od) => od.orderingId == ordering.id).map<Widget>((od) {
+                          var product = od.product;
+                          return CustomProductCheckOutItem(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+                            },
+                            backgroundColor: FOREGROUND_COLOR,
+                            cartItem: od,
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ))
+              .toList()),
     );
   }
 
-  Widget buildDelivery(OrderingModel orderingModel) {
+  Widget buildDelivery(List<OrderingModel> orderingModels) {
+    OrderingModel firstOrdering = orderingModels.first;
     return CustomOnTapWidget(
       onTap: () {
-        showAddressChooserDialog(orderingModel);
+        showAddressChooserDialog(firstOrdering);
       },
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -240,7 +270,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
             cubit: deliveryAddressBloc,
             builder: (context, state) {
               if (state is DeliveryAddressLoaded) {
-                orderingModel.deliveryId = state.deliveryAddress.id;
+                firstOrdering.deliveryId = state.deliveryAddress.id;
                 return Row(
                   children: <Widget>[
                     Expanded(
@@ -250,7 +280,12 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Expanded(flex: 1, child: Text('Name:')),
+                              Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    'Name:',
+                                    style: TEXT_STYLE_PRIMARY,
+                                  )),
                               SizedBox(
                                 width: 20,
                               ),
@@ -259,9 +294,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                                 child: Text(
                                   state.deliveryAddress.fullname,
                                   textAlign: TextAlign.right,
-                                  style: DEFAULT_TEXT_STYLE.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18),
+                                  style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
                                 ),
                               )
                             ],
@@ -273,15 +306,13 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Expanded(flex: 1, child: Text('Address:')),
+                              Expanded(flex: 1, child: Text('Address:', style: TEXT_STYLE_PRIMARY)),
                               Expanded(
                                 flex: 2,
                                 child: Text(
                                   state.deliveryAddress.address,
                                   textAlign: TextAlign.right,
-                                  style: DEFAULT_TEXT_STYLE.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14),
+                                  style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 14),
                                 ),
                               )
                             ],
@@ -293,15 +324,13 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Expanded(flex: 1, child: Text('Phone:')),
+                              Expanded(flex: 1, child: Text('Phone:', style: TEXT_STYLE_PRIMARY)),
                               Expanded(
                                 flex: 2,
                                 child: Text(
                                   state.deliveryAddress.phoneNumber,
                                   textAlign: TextAlign.right,
-                                  style: DEFAULT_TEXT_STYLE.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18),
+                                  style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
                                 ),
                               )
                             ],
@@ -330,11 +359,10 @@ class _CheckOutPageState extends State<CheckOutPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text('Payment Method:'),
+              Text('Payment Method:', style: TEXT_STYLE_PRIMARY),
               Text(
                 'COD',
-                style: DEFAULT_TEXT_STYLE.copyWith(
-                    fontWeight: FontWeight.bold, fontSize: 16),
+                style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
               )
             ],
           )
@@ -364,31 +392,42 @@ class _CheckOutPageState extends State<CheckOutPage> {
       barrierDismissible: false,
     );
     if (rs != null && rs is DeliveryAddressModel) {
-      await CheckoutService().checkOut(orderingModel, deliveryId: rs.id);
+      _choosenDeliveryId = rs.id;
+      LoadingDialog.showLoadingDialog(context);
+
+      //await Future.delayed(Duration(seconds: 2));
+      //await CheckoutService().checkOut(ordering, deliveryId: rs.id);
       deliveryAddressBloc.add(GetDeliveryAddress(rs.id));
-      bloc.add(GetCheckout(orderingModel));
+      setState(() {});
+
+      LoadingDialog.hideLoadingDialog(context);
     }
   }
 
-  Future<OrderingModel> confirmCheckout(OrderingModel orderingModel) async {
+  Future<List<OrderingModel>> confirmCheckout(List<OrderingModel> orderingModels) async {
     setState(() {
       _isDoingCheckoutConfirm = true;
     });
-    var isCheckOutOk =
-        await CheckoutService().checkOut(orderingModel, status: 1);
-    if (isCheckOutOk != null) {
+    List<OrderingModel> isAllCheckOutOk = [];
+    for (var ordering in orderingModels) {
+      var isCheckoutOk = await CheckoutService().checkOut(ordering, status: 1, deliveryId: _choosenDeliveryId);
+      if (isCheckoutOk != null) {
+        isAllCheckOutOk.add(isCheckoutOk);
+      }
+    }
+    if (isAllCheckOutOk.length > 0) {
       await Future.delayed(Duration(seconds: 5));
-      print(jsonEncode(isCheckOutOk));
+      print(jsonEncode(isAllCheckOutOk));
       refreshCart(context);
-
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (b) => OrderingDetailPage(orderingModel)));
+      changePageViewPage(3);
+      Navigator.popUntil(context, (route) => route.isFirst);
+//      Navigator.pushReplacement(context, MaterialPageRoute(builder: (b) => OrderingDetailPage(orderingModel)));
     } else {
       setState(() {
         _isDoingCheckoutConfirm = false;
       });
     }
 
-    return isCheckOutOk;
+    return isAllCheckOutOk;
   }
 }

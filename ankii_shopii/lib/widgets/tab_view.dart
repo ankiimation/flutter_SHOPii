@@ -11,10 +11,17 @@ class CustomTabView extends StatefulWidget {
   final bool barShadow;
   final Color backgroundColor;
   final Color itemColor;
+  final bool alwaysShowLabel;
+  final bool hideIcon;
   final List<CustomTabViewItem> children;
 
   CustomTabView(
-      {this.barShadow = false, this.backgroundColor = BACKGROUND_COLOR, this.itemColor = PRIMARY_COLOR, this.children});
+      {this.alwaysShowLabel = false,
+      this.hideIcon = false,
+      this.barShadow = false,
+      this.backgroundColor = BACKGROUND_COLOR,
+      this.itemColor = PRIMARY_TEXT_COLOR,
+      this.children});
 
   @override
   _CustomTabViewState createState() => _CustomTabViewState();
@@ -66,12 +73,12 @@ class _CustomTabViewState extends State<CustomTabView> {
 //                borderRadius: BorderRadius.circular(30),
 //                color: widget.backgroundColor,
 //                boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(0, 5), blurRadius: 5)]),
-          height: 60,
+          height: widget.hideIcon ? 50 : 60,
           alignment: Alignment.center,
           decoration: BoxDecoration(
               color: widget.backgroundColor,
               boxShadow: widget.barShadow
-                  ? [BoxShadow(color: Colors.grey.withOpacity(0.3), offset: Offset(0, 6), blurRadius: 3)]
+                  ? [BoxShadow(color: Colors.black26, offset: Offset(0, 6), blurRadius: 3)]
                   : null),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -91,14 +98,17 @@ class _CustomTabViewState extends State<CustomTabView> {
                     margin: EdgeInsets.only(top: _currentIndex == index ? 5 : 0),
                     child: Column(
                       children: <Widget>[
-                        Icon(
-                          icon,
-                          size: 20,
-                          color: _currentIndex == index ? color : color.withOpacity(0.3),
-                        ),
+                        widget.hideIcon
+                            ? Container()
+                            : Icon(
+                                icon,
+                                size: 20,
+                                color: _currentIndex == index ? color : color.withOpacity(0.3),
+                              ),
                         Text(
-                          _currentIndex == index ? label : '',
-                          style: TextStyle(color: color, fontSize: 14),
+                          _currentIndex == index || widget.alwaysShowLabel || widget.hideIcon ? label : '',
+                          style:
+                              TextStyle(color: _currentIndex == index ? color : color.withOpacity(0.3), fontSize: 14),
                         )
                       ],
                     ),

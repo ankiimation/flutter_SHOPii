@@ -148,11 +148,11 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                   child: isDefault
                       ? Text(
                           'Default Address',
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, color: FOREGROUND_COLOR),
+                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, color: FOREGROUND_COLOR),
                         )
                       : Text(
                           'Tap to set default delivery address',
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 12),
+                          style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 12),
                         ),
                 ),
               ),
@@ -175,7 +175,7 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                     child: Container(
                       height: 30,
                       width: 30,
-                      color: PRICE_COLOR,
+                      color: PRICE_COLOR_PRIMARY,
                       child: Icon(
                         Icons.delete,
                         color: BACKGROUND_COLOR,
@@ -210,7 +210,7 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                         child: Text(
                           deliveryAddressModel.fullname,
                           textAlign: TextAlign.right,
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       )
                     ],
@@ -228,7 +228,7 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                         child: Text(
                           deliveryAddressModel.address,
                           textAlign: TextAlign.right,
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                       )
                     ],
@@ -246,7 +246,7 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                         child: Text(
                           deliveryAddressModel.phoneNumber,
                           textAlign: TextAlign.right,
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       )
                     ],

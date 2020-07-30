@@ -160,7 +160,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.center,
-                                  style: DEFAULT_TEXT_STYLE.copyWith(
+                                  style: TEXT_STYLE_ON_FOREGROUND.copyWith(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -172,8 +172,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.center,
-                                  style: DEFAULT_TEXT_STYLE.copyWith(
-                                    color: PRICE_COLOR,
+                                  style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                    color: PRICE_COLOR_PRIMARY,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -209,7 +209,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       cartIconKey: cartIconKey,
                       title: productModel.name,
                       leading: IconButton(
-                          icon: Icon(Icons.arrow_back_ios),
+                          icon: Icon(
+                            Icons.arrow_back_ios,
+                            color: PRIMARY_TEXT_COLOR,
+                          ),
                           onPressed: () {
                             Navigator.pop(context);
                           }),
@@ -229,7 +232,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           //  decoration: BoxDecoration(image: DecorationImage(image: CachedNetworkImageProvider(productModel.image))),
           child: Image.network(
             productModel.image,
-            fit: BoxFit.fill,
+            fit: BoxFit.cover,
           ),
         ));
   }
@@ -252,32 +255,42 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 Icon(
                   Icons.store,
                   size: 20,
-                  color: TEXT_COLOR,
+                  color: PRIMARY_TEXT_COLOR,
                 ),
                 SizedBox(
                   width: 10,
                 ),
-                BlocBuilder(
-                    cubit: shopAccountBloc,
-                    builder: (_, state) {
-                      if (state is ShopAccountLoaded) {
-                        return CustomOnTapWidget(
-                          onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (b) => ShopAccountDetailPage(state.shopAccountModel)));
-                          },
-                          child: Text(
-                            state.shopAccountModel.name,
-                            style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        );
-                      } else {
-                        return CustomDotLoading(
-                          primaryColor: FOREGROUND_COLOR,
-                          secondaryColor: BACKGROUND_COLOR,
-                        );
-                      }
-                    }),
+//                BlocBuilder(
+//                    cubit: shopAccountBloc,
+//                    builder: (_, state) {
+//                      if (state is ShopAccountLoaded) {
+//                        return CustomOnTapWidget(
+//                          onTap: () {
+//                            Navigator.push(context,
+//                                MaterialPageRoute(builder: (b) => ShopAccountDetailPage(state.shopAccountModel)));
+//                          },
+//                          child: Text(
+//                            state.shopAccountModel.name,
+//                            style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+//                          ),
+//                        );
+//                      } else {
+//                        return CustomDotLoading(
+//                          primaryColor: FOREGROUND_COLOR,
+//                          secondaryColor: BACKGROUND_COLOR,
+//                        );
+//                      }
+//                    }),
+                CustomOnTapWidget(
+                  onTap: () {
+                    Navigator.push(
+                        context, MaterialPageRoute(builder: (b) => ShopAccountDetailPage(productModel.shopUsername)));
+                  },
+                  child: Text(
+                    productModel.shopUsername,
+                    style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                )
               ],
             ),
           ),
@@ -287,7 +300,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 margin: EdgeInsets.all(20),
                 child: Text(
                   numberToMoneyString(productModel.price),
-                  style: DEFAULT_TEXT_STYLE.copyWith(color: PRICE_COLOR, fontSize: 30, fontWeight: FontWeight.bold),
+                  style: TEXT_STYLE_PRIMARY.copyWith(
+                      color: PRICE_COLOR_PRIMARY, fontSize: 30, fontWeight: FontWeight.bold),
                 ),
               )),
           Container(
@@ -296,13 +310,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
                   initiallyExpanded: true,
-                  title: Text('Description'),
+                  title: Text('Description', style: TEXT_STYLE_PRIMARY),
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.all(10),
-                      child: Text(productModel.description != null && productModel.description.length > 0
-                          ? productModel.description
-                          : 'No Description'),
+                      child: Text(
+                          productModel.description != null && productModel.description.length > 0
+                              ? productModel.description
+                              : 'No Description',
+                          style: TEXT_STYLE_PRIMARY),
                     )
                   ],
                 ),
@@ -313,7 +329,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
                   initiallyExpanded: true,
-                  title: Text('Images'),
+                  title: Text('Images', style: TEXT_STYLE_PRIMARY),
                   children: <Widget>[
                     Container(margin: EdgeInsets.all(10), child: _buildCarousel(productModel.productImage))
                   ],
@@ -324,13 +340,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               child: Theme(
                 data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
-                  title: Text('Reviews'),
+                  title: Text('Reviews', style: TEXT_STYLE_PRIMARY),
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.all(10),
-                      child: Text(productModel.description != null && productModel.description.length > 0
-                          ? productModel.description
-                          : 'No Review'),
+                      child: Text(
+                          productModel.description != null && productModel.description.length > 0
+                              ? productModel.description
+                              : 'No Review',
+                          style: TEXT_STYLE_PRIMARY),
                     )
                   ],
                 ),
@@ -341,7 +359,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
                   initiallyExpanded: true,
-                  title: Text('Related'),
+                  title: Text('Related', style: TEXT_STYLE_PRIMARY),
                   children: <Widget>[Container(child: buildRelated(productModel.category.product))],
                 ),
               )),
@@ -366,7 +384,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             items: images
                 .map((image) => Container(
                       margin: EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(image: DecorationImage(image: CachedNetworkImageProvider(image.image))),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          image: DecorationImage(image: CachedNetworkImageProvider(image.image),fit: BoxFit.cover)),
                     ))
                 .toList(),
             options: CarouselOptions(enlargeCenterPage: true, autoPlay: true, autoPlayInterval: Duration(seconds: 2))),
@@ -442,7 +462,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               child: Text(
                                 'Get it',
                                 textAlign: TextAlign.center,
-                                style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20),
+                                style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 20),
                               )),
                         ))
                       ],
@@ -496,14 +516,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 widget.product.name,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                                style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                               Text(
                                 numberToMoneyString(widget.product.price),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: DEFAULT_TEXT_STYLE.copyWith(
-                                    fontSize: 20, fontWeight: FontWeight.bold, color: PRICE_COLOR),
+                                style: TEXT_STYLE_PRIMARY.copyWith(
+                                    fontSize: 20, fontWeight: FontWeight.bold, color: PRICE_COLOR_PRIMARY),
                               ),
                             ],
                           ),
@@ -515,7 +535,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text('Quantity'),
+                        Text('Quantity', style: TEXT_STYLE_PRIMARY),
                         SizedBox(
                           width: 30,
                         ),
@@ -537,7 +557,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   padding: EdgeInsets.all(3),
                                   decoration:
                                       BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(50)),
-                                  child: Icon(Icons.remove),
+                                  child: Icon(
+                                    Icons.remove,
+                                    color: FORE_TEXT_COLOR,
+                                  ),
                                 ),
                               ),
                               Center(
@@ -552,7 +575,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                     controller: quantityController,
                                     keyboardType: TextInputType.number,
                                     textAlign: TextAlign.center,
-                                    style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                                    style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
                                     cursorColor: FOREGROUND_COLOR,
                                     decoration: InputDecoration.collapsed()
                                         .copyWith(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 5)),
@@ -573,7 +596,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   padding: EdgeInsets.all(3),
                                   decoration:
                                       BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(50)),
-                                  child: Icon(Icons.add),
+                                  child: Icon(Icons.add, color: FORE_TEXT_COLOR),
                                 ),
                               ),
                             ],
@@ -589,7 +612,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text('Size'),
+                        Text('Size', style: TEXT_STYLE_PRIMARY),
                         Row(
                           children: <Widget>[
                             Container(
@@ -600,7 +623,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               margin: EdgeInsets.only(left: 5),
                               decoration:
                                   BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(30)),
-                              child: Text('S'),
+                              child: Text(
+                                'S',
+                                style: TEXT_STYLE_ON_FOREGROUND,
+                              ),
                             ),
                             Container(
                               width: 30,
@@ -610,7 +636,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               margin: EdgeInsets.only(left: 5),
                               decoration:
                                   BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(30)),
-                              child: Text('M'),
+                              child: Text('M', style: TEXT_STYLE_ON_FOREGROUND),
                             ),
                             Container(
                               width: 30,
@@ -620,7 +646,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               margin: EdgeInsets.only(left: 5),
                               decoration:
                                   BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(30)),
-                              child: Text('L'),
+                              child: Text('L', style: TEXT_STYLE_ON_FOREGROUND),
                             ),
                             Container(
                               width: 30,
@@ -630,7 +656,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               margin: EdgeInsets.only(left: 5),
                               decoration:
                                   BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(30)),
-                              child: Text('XL'),
+                              child: Text('XL', style: TEXT_STYLE_ON_FOREGROUND),
                             ),
                           ],
                         )
@@ -650,7 +676,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 BoxDecoration(color: BACKGROUND_COLOR, borderRadius: BorderRadius.circular(100)),
                             child: Text(
                               quantityController.text,
-                              style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                              style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
                           start: CustomPosition(
@@ -672,7 +698,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         child: Text(
                           'Add To Cart',
                           textAlign: TextAlign.center,
-                          style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20),
+                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 20),
                         )),
                   )
                 ],

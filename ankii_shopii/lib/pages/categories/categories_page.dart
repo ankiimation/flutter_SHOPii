@@ -95,14 +95,14 @@ class _CategoriesPageState extends State<CategoriesPage> {
             children: <Widget>[
               Text(
                 category.name ?? '',
-                style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 40, color: BACKGROUND_COLOR),
+                style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 40, color: BACKGROUND_COLOR),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
                 category.description ?? '',
-                style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, color: FOREGROUND_COLOR),
+                style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 20, color: FOREGROUND_COLOR),
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

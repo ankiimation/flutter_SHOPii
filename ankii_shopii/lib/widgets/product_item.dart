@@ -34,14 +34,14 @@ class CustomProductListItem extends StatelessWidget {
       this.onTap,
       this.onAddToCart,
       this.onFavourite,
-      this.quickActionColor = PRIMARY_COLOR,
-      this.priceTextColor = PRICE_COLOR,
+      this.quickActionColor = FORE_TEXT_COLOR,
+      this.priceTextColor = PRICE_COLOR_ON_FORE,
       this.isFavorite = false});
 
   @override
   Widget build(BuildContext context) {
     GlobalKey inkwellKey = GlobalKey();
-    double height = 100;
+    double height = 120;
     // TODO: implement build
     return CustomOnTapWidget(
       onTap: onTap,
@@ -71,7 +71,7 @@ class CustomProductListItem extends StatelessWidget {
                               product.name ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: PRIMARY_COLOR, fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),
                           Expanded(
@@ -83,12 +83,31 @@ class CustomProductListItem extends StatelessWidget {
                                   letterSpacing: 1.2, color: priceTextColor, fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),
+//                          Expanded(
+//                            child: Row(
+//                              children: <Widget>[
+//                                Icon(
+//                                  Icons.store,
+//                                  size: 20,
+//                                ),
+//                                SizedBox(
+//                                  width: 5,
+//                                ),
+//                                Text(
+//                                  product.shopUsername,
+//                                  maxLines: 1,
+//                                  overflow: TextOverflow.ellipsis,
+//                                  style: TextStyle(letterSpacing: 1.2, fontSize: 12, fontWeight: FontWeight.bold),
+//                                ),
+//                              ],
+//                            ),
+//                          ),
                           Expanded(
                             child: Text(
                               product.description ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: PRIMARY_COLOR, fontSize: 12, fontWeight: FontWeight.bold),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -161,8 +180,8 @@ class CustomProductListItem extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: backgroundColor,
                 child: Container(
-                  width: height - 15,
-                  height: height - 15,
+                  width: height - 20,
+                  height: height - 20,
                   child: CircleAvatar(
                     backgroundColor: backgroundColor,
                     backgroundImage: CachedNetworkImageProvider(product.image),
@@ -197,7 +216,7 @@ class CustomProductCartItem extends StatefulWidget {
     this.onDelete,
     this.onTextSubmit,
     this.quickActionColor = PRIMARY_COLOR,
-    this.priceTextColor = PRICE_COLOR,
+    this.priceTextColor = PRICE_COLOR_ON_FORE,
   });
 
   @override
@@ -249,7 +268,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                               widget.cartItem.product.name ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: PRIMARY_COLOR, fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),
                           Expanded(
@@ -257,7 +276,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                               widget.cartItem.product.description ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: PRIMARY_COLOR, fontSize: 12, fontWeight: FontWeight.bold),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                           ),
                           Container(
@@ -268,11 +287,17 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Text('Total'),
+                                    Text(
+                                      'Total',
+                                      style: TEXT_STYLE_ON_FOREGROUND,
+                                    ),
                                     SizedBox(
                                       height: 5,
                                     ),
-                                    Text('Quantity'),
+                                    Text(
+                                      'Quantity',
+                                      style: TEXT_STYLE_ON_FOREGROUND,
+                                    ),
                                   ],
                                 ),
                                 SizedBox(
@@ -313,7 +338,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                                   ? Icon(Icons.remove)
                                                   : Icon(
                                                       Icons.delete_outline,
-                                                      color: PRICE_COLOR,
+                                                      color: PRICE_COLOR_PRIMARY,
                                                     ),
                                             ),
                                           ),
@@ -336,7 +361,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                                   }
                                                 },
                                                 textAlign: TextAlign.center,
-                                                style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                                                style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontWeight: FontWeight.bold),
                                                 cursorColor: FOREGROUND_COLOR,
                                                 decoration: InputDecoration.collapsed(hintText: '').copyWith(
                                                     hintText: '',
@@ -395,6 +420,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                       child: Icon(
                         Icons.close,
                         size: 20,
+                        color: FORE_TEXT_COLOR,
                       ))),
             ),
           ],
@@ -420,8 +446,8 @@ class CustomProductGridItem extends StatelessWidget {
   CustomProductGridItem(
       {this.cartIconKey,
       this.product,
-      this.priceTextColor = PRICE_COLOR,
-      this.quickActionColor = TEXT_COLOR,
+      this.priceTextColor = PRICE_COLOR_PRIMARY,
+      this.quickActionColor = FORE_TEXT_COLOR,
       this.width = 150,
       this.onTap,
       this.onAddToCart,
@@ -467,7 +493,7 @@ class CustomProductGridItem extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: DEFAULT_TEXT_STYLE.copyWith(
+                  style: TEXT_STYLE_ON_FOREGROUND.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -477,8 +503,8 @@ class CustomProductGridItem extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: DEFAULT_TEXT_STYLE.copyWith(
-                    color: PRICE_COLOR,
+                  style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                    color: PRICE_COLOR_PRIMARY,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -557,13 +583,13 @@ class CustomProductCheckOutItem extends StatelessWidget {
   final bool isFavorite;
 
   CustomProductCheckOutItem(
-      {this.backgroundColor = BACKGROUND_COLOR,
+      {this.backgroundColor = FOREGROUND_COLOR,
       this.cartItem,
       this.onTap,
       this.onAddToCart,
       this.onFavourite,
       this.quickActionColor = PRIMARY_COLOR,
-      this.priceTextColor = PRICE_COLOR,
+      this.priceTextColor = PRICE_COLOR_ON_FORE,
       this.isFavorite = false});
 
   @override
@@ -592,34 +618,36 @@ class CustomProductCheckOutItem extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         cartItem.product.name,
-                        style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Text('Price:', style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                          Text('Price:',
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
                           Text('${numberToMoneyString(cartItem.product.price)}',
                               textAlign: TextAlign.end,
-                              style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text('Quantity:',
-                              style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
                           Text('x ${cartItem.count}',
                               textAlign: TextAlign.end,
-                              style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Text('Total:', style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                          Text('Total:',
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
                           Text('${numberToMoneyString(cartItem.count * cartItem.product.price)}',
                               textAlign: TextAlign.end,
-                              style: DEFAULT_TEXT_STYLE.copyWith(
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
                                   fontSize: 18, fontWeight: FontWeight.bold, color: priceTextColor)),
                         ],
                       )

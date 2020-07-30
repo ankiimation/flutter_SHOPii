@@ -198,7 +198,7 @@ class _AddDeliveryAddressPageState extends State<AddDeliveryAddressPage> {
             alignment: Alignment.center,
             child: Text(
               'Add',
-              style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
             )),
       ),
     );
@@ -290,7 +290,7 @@ class _AddDeliveryAddressPageState extends State<AddDeliveryAddressPage> {
               padding: EdgeInsets.all(5),
               child: Text(
                 'Search in Map',
-                style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 15, fontWeight: FontWeight.bold, color: FOREGROUND_COLOR),
+                style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 15, fontWeight: FontWeight.bold, color: FOREGROUND_COLOR),
               )),
         ),
         Container(

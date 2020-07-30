@@ -143,6 +143,7 @@ namespace SHOPii.Controllers
 
                 ordering.DeliveryId = checkOutHelper.deliveryId ?? -1;
                 ordering.Status = checkOutHelper.status;
+                ordering.CreatedDate = DateTime.Now;
 
 
                 _context.Ordering.Update(ordering);

@@ -25,20 +25,20 @@ class CustomNotificationListItem extends StatelessWidget {
             title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
+            style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
           ),
           Text(
             description,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20),
+            style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 20),
           ),
           Text(
             dateTimeString,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.end,
-            style: DEFAULT_TEXT_STYLE.copyWith(
+            style: TEXT_STYLE_ON_FOREGROUND.copyWith(
                 fontWeight: FontWeight.bold, fontSize: 10, color: PRIMARY_COLOR.withOpacity(0.5)),
           )
         ],
@@ -66,7 +66,7 @@ class CustomOrderItem extends StatelessWidget {
         statusColor = Colors.green;
         break;
       case 4:
-        statusColor = PRICE_COLOR;
+        statusColor = PRICE_COLOR_PRIMARY;
         break;
       default:
         statusColor = Colors.black26;
@@ -88,13 +88,13 @@ class CustomOrderItem extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       'Order: ',
-                      style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
+                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
                     ),
                     Text(
                       '${orderingModel.id}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
+                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
                     ),
                   ],
                 ),
@@ -103,17 +103,16 @@ class CustomOrderItem extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       'Created: ',
-                      style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 15),
+                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontWeight: FontWeight.bold, fontSize: 15),
                     ),
                     Text(
                       ' ${DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.parse(orderingModel.createdDate))}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.end,
-                      style: DEFAULT_TEXT_STYLE.copyWith(
+                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
                           fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: PRIMARY_COLOR.withOpacity(0.5),
+                          fontSize: 12,
                           letterSpacing: 1.2),
                     ),
                   ],
@@ -123,13 +122,13 @@ class CustomOrderItem extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       'Total: ',
-                      style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       '${numberToMoneyString(countOrderTotal(orderingModel))}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 20, fontWeight: FontWeight.bold, color: PRICE_COLOR),
+                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 20, fontWeight: FontWeight.bold, color: PRICE_COLOR_ON_FORE),
                     ),
                   ],
                 ),
@@ -138,15 +137,15 @@ class CustomOrderItem extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       'Status: ',
-                      style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 12, fontWeight: FontWeight.bold),
+                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       '${getOrderStatus(orderingModel)}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.end,
-                      style: DEFAULT_TEXT_STYLE.copyWith(
-                          fontWeight: FontWeight.bold, fontSize: 14, color: PRIMARY_COLOR, letterSpacing: 1.2),
+                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                          fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.2),
                     ),
                   ],
                 )

@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'SHOPii',
           theme: ThemeData(
-            fontFamily: GoogleFonts.andada().fontFamily,
+            fontFamily: GoogleFonts.aBeeZee().fontFamily,
             // This is the theme of your application.
             //
             // Try running your application with "flutter run". You'll see the

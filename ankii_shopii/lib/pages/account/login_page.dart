@@ -135,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
               'Or login with',
               textAlign: TextAlign.center,
               style:
-                  TextStyle(color: TEXT_COLOR.withOpacity(0.5), fontSize: 12),
+                  TextStyle(color: PRIMARY_TEXT_COLOR.withOpacity(0.5), fontSize: 12),
             ),
           ),
           buildSocialLogin(),
@@ -177,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
             alignment: Alignment.center,
             child: Text(
               'Login',
-              style: DEFAULT_TEXT_STYLE.copyWith(
+              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
                   fontSize: 16, fontWeight: FontWeight.bold),
             )),
       ),
@@ -203,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
             icon: Icon(
               FontAwesomeIcons.google,
               size: 30,
-              color: PRICE_COLOR,
+              color: PRICE_COLOR_PRIMARY,
             ),
             onPressed: () {}),
       ],
@@ -214,7 +214,7 @@ class _LoginPageState extends State<LoginPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text('Dont have an account?'),
+        Text('Dont have an account?',style: TEXT_STYLE_PRIMARY),
         Container(
           margin: EdgeInsets.symmetric(horizontal: 20),
           child: RaisedButton(
@@ -226,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
             color: BACKGROUND_COLOR,
             padding: EdgeInsets.all(10),
             child:
-                Container(alignment: Alignment.center, child: Text('Register')),
+                Container(alignment: Alignment.center, child: Text('Register',style: TEXT_STYLE_PRIMARY)),
           ),
         ),
       ],

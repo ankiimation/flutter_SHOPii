@@ -18,7 +18,7 @@ addToCart(BuildContext context, {@required int productID, int count = 1}) async 
 //  BlocProvider.of<CartBloc>(context).add(AddToCart(productID: productID, count: count));
   LoadingDialog.showLoadingDialog(context);
 
-  await Future.delayed(Duration(milliseconds: 2000));
+//  await Future.delayed(Duration(milliseconds: 2000));
   await CartService().addToCart(productID, count);
 
   LoadingDialog.hideLoadingDialog(context);

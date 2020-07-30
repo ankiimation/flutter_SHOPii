@@ -28,6 +28,18 @@ class CheckoutService extends BlocService<OrderingModel> {
     return null;
   }
 
+//  Future<List<OrderingModel>> getCheckOut(List<OrderingModel> orderingModels) async {
+//    var rs = await HttpHelper.get(ORDERING_ENDPOINT, bearerToken: currentLogin.token);
+//    if (rs.statusCode == 200) {
+//      var jsonArray = jsonDecode(rs.body) as List;
+//      return jsonArray
+//          .map<OrderingModel>((j) => OrderingModel.fromJson(j))
+//          .where((orderingModel) => orderingModel.status == 0)
+//          .toList();
+//    }
+//    return null;
+//  }
+
   Future<OrderingModel> checkOut(OrderingModel orderingModel, {int status, int deliveryId}) async {
     var rs = await HttpHelper.post(
         CHECKOUT_ENDPOINT,

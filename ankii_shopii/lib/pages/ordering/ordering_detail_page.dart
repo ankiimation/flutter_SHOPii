@@ -18,6 +18,7 @@ import 'package:ankiishopii/models/account_model.dart';
 import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:ankiishopii/pages/navigator/navigator_page.dart';
 import 'package:ankiishopii/pages/product/product_detail_page.dart';
+import 'package:ankiishopii/pages/shop_account/shop_account_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
@@ -93,6 +94,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                           buildDivider(),
                           buildPaymentMethod(),
                           buildDivider(),
+                          buildShopUsername(state.orderingModel),
                           buildListOrderDetail(state.orderingModel.orderingDetail),
                         ],
                       ),
@@ -118,7 +120,10 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
           changePageViewPage(3);
           Navigator.popUntil(context, (route) => route.isFirst);
         },
-        child: Icon(Icons.arrow_back_ios),
+        child: Icon(
+          Icons.arrow_back_ios,
+          color: PRIMARY_TEXT_COLOR,
+        ),
       ),
     );
   }
@@ -129,13 +134,16 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text('Created At: '),
+          Text(
+            'Created At: ',
+            style: TEXT_STYLE_PRIMARY,
+          ),
           Text(
             '${DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.parse(orderingModel.createdDate))}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.end,
-            style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 12, color: PRIMARY_COLOR),
+            style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 12),
           ),
         ],
       ),
@@ -145,18 +153,43 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
   Widget buildStatus(OrderingModel orderingModel) {
     var statusCode = orderingModel.status;
     var statusString = "Processing";
+    var statusIcon = Icon(
+      Icons.query_builder,
+      size: 15,
+      color: Colors.grey,
+    );
     switch (statusCode) {
       case 1:
         statusString = "Processing";
+        statusIcon = Icon(
+          Icons.repeat,
+          size: 20,
+          color: FOREGROUND_COLOR,
+        );
         break;
       case 2:
         statusString = "Delivering";
+        statusIcon = Icon(
+          Icons.local_shipping,
+          size: 20,
+          color: Colors.orange,
+        );
         break;
       case 3:
         statusString = "Complete";
+        statusIcon = Icon(
+          Icons.check_circle,
+          size: 20,
+          color: Colors.green,
+        );
         break;
       case 4:
         statusString = "Cancelled";
+        statusIcon = Icon(
+          Icons.cancel,
+          size: 20,
+          color: Colors.red,
+        );
         break;
     }
     return Container(
@@ -164,10 +197,18 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text('Status:'),
-          Text(
-            '$statusString',
-            style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+          Text('Status:', style: TEXT_STYLE_PRIMARY),
+          Row(
+            children: <Widget>[
+              Text(
+                '$statusString',
+                style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              statusIcon
+            ],
           )
         ],
       ),
@@ -195,16 +236,40 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
               children: <Widget>[
                 Text(
                   'Total:',
-                  style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold),
+                  style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
                   '${numberToMoneyString(total)} đ',
-                  style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR),
+                  style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR_PRIMARY),
                 )
               ],
             ),
           )),
         ],
+      ),
+    );
+  }
+
+  Widget buildShopUsername(OrderingModel orderingModel) {
+    return CustomOnTapWidget(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (b) => ShopAccountDetailPage(orderingModel.shopUsername)));
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          children: <Widget>[
+            Icon(
+              Icons.store,
+              size: 20,
+              color: PRIMARY_TEXT_COLOR,
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Text(orderingModel.shopUsername, style: TEXT_STYLE_PRIMARY),
+          ],
+        ),
       ),
     );
   }
@@ -244,7 +309,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Expanded(flex: 1, child: Text('Name:')),
+                            Expanded(flex: 1, child: Text('Name:', style: TEXT_STYLE_PRIMARY)),
                             SizedBox(
                               width: 20,
                             ),
@@ -253,7 +318,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                               child: Text(
                                 state.deliveryAddress.fullname,
                                 textAlign: TextAlign.right,
-                                style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                                style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
                               ),
                             )
                           ],
@@ -265,13 +330,13 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Expanded(flex: 1, child: Text('Address:')),
+                            Expanded(flex: 1, child: Text('Address:', style: TEXT_STYLE_PRIMARY)),
                             Expanded(
                               flex: 2,
                               child: Text(
                                 state.deliveryAddress.address,
                                 textAlign: TextAlign.right,
-                                style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 14),
+                                style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 14),
                               ),
                             )
                           ],
@@ -283,13 +348,13 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Expanded(flex: 1, child: Text('Phone:')),
+                            Expanded(flex: 1, child: Text('Phone:', style: TEXT_STYLE_PRIMARY)),
                             Expanded(
                               flex: 2,
                               child: Text(
                                 state.deliveryAddress.phoneNumber,
                                 textAlign: TextAlign.right,
-                                style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                                style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
                               ),
                             )
                           ],
@@ -317,10 +382,10 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text('Payment Method:'),
+              Text('Payment Method:', style: TEXT_STYLE_PRIMARY),
               Text(
                 'COD',
-                style: DEFAULT_TEXT_STYLE.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
               )
             ],
           )

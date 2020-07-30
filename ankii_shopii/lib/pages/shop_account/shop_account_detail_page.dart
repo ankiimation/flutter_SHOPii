@@ -3,6 +3,8 @@ import 'package:ankiishopii/blocs/product_bloc/event.dart';
 import 'package:ankiishopii/blocs/product_bloc/service.dart';
 import 'package:ankiishopii/blocs/product_bloc/state.dart';
 import 'package:ankiishopii/blocs/shop_bloc/bloc.dart';
+import 'package:ankiishopii/blocs/shop_bloc/event.dart';
+import 'package:ankiishopii/blocs/shop_bloc/state.dart';
 import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/models/product_model.dart';
@@ -12,15 +14,19 @@ import 'package:ankiishopii/pages/product/product_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
+import 'package:ankiishopii/widgets/debug_widget.dart';
+import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ShopAccountDetailPage extends StatefulWidget {
-  final ShopAccountModel shopAccountModel;
+  final String shopAccountUsername;
 
-  ShopAccountDetailPage(this.shopAccountModel);
+  // final ShopAccountModel shopAccountModel;
+
+  ShopAccountDetailPage(this.shopAccountUsername);
 
   @override
   _ShopAccountDetailPageState createState() => _ShopAccountDetailPageState();
@@ -47,6 +53,7 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    bloc.add(GetShopAccount(widget.shopAccountUsername));
     productBloc.add(GetAllProducts());
   }
 
@@ -62,16 +69,35 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: BACKGROUND_COLOR,
-      body: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        child: Column(
-          children: <Widget>[buildAppBar(), buildAvatar(), buildInfo(), buildProducts()],
-        ),
-      ),
+      body: BlocBuilder(
+          cubit: bloc,
+          builder: (context, state) {
+            if (state is ShopAccountLoaded) {
+              return SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: <Widget>[
+                    buildAppBar(state.shopAccountModel),
+                    buildAvatar(state.shopAccountModel),
+                    buildInfo(state.shopAccountModel),
+                    buildProducts()
+                  ],
+                ),
+              );
+            } else if (state is ShopAccountError) {
+              return Center(
+                child: CustomErrorWidget(),
+              );
+            } else {
+              return Center(
+                child: CustomDotLoading(),
+              );
+            }
+          }),
     );
   }
 
-  Widget buildAppBar() {
+  Widget buildAppBar(ShopAccountModel shopAccountModel) {
     return InPageAppBar(
       cartIconKey: cartIconKey,
       leading: CustomOnTapWidget(
@@ -80,11 +106,11 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
         },
         child: Icon(Icons.arrow_back_ios),
       ),
-      title: widget.shopAccountModel.name,
+      title: shopAccountModel.name,
     );
   }
 
-  Widget buildAvatar() {
+  Widget buildAvatar(ShopAccountModel shopAccountModel) {
     return Container(
       margin: EdgeInsets.all(20),
       height: 200,
@@ -95,8 +121,7 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
             height: 150,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                image: DecorationImage(
-                    image: CachedNetworkImageProvider(widget.shopAccountModel.image), fit: BoxFit.cover)),
+                image: DecorationImage(image: CachedNetworkImageProvider(shopAccountModel.image), fit: BoxFit.cover)),
           ),
           Align(
             alignment: Alignment.bottomCenter,
@@ -115,7 +140,7 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
     );
   }
 
-  Widget buildInfo() {
+  Widget buildInfo(ShopAccountModel shopAccountModel) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -127,8 +152,8 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
                 width: 10,
               ),
               Text(
-                widget.shopAccountModel.address,
-                style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                shopAccountModel.address,
+                style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
               )
             ],
           ),
@@ -142,8 +167,8 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
                 width: 10,
               ),
               Text(
-                widget.shopAccountModel.phoneNumber,
-                style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                shopAccountModel.phoneNumber,
+                style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
               )
             ],
           ),
@@ -169,7 +194,7 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
         ),
         Text(
           'Delicious',
-          style: DEFAULT_TEXT_STYLE.copyWith(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
+          style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
         )
       ],
     );
@@ -181,7 +206,7 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
         builder: (_, state) {
           if (state is ListProductsLoaded) {
             var products =
-                state.products.where((product) => product.shopUsername == widget.shopAccountModel.username).toList();
+                state.products.where((product) => product.shopUsername == widget.shopAccountUsername).toList();
             return Container(
                 margin: EdgeInsets.symmetric(vertical: 10),
                 child: Wrap(

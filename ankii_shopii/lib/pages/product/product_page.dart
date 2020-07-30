@@ -75,6 +75,7 @@ class _ProductPageState extends State<ProductPage> {
                   child: Icon(
                     Icons.arrow_back_ios,
                     size: 20,
+                    color: PRIMARY_TEXT_COLOR,
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -107,14 +108,10 @@ class _ProductPageState extends State<ProductPage> {
         .map<Widget>((product) => CustomProductListItem(
               cartIconKey: cartGlobalKey,
               onTap: () async {
-                await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (b) => ProductDetailPage(product)));
+                await Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
                 _refresh();
               },
               product: product,
-              priceTextColor: PRICE_COLOR,
               backgroundColor: FOREGROUND_COLOR,
               isFavorite: product.isFavoriteByCurrentUser,
               onFavourite: () async {
