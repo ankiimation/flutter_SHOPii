@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http.OData;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,7 @@ namespace SHOPii.Controllers
 
             if (categoryID == null)
             {
-                return await new QueryHelper<Product>(_context.Product.Include(p => p.ProductImage).Include(p=>p.Category)).pagingQuery(from, limit).ToListAsync();
+                return await new QueryHelper<Product>(_context.Product.Include(p => p.ProductImage).Include(p => p.Category)).pagingQuery(from, limit).ToListAsync();
             }
             else
             {
@@ -51,6 +52,52 @@ namespace SHOPii.Controllers
             }
 
             return product;
+        }
+
+        [HttpGet("forYou")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsForYou()
+        {
+            String username = User.Identity.Name;
+            List<Product> listResult = new List<Product>();
+            var listProducts = await getBuyedProduct(username);
+            HashSet<int> setCategoryId = listProducts.Select(p => p.CategoryId).ToList().ToHashSet();
+              foreach(int id in setCategoryId)
+            {
+                var listRandomProduct = await getRandomProductFromCategoryId(id, 5);
+                foreach(var product in listRandomProduct)
+                {
+                    product.OrderingDetail = null;
+                    listResult.Add(product);
+                }
+            }
+            return listResult;
+
+
+        }
+
+
+        private async Task<List<Product>> getRandomProductFromCategoryId(int categoryId, int limit)
+        {
+            var allProduct = await _context.Product.Where(p => p.CategoryId == categoryId).ToListAsync();
+            allProduct = allProduct.OrderBy(x => Guid.NewGuid()).ToList();
+            List<Product> listProducts = allProduct.Take(limit).ToList();
+            return listProducts;
+        }
+
+        private async Task<List<Product>> getBuyedProduct(String username)
+        {
+            List<Product> listProducts = new List<Product>();
+            var listOrdering = await _context.Ordering.Include(o => o.OrderingDetail).Where(o => o.Username.Equals(username)).ToListAsync();
+            foreach (var ordering in listOrdering)
+            {
+                foreach (var od in ordering.OrderingDetail)
+                {
+                    var product = await _context.Product.FirstOrDefaultAsync(p => p.Id == od.ProductId);
+                    listProducts.Add(product);
+                }
+            }
+            return listProducts;
         }
 
         //[HttpGet("categories/{id}")]

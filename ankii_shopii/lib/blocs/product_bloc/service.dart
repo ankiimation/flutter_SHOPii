@@ -54,6 +54,13 @@ class ProductService extends BlocService<ProductModel> {
     return productModel;
   }
 
+  Future<ProductModel> doFavorite(ProductModel productModel) async {
+    var favorite = await FavoriteService().doFavorite(productID: productModel.id);
+    var rs = _checkIsFavoriteByFavoriteModel(productModel: productModel, favoriteModel: favorite);
+    // print(jsonEncode(rs.isFavoriteByCurrentUser));
+    return rs;
+  }
+
   Future<List<ProductModel>> getAllWithCategoryId(int categoryID, {int from = 0, int limit}) async {
     // TODO: implement getAll
     var rs = await HttpHelper.get(
@@ -70,10 +77,16 @@ class ProductService extends BlocService<ProductModel> {
     return null;
   }
 
-  Future<ProductModel> doFavorite(ProductModel productModel) async {
-    var favorite = await FavoriteService().doFavorite(productID: productModel.id);
-    var rs = _checkIsFavoriteByFavoriteModel(productModel: productModel, favoriteModel: favorite);
-    // print(jsonEncode(rs.isFavoriteByCurrentUser));
-    return rs;
+  Future<List<ProductModel>> getProductsForYou() async {
+    var rs = await HttpHelper.get(PRODUCT_ENDPOINT + "/foryou", bearerToken: currentLogin.token);
+    if (rs.statusCode == 200) {
+      var jsonList = jsonDecode(rs.body) as List;
+      var products = jsonList.map((j) => ProductModel.fromJson(j)).toList();
+      for (var product in products) {
+        product = _checkIsFavoriteByCurrentUser(product);
+      }
+      return products;
+    }
+    return null;
   }
 }

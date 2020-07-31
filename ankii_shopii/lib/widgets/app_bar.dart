@@ -59,6 +59,7 @@ class InPageAppBar extends StatelessWidget {
   final bool isLoggedIn;
   final bool showCartButton;
   final bool showBackground;
+  final bool showSearchButton;
 
   const InPageAppBar(
       {this.showBackground = false,
@@ -67,6 +68,7 @@ class InPageAppBar extends StatelessWidget {
       this.title,
       this.leading,
       this.isLoggedIn = true,
+      this.showSearchButton = true,
       this.showCartButton = true});
 
   @override
@@ -93,15 +95,17 @@ class InPageAppBar extends StatelessWidget {
                 ),
                 Row(
                   children: <Widget>[
-                    CustomOnTapWidget(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (b) => SearchPage()));
-                      },
-                      child: Icon(
-                        Icons.search,
-                        color: PRIMARY_TEXT_COLOR,
-                      ),
-                    ),
+                    showSearchButton
+                        ? CustomOnTapWidget(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (b) => SearchPage()));
+                            },
+                            child: Icon(
+                              Icons.search,
+                              color: PRIMARY_TEXT_COLOR,
+                            ),
+                          )
+                        : Container(),
                     showCartButton
                         ? BlocBuilder(
                             cubit: BlocProvider.of<LoginBloc>(context),
@@ -130,8 +134,9 @@ class InPageAppBar extends StatelessWidget {
 
 class CartWidget extends StatefulWidget {
   final GlobalKey cartKey;
+  double size;
 
-  CartWidget(this.cartKey) : super(key: cartKey);
+  CartWidget(this.cartKey, {this.size = 25}) : super(key: cartKey);
 
   @override
   CartWidgetState createState() => CartWidgetState();
@@ -172,7 +177,7 @@ class CartWidgetState extends State<CartWidget> {
                   if (totalCount == 0) return Container();
                   return Text(
                     totalCount.toString(),
-                    style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
+                    style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold,fontSize: widget.size/2),
                   );
                 } else {
                   return Container();
@@ -182,7 +187,7 @@ class CartWidgetState extends State<CartWidget> {
             Icons.shopping_cart,
             //  key: widget.cartKey,
             color: PRIMARY_TEXT_COLOR,
-            size: _inProcess ? 35 : 25,
+            size: _inProcess ? widget.size * 1.2 : widget.size,
           ),
         ],
       ),

@@ -17,6 +17,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       yield* mapGetProductByIdToState(event);
     } else if (event is DoFavorite) {
       yield* mapDoFavoriteByIdToState(event);
+    } else if (event is GetProductsForYou) {
+      yield* mapGetProductsForYouToState(event);
     }
   }
 
@@ -29,8 +31,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
   }
 
-  Stream<ProductState> mapGetAppProductsViaCategoryIdToState(
-      GetAllProductsByCategoryId event) async* {
+  Stream<ProductState> mapGetAppProductsViaCategoryIdToState(GetAllProductsByCategoryId event) async* {
     await Future.delayed(Duration(seconds: 2));
     var rs = await ProductService().getAllWithCategoryId(event.categoryID);
     if (rs != null) {
@@ -54,5 +55,14 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     var rs = await ProductService().doFavorite(event.product);
     // print(rs.isFavoriteByCurrentUser);
     // yield ProductLoaded(rs);
+  }
+
+  Stream<ProductState> mapGetProductsForYouToState(GetProductsForYou event) async* {
+    var rs = await ProductService().getProductsForYou();
+    if (rs != null) {
+      yield ListProductsLoaded(rs);
+    } else {
+      yield ProductLoadingError();
+    }
   }
 }

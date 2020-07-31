@@ -504,7 +504,7 @@ class CustomProductGridItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                    color: PRICE_COLOR_PRIMARY,
+                    color: PRICE_COLOR_ON_FORE,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),

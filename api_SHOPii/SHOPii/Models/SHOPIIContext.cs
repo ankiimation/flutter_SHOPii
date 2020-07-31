@@ -307,6 +307,14 @@ namespace SHOPii.Models
                     .IsRequired()
                     .HasColumnName("IMAGE");
 
+                entity.Property(e => e.Latitude)
+                    .HasColumnName("LATITUDE")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Longitude)
+                    .HasColumnName("LONGITUDE")
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasColumnName("NAME");

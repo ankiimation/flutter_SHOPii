@@ -1,15 +1,26 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:ankiishopii/blocs/product_bloc/bloc.dart';
+import 'package:ankiishopii/blocs/product_bloc/event.dart';
+import 'package:ankiishopii/blocs/product_bloc/service.dart';
+import 'package:ankiishopii/blocs/product_bloc/state.dart';
+import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
+import 'package:ankiishopii/models/product_model.dart';
+import 'package:ankiishopii/pages/product/product_detail_page.dart';
 import 'package:ankiishopii/themes/app_icon.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/custom_sliver_appbar.dart';
+import 'package:ankiishopii/widgets/debug_widget.dart';
+import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:ankiishopii/widgets/tab_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../themes/constant.dart';
 import '../../themes/constant.dart';
@@ -31,6 +42,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  GlobalKey<CartWidgetState> _cartIconKey = GlobalKey();
+  ProductBloc productForYouBloc = ProductBloc(ProductLoading())..add(GetProductsForYou());
+
   @override
   void initState() {
     // TODO: implement initState
@@ -40,7 +54,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     // TODO: implement dispose
-
+    productForYouBloc.close();
     super.dispose();
   }
 
@@ -48,189 +62,132 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: BACKGROUND_COLOR,
-      body: SingleChildScrollView(
-        controller: widget.scrollController,
-        child: Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              InPageAppBar(
-                title: 'Home',
-              ),
-              buildForYou(),
-              // buildSearchBar(),
-              buildCategories()
-            ],
+      body: CustomScrollView(controller: widget.scrollController, slivers: <Widget>[
+        buildAppBar(),
+//        SliverToBoxAdapter(
+//          child: InPageAppBar(
+//            showSearchButton: false,
+//            cartIconKey: _cartIconKey,
+//            title: 'Home',
+//          ),
+//        ),
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 50,
           ),
         ),
-      ),
+        SliverToBoxAdapter(child: buildForYou()),
+        SliverToBoxAdapter(
+          child: buildCategories(),
+        )
+      ]),
     );
   }
 
-  Widget buildSearchBar() {
-    return SliverAppBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
+  Widget buildAppBar() {
+    return SliverPersistentHeader(
+      delegate: CustomSliverAppBar(expandedHeight: 200, cartIconKey: _cartIconKey),
       pinned: true,
-      floating: true,
-      title: Container(
-        margin: EdgeInsets.only(top: 15, bottom: 15),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: TextField(
-                decoration:
-                    InputDecoration(contentPadding: EdgeInsets.all(15), hintText: 'Search', border: InputBorder.none),
-              ),
-            ),
-            IconButton(
-                icon: Icon(
-                  MyIcons.search_1,
-                  color: PRIMARY_COLOR,
-                  size: 20,
-                ),
-                onPressed: () {})
-          ],
-        ),
-      ),
     );
+
+//    return SliverAppBar(
+//      backgroundColor: BACKGROUND_COLOR,
+//      pinned: true,
+//      floating: true,
+//      expandedHeight: 200,
+//      flexibleSpace: LayoutBuilder(builder: (_, constraints) {
+//        var top = constraints.biggest.height;
+//        return FlexibleSpaceBar(
+//            centerTitle: true,
+//            title: AnimatedOpacity(
+//                duration: Duration(milliseconds: 300),
+//                //opacity: top == 80.0 ? 1.0 : 0.0,
+//                opacity: 1.0,
+//                child: Container(
+//                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+//                  color: BACKGROUND_COLOR.withOpacity(0.8),
+//                  child: Row(
+//                    children: <Widget>[Text('Home')],
+//                  ),
+//                )),
+//            background: Image.network(
+//              "https://assets.lightspeedhq.com/img/2019/07/8aac85b2-blog_foodpresentationtipsfromtopchefs.jpg",
+//              fit: BoxFit.cover,
+//            ));
+//      }),
+//    );
   }
 
   Widget buildForYou() {
-    List<String> urls = [
-      'https://conbovang.vn/wp-content/uploads/2017/06/m%E1%BB%B9-x%C3%A0o-th%E1%BA%ADp-c%E1%BA%A9m.jpg',
-      'https://shipdoandemff.com/wp-content/uploads/2017/06/M%C3%AC-x%C3%A0o-gi%C3%B2n-shipdoandemFF.jpg',
-      'https://cdn.tgdd.vn/Files/2020/03/08/1240753/3-cach-lam-mon-com-chien-thom-ngon-bo-duong-cho-bua-com-gia-dinh-2.png',
-      'https://thucthan.com/media/2019/07/bun-rieu-cua/bun-rieu-cua.png'
-    ];
-    return Container(
-      margin: EdgeInsets.only(top: _topBottomMargin, bottom: _topBottomMargin),
-      height: 250,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(left: 25, bottom: 10),
-            child: Text(
-              'For you',
-              style: TEXT_STYLE_PRIMARY.copyWith(
-                color: PRIMARY_COLOR,
-                fontSize: 20,
-                letterSpacing: 1.2,
+    return BlocBuilder(
+        cubit: productForYouBloc,
+        builder: (context, state) {
+          if (state is ListProductsLoaded) {
+            return Container(
+              margin: EdgeInsets.only(top: _topBottomMargin, bottom: _topBottomMargin),
+              height: 250,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.only(left: 25, bottom: 10),
+                    child: Text(
+                      'For you',
+                      style: TEXT_STYLE_PRIMARY.copyWith(
+                        color: PRIMARY_COLOR,
+                        fontSize: 20,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                      child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: state.products
+                              .map<Widget>((product) => Container(
+                                    margin: EdgeInsets.only(left: 10),
+                                    child: CustomProductGridItem(
+                                      cartIconKey: _cartIconKey,
+                                      product: product,
+                                      isFavorite: product.isFavoriteByCurrentUser,
+                                      onTap: () {
+                                        Navigator.push(
+                                            context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+                                      },
+                                      onFavourite: () async {
+                                        setState(() {
+                                          product.isFavoriteByCurrentUser = !product.isFavoriteByCurrentUser;
+                                        });
+                                        await ProductService().doFavorite(product);
+                                        //productForYouBloc.add(GetProductsForYou());
+                                      },
+                                      onAddToCart: () {
+                                        addToCart(context, productID: product.id);
+                                      },
+                                    ),
+                                  ))
+                              .toList()
+                                ..add(SizedBox(
+                                  width: 10,
+                                ))))
+                ],
               ),
-            ),
-          ),
-          Expanded(
-              child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: urls
-                      .map(
-                        (url) => Container(
-                          width: 150,
-                          margin: EdgeInsets.only(left: urls.indexOf(url) == 0 ? 20 : 0, right: 20),
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-//                              boxShadow: [
-//                                BoxShadow(
-//                                    color: Colors.black26,
-//                                    offset: Offset(5, 5),
-//                                    blurRadius: 5)
-//                              ],
-                              color: FOREGROUND_COLOR,
-                              borderRadius: BorderRadius.circular(30)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Expanded(
-                                flex: 5,
-                                child: Container(
-                                  decoration: BoxDecoration(
-//
-                                      image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
-                                      color: PRIMARY_COLOR,
-                                      borderRadius: BorderRadius.circular(25)),
-                                ),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Column(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Text(
-                                        'Bún thịt lướng',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.center,
-                                        style: TEXT_STYLE_PRIMARY.copyWith(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Text(
-                                        '50.000đ',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.center,
-                                        style: TEXT_STYLE_PRIMARY.copyWith(
-                                          color: PRICE_COLOR_PRIMARY,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.add_shopping_cart,
-                                      size: 20,
-                                    ),
-                                    Icon(
-                                      Icons.favorite_border,
-                                      size: 20,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                      .toList()))
-        ],
-      ),
-    );
+            );
+          } else if (state is ProductLoadingError) {
+            return Center(
+              child: CustomErrorWidget(),
+            );
+          } else {
+            return Center(
+              child: CustomDotLoading(),
+            );
+          }
+        });
   }
 
   Widget buildCategories() {
     return Container(
-        height: 800,
-        margin: EdgeInsets.only(
-          top: _topBottomMargin,
-          bottom: _topBottomMargin,
-//            left: _leftRightMargin,
-//            right: _leftRightMargin
-        ),
-        child: CustomTabView(
-          backgroundColor: BACKGROUND_COLOR,
-          children: [
-            CustomTabViewItem(
-                icon: Icons.fastfood,
-                label: 'Noodle',
-                color: PRIMARY_COLOR,
-                child: Column(
-                  children: <Widget>[],
-                )),
-          ],
-        ));
+      height: 1000,
+    );
   }
 }

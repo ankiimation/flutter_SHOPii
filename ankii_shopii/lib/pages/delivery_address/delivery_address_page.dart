@@ -105,7 +105,7 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
           padding: EdgeInsets.all(10),
           child: Icon(
             Icons.add,
-            color: FOREGROUND_COLOR,
+            color: FORE_TEXT_COLOR,
           )),
     );
   }
