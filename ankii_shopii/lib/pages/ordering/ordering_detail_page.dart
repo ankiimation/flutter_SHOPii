@@ -22,6 +22,7 @@ import 'package:ankiishopii/pages/shop_account/shop_account_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
+import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -51,9 +52,11 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
     // TODO: implement initState
     super.initState();
     bloc.add(GetOrdering(widget.orderingModel.id));
-    deliveryAddressBloc.add(GetDeliveryAddress(widget.orderingModel.deliveryId));
+    deliveryAddressBloc
+        .add(GetDeliveryAddress(widget.orderingModel.deliveryId));
     _scrollController.addListener(() {
-      bool isScrollUp = _scrollController.position.userScrollDirection == ScrollDirection.reverse;
+      bool isScrollUp = _scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse;
       _scrollStreamController.sink.add(isScrollUp);
     });
   }
@@ -95,15 +98,20 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                           buildPaymentMethod(),
                           buildDivider(),
                           buildShopUsername(state.orderingModel),
-                          buildListOrderDetail(state.orderingModel.orderingDetail),
+                          buildListOrderDetail(
+                              state.orderingModel.orderingDetail),
                         ],
                       ),
                     ))
                   ],
                 );
+              } else if (state is OrderingLoading) {
+                return Center(
+                  child: CustomDotLoading(),
+                );
               }
               return Center(
-                child: Text('error'),
+                child: CustomEmptyWidget(),
               );
             }),
       ),
@@ -143,7 +151,8 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.end,
-            style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 12),
+            style: TEXT_STYLE_PRIMARY.copyWith(
+                fontWeight: FontWeight.bold, fontSize: 12),
           ),
         ],
       ),
@@ -236,11 +245,15 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
               children: <Widget>[
                 Text(
                   'Total:',
-                  style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
+                  style:
+                      TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
                   '${numberToMoneyString(total)} đ',
-                  style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR_PRIMARY),
+                  style: TEXT_STYLE_PRIMARY.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: PRICE_COLOR_PRIMARY),
                 )
               ],
             ),
@@ -253,7 +266,11 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
   Widget buildShopUsername(OrderingModel orderingModel) {
     return CustomOnTapWidget(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (b) => ShopAccountDetailPage(orderingModel.shopUsername)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (b) =>
+                    ShopAccountDetailPage(orderingModel.shopUsername)));
       },
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 20),
@@ -282,7 +299,10 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
           var product = od.product;
           return CustomProductCheckOutItem(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (b) => ProductDetailPage(product)));
             },
             backgroundColor: FOREGROUND_COLOR,
             cartItem: od,
@@ -309,7 +329,10 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Expanded(flex: 1, child: Text('Name:', style: TEXT_STYLE_PRIMARY)),
+                            Expanded(
+                                flex: 1,
+                                child:
+                                    Text('Name:', style: TEXT_STYLE_PRIMARY)),
                             SizedBox(
                               width: 20,
                             ),
@@ -318,7 +341,8 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                               child: Text(
                                 state.deliveryAddress.fullname,
                                 textAlign: TextAlign.right,
-                                style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                                style: TEXT_STYLE_PRIMARY.copyWith(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
                               ),
                             )
                           ],
@@ -330,13 +354,17 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Expanded(flex: 1, child: Text('Address:', style: TEXT_STYLE_PRIMARY)),
+                            Expanded(
+                                flex: 1,
+                                child: Text('Address:',
+                                    style: TEXT_STYLE_PRIMARY)),
                             Expanded(
                               flex: 2,
                               child: Text(
                                 state.deliveryAddress.address,
                                 textAlign: TextAlign.right,
-                                style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 14),
+                                style: TEXT_STYLE_PRIMARY.copyWith(
+                                    fontWeight: FontWeight.bold, fontSize: 14),
                               ),
                             )
                           ],
@@ -348,13 +376,17 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Expanded(flex: 1, child: Text('Phone:', style: TEXT_STYLE_PRIMARY)),
+                            Expanded(
+                                flex: 1,
+                                child:
+                                    Text('Phone:', style: TEXT_STYLE_PRIMARY)),
                             Expanded(
                               flex: 2,
                               child: Text(
                                 state.deliveryAddress.phoneNumber,
                                 textAlign: TextAlign.right,
-                                style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                                style: TEXT_STYLE_PRIMARY.copyWith(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
                               ),
                             )
                           ],
@@ -385,7 +417,8 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
               Text('Payment Method:', style: TEXT_STYLE_PRIMARY),
               Text(
                 'COD',
-                style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TEXT_STYLE_PRIMARY.copyWith(
+                    fontWeight: FontWeight.bold, fontSize: 16),
               )
             ],
           )
@@ -404,7 +437,8 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
 
   Future<OrderingModel> confirmCheckout(OrderingModel orderingModel) async {
     setState(() {});
-    var isCheckOutOk = await CheckoutService().checkOut(orderingModel, status: 1);
+    var isCheckOutOk =
+        await CheckoutService().checkOut(orderingModel, status: 1);
     if (isCheckOutOk != null) {
       await Future.delayed(Duration(seconds: 5));
       print(jsonEncode(isCheckOutOk));

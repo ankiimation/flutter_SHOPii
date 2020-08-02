@@ -14,11 +14,13 @@ class CustomSliverAppBar extends SliverPersistentHeaderDelegate {
   CustomSliverAppBar({@required this.expandedHeight, this.cartIconKey});
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
     bool isCollapsed = kToolbarHeight - shrinkOffset <= 0;
     return Container(
-      decoration: BoxDecoration(
-          color: FOREGROUND_COLOR, boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(0, 3), blurRadius: 3)]),
+      decoration: BoxDecoration(color: FOREGROUND_COLOR, boxShadow: [
+        BoxShadow(color: Colors.black26, offset: Offset(0, 3), blurRadius: 3)
+      ]),
       child: Stack(
         fit: StackFit.expand,
         overflow: Overflow.visible,
@@ -47,26 +49,34 @@ class CustomSliverAppBar extends SliverPersistentHeaderDelegate {
 //            ),
 //          ),
           Positioned(
-            top: expandedHeight / 1.2 - shrinkOffset >= kToolbarHeight
-                ? expandedHeight / 1.2 - shrinkOffset
-                : kToolbarHeight,
             width: ScreenHelper.getWidth(context),
             child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 20),
+              margin: EdgeInsets.only(
+                  top: expandedHeight / 1.2 - shrinkOffset >= kToolbarHeight
+                      ? expandedHeight / 1.2 - shrinkOffset
+                      : kToolbarHeight,
+                  right: 20,
+                  left: 20),
               height: isCollapsed ? 65 : 70,
               child: Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)),
                 elevation: 10,
                 child: Container(
                     padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text('Commerce'),
+                        Text(
+                          'SHOPii',
+                          style:
+                              TEXT_STYLE_PRIMARY.copyWith(letterSpacing: 1.2),
+                        ),
                         CustomOnTapWidget(
                           onTap: () {
                             //  print('ok');
-                            Navigator.push(context, MaterialPageRoute(builder: (b) => CartPage()));
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (b) => CartPage()));
                           },
                           child: CartWidget(
                             cartIconKey,

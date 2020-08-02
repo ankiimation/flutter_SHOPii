@@ -23,7 +23,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AppBar appBar;
 
   CustomAppBar(
-      {Key key, this.padding, this.backgroundColor = BACKGROUND_COLOR, this.primaryColor = PRIMARY_COLOR, this.appBar})
+      {Key key,
+      this.padding,
+      this.backgroundColor = BACKGROUND_COLOR,
+      this.primaryColor = PRIMARY_COLOR,
+      this.appBar})
       : super(key: key);
 
   @override
@@ -56,17 +60,19 @@ class InPageAppBar extends StatelessWidget {
   final String title;
   final Widget titleWidget;
   final Widget leading;
+  final Color backgroundColor;
   final bool isLoggedIn;
   final bool showCartButton;
-  final bool showBackground;
+  final bool showAwesomeBackground;
   final bool showSearchButton;
 
   const InPageAppBar(
-      {this.showBackground = false,
+      {this.showAwesomeBackground = false,
       this.titleWidget,
       this.cartIconKey,
       this.title,
       this.leading,
+      this.backgroundColor = BACKGROUND_COLOR,
       this.isLoggedIn = true,
       this.showSearchButton = true,
       this.showCartButton = true});
@@ -74,59 +80,71 @@ class InPageAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
-      alignment: Alignment.center,
-      margin: EdgeInsets.only(left: 20, right: 20, top: ScreenHelper.getPaddingTop(context) + 10),
-      child: Row(
-        children: <Widget>[
-          Container(margin: EdgeInsets.only(right: this.leading != null ? 10 : 0), child: this.leading),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Expanded(
-                  child: titleWidget ??
-                      Text(
-                        title ?? '',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 30),
-                      ),
-                ),
-                Row(
-                  children: <Widget>[
-                    showSearchButton
-                        ? CustomOnTapWidget(
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (b) => SearchPage()));
-                            },
-                            child: Icon(
-                              Icons.search,
-                              color: PRIMARY_TEXT_COLOR,
-                            ),
-                          )
-                        : Container(),
-                    showCartButton
-                        ? BlocBuilder(
-                            cubit: BlocProvider.of<LoginBloc>(context),
-                            builder: (context, state) {
-                              if (state is LoginSuccessfully) {
-                                return CustomOnTapWidget(
-                                  onTap: () {
-                                    Navigator.push(context, MaterialPageRoute(builder: (b) => CartPage()));
-                                  },
-                                  child: CartWidget(cartIconKey),
-                                );
-                              }
-                              return Container();
-                            })
-                        : Container(),
-                  ],
-                )
-              ],
-            ),
-          )
-        ],
+      color: showAwesomeBackground ? null : backgroundColor,
+      child: Container(
+        height: 60,
+        alignment: Alignment.center,
+        margin: EdgeInsets.only(
+            left: 20, right: 20, top: ScreenHelper.getPaddingTop(context) + 10),
+        child: Row(
+          children: <Widget>[
+            Container(
+                margin: EdgeInsets.only(right: this.leading != null ? 10 : 0),
+                child: this.leading),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Expanded(
+                    child: titleWidget ??
+                        Text(
+                          title ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 30),
+                        ),
+                  ),
+                  Row(
+                    children: <Widget>[
+                      showSearchButton
+                          ? CustomOnTapWidget(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (b) => SearchPage()));
+                              },
+                              child: Icon(
+                                Icons.search,
+                                color: PRIMARY_TEXT_COLOR,
+                              ),
+                            )
+                          : Container(),
+                      showCartButton
+                          ? BlocBuilder(
+                              cubit: BlocProvider.of<LoginBloc>(context),
+                              builder: (context, state) {
+                                if (state is LoginSuccessfully) {
+                                  return CustomOnTapWidget(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (b) => CartPage()));
+                                    },
+                                    child: CartWidget(cartIconKey),
+                                  );
+                                }
+                                return Container();
+                              })
+                          : Container(),
+                    ],
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -134,7 +152,7 @@ class InPageAppBar extends StatelessWidget {
 
 class CartWidget extends StatefulWidget {
   final GlobalKey cartKey;
-  double size;
+  final double size;
 
   CartWidget(this.cartKey, {this.size = 25}) : super(key: cartKey);
 
@@ -177,7 +195,8 @@ class CartWidgetState extends State<CartWidget> {
                   if (totalCount == 0) return Container();
                   return Text(
                     totalCount.toString(),
-                    style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold,fontSize: widget.size/2),
+                    style: TEXT_STYLE_PRIMARY.copyWith(
+                        fontWeight: FontWeight.bold, fontSize: widget.size / 2),
                   );
                 } else {
                   return Container();
