@@ -121,7 +121,8 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
             height: 150,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                image: DecorationImage(image: CachedNetworkImageProvider(shopAccountModel.image), fit: BoxFit.cover)),
+                image: DecorationImage(
+                    image: CachedNetworkImageProvider('${shopAccountModel.coverImage}'), fit: BoxFit.cover)),
           ),
           Align(
             alignment: Alignment.bottomCenter,
@@ -131,8 +132,7 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
               child: CircleAvatar(
                   radius: 40,
                   backgroundColor: FOREGROUND_COLOR,
-                  backgroundImage: CachedNetworkImageProvider(
-                      'https://scontent.fvca1-1.fna.fbcdn.net/v/t1.0-9/102713645_101651018255875_3264774611723934322_o.png?_nc_cat=102&_nc_sid=09cbfe&_nc_ohc=zS0la529QEMAX-ReAtd&_nc_ht=scontent.fvca1-1.fna&oh=90887d87318590c83ec52ace7dfb1c37&oe=5F485AA0')),
+                  backgroundImage: CachedNetworkImageProvider('${shopAccountModel.image}')),
             ),
           )
         ],

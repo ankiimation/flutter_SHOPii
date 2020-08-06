@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 class LoadingDialog {
   static bool _isLoadingDialogShowing = false;
 
-  static showLoadingDialog(BuildContext context, {String text, bool hideOnBackButton = false}) async {
+  static showLoadingDialog(BuildContext context,
+      {String text, bool hideOnBackButton = false}) async {
     _isLoadingDialogShowing = true;
     showDialog(
         context: context,
@@ -17,8 +18,11 @@ class LoadingDialog {
           },
           child: AlertDialog(
             elevation: 0,
-            backgroundColor: text == null ? Colors.transparent : BACKGROUND_COLOR.withOpacity(0.9),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            backgroundColor: text == null
+                ? Colors.transparent
+                : BACKGROUND_COLOR.withOpacity(0.9),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
@@ -32,7 +36,8 @@ class LoadingDialog {
                     ? Container()
                     : Text(
                         text ?? 'Processing...',
-                        style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
+                        style: TEXT_STYLE_PRIMARY.copyWith(
+                            fontWeight: FontWeight.bold),
                       )
               ],
             ),
@@ -65,6 +70,47 @@ class LoadingDialog {
                 Navigator.pop(context);
               },
               child: Text('OK'),
+            )
+          ],
+        ));
+  }
+
+  static showConfirm(BuildContext context,
+      {String text, @required Function onYes, @required Function onNo}) async {
+    return await showDialog(
+        context: context,
+        child: AlertDialog(
+          backgroundColor: BACKGROUND_COLOR,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          content: text == null
+              ? null
+              : Text(
+                  text,
+                  style:
+                      TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
+                ),
+          actions: <Widget>[
+            FlatButton(
+              color: FOREGROUND_COLOR,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              onPressed: () {
+                Navigator.pop(context);
+                onNo();
+              },
+              child: Text('No'),
+            ),
+            FlatButton(
+              color: FOREGROUND_COLOR,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              onPressed: () {
+                Navigator.pop(context);
+                onYes();
+              },
+              child: Text('Yes'),
             )
           ],
         ));

@@ -30,7 +30,7 @@ namespace SHOPii.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Data Source=SQL5063.site4now.net;Initial Catalog=DB_A654D2_shopii;User Id=DB_A654D2_shopii_admin;Password=kii181998");
+                optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=SHOPII;Integrated Security=True");
             }
         }
 
@@ -302,6 +302,8 @@ namespace SHOPii.Models
                 entity.Property(e => e.Address)
                     .IsRequired()
                     .HasColumnName("ADDRESS");
+
+                entity.Property(e => e.CoverImage).HasColumnName("COVER_IMAGE");
 
                 entity.Property(e => e.Image)
                     .IsRequired()

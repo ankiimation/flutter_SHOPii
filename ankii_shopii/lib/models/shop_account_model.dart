@@ -5,10 +5,12 @@ class ShopAccountModel {
   String address;
   String phoneNumber;
   String image;
+  String coverImage;
   String latitude;
   String longitude;
 
-  ShopAccountModel({this.username, this.password, this.name, this.address, this.phoneNumber, this.image});
+  ShopAccountModel(
+      {this.username, this.password, this.name, this.address, this.phoneNumber, this.image, this.coverImage});
 
   ShopAccountModel.fromJson(Map<String, dynamic> json) {
     username = json['username'];
@@ -17,6 +19,7 @@ class ShopAccountModel {
     address = json['address'];
     phoneNumber = json['phoneNumber'];
     image = json['image'];
+    coverImage = json['coverImage'];
     latitude = json['latitude'];
     longitude = json['longitude'];
   }
@@ -29,6 +32,7 @@ class ShopAccountModel {
     data['address'] = this.address;
     data['phoneNumber'] = this.phoneNumber;
     data['image'] = this.image;
+    data['coverImage'] = this.coverImage;
     data['latitude'] = this.latitude;
     data['longitude'] = this.longitude;
     return data;

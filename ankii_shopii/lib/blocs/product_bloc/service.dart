@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:ankiishopii/blocs/bloc_service.dart';
 import 'package:ankiishopii/blocs/favorite_bloc/service.dart';
@@ -78,15 +79,18 @@ class ProductService extends BlocService<ProductModel> {
   }
 
   Future<List<ProductModel>> getProductsForYou() async {
-    var rs = await HttpHelper.get(PRODUCT_ENDPOINT + "/foryou", bearerToken: currentLogin.token);
-    if (rs.statusCode == 200) {
-      var jsonList = jsonDecode(rs.body) as List;
-      var products = jsonList.map((j) => ProductModel.fromJson(j)).toList();
-      for (var product in products) {
-        product = _checkIsFavoriteByCurrentUser(product);
+    if (currentLogin != null) {
+      var rs = await HttpHelper.get(PRODUCT_ENDPOINT + "/foryou", bearerToken: currentLogin.token);
+      if (rs.statusCode == 200) {
+        var jsonList = jsonDecode(rs.body) as List;
+        var products = jsonList.map((j) => ProductModel.fromJson(j)).toList();
+        for (var product in products) {
+          product = _checkIsFavoriteByCurrentUser(product);
+        }
+        return products;
       }
-      return products;
+      return null;
     }
-    return null;
+    return getAll(limit: 10, from: Random().nextInt(10));
   }
 }

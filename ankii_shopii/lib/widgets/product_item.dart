@@ -1,16 +1,15 @@
 import 'package:ankiishopii/global/global_function.dart';
 import 'package:ankiishopii/global/global_variable.dart';
-import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/helpers/string_helper.dart';
 import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:ankiishopii/models/product_model.dart';
 import 'package:ankiishopii/pages/account/login_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/add_to_cart_effect.dart';
-import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../themes/constant.dart';
 import 'base/custom_ontap_widget.dart';
@@ -52,16 +51,12 @@ class CustomProductListItem extends StatelessWidget {
           children: <Widget>[
             Container(
               width: double.infinity,
-              padding: EdgeInsets.only(
-                  left: height - 50, top: 10, bottom: 10, right: 10),
+              padding: EdgeInsets.only(left: height - 50, top: 10, bottom: 10, right: 10),
               child: Container(
-                padding:
-                    EdgeInsets.only(left: 60, top: 10, right: 20, bottom: 10),
+                padding: EdgeInsets.only(left: 60, top: 10, right: 20, bottom: 10),
                 decoration: BoxDecoration(
                     color: backgroundColor,
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(100),
-                        bottomRight: Radius.circular(100))),
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(100), bottomRight: Radius.circular(100))),
                 child: Row(
                   children: <Widget>[
                     Expanded(
@@ -75,8 +70,7 @@ class CustomProductListItem extends StatelessWidget {
                               product.name ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),
                           Expanded(
@@ -85,10 +79,7 @@ class CustomProductListItem extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                  letterSpacing: 1.2,
-                                  color: priceTextColor,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
+                                  letterSpacing: 1.2, color: priceTextColor, fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),
 //                          Expanded(
@@ -115,8 +106,7 @@ class CustomProductListItem extends StatelessWidget {
                               product.description ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                  fontSize: 12, fontWeight: FontWeight.bold),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -130,10 +120,7 @@ class CustomProductListItem extends StatelessWidget {
                             child: InkWell(
                               onTap: () {
                                 if (currentLogin == null) {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (b) => LoginPage()));
+                                  Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
                                   return;
                                 }
                                 if (onFavourite != null) {
@@ -142,11 +129,9 @@ class CustomProductListItem extends StatelessWidget {
                               },
                               child: Container(
                                   child: Icon(
-                                isFavorite
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
+                                isFavorite ? Icons.favorite : Icons.favorite_border,
                                 color: quickActionColor,
-                                size: 20,
+                                size: 25,
                               )),
                             ),
                           ),
@@ -155,29 +140,21 @@ class CustomProductListItem extends StatelessWidget {
                               key: inkwellKey,
                               onTap: () async {
                                 if (currentLogin == null) {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (b) => LoginPage()));
+                                  Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
                                   return;
                                 }
                                 if (onAddToCart != null) {
-                                  final RenderBox box = inkwellKey
-                                      .currentContext
-                                      .findRenderObject();
-                                  final Offset position =
-                                      box.globalToLocal(Offset.zero);
+                                  final RenderBox box = inkwellKey.currentContext.findRenderObject();
+                                  final Offset position = box.globalToLocal(Offset.zero);
                                   var dx = position.dx * -1;
                                   var dy = position.dy * -1;
                                   //print(dx.toString() + " - " + dy.toString());
 
-                                  updateCartIconPosition(
-                                      cartIconKey: cartIconKey);
+                                  updateCartIconPosition(cartIconKey: cartIconKey);
 
                                   await showAddToCartAnimation(context,
                                       start: CustomPosition(dx, dy),
-                                      end: CustomPosition(cartIconPositionDx,
-                                          cartIconPositionDy));
+                                      end: CustomPosition(cartIconPositionDx, cartIconPositionDy));
                                   onAddToCart();
                                 }
                               },
@@ -185,7 +162,7 @@ class CustomProductListItem extends StatelessWidget {
                                   child: Icon(
                                 Icons.add_shopping_cart,
                                 color: quickActionColor,
-                                size: 20,
+                                size: 25,
                               )),
                             ),
                           ),
@@ -268,11 +245,9 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
           children: <Widget>[
             Container(
               width: double.infinity,
-              padding: EdgeInsets.only(
-                  left: height - 100, top: 10, bottom: 10, right: 10),
+              padding: EdgeInsets.only(left: height - 100, top: 10, bottom: 10, right: 10),
               child: Container(
-                padding:
-                    EdgeInsets.only(left: 60, top: 10, right: 20, bottom: 10),
+                padding: EdgeInsets.only(left: 60, top: 10, right: 20, bottom: 10),
                 decoration: BoxDecoration(
                     color: widget.backgroundColor,
                     borderRadius: BorderRadius.only(
@@ -292,8 +267,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                               widget.cartItem.product.name ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),
                           Expanded(
@@ -301,8 +275,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                               widget.cartItem.product.description ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                  fontSize: 12, fontWeight: FontWeight.bold),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                           ),
                           Container(
@@ -310,8 +283,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
                                 Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text(
@@ -332,14 +304,11 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                 ),
                                 Container(
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
                                       Container(
                                         child: Text(
-                                          numberToMoneyString(widget.cartItem
-                                                          .product.price *
-                                                      widget.cartItem.count)
+                                          numberToMoneyString(widget.cartItem.product.price * widget.cartItem.count)
                                                   .toString() ??
                                               '0đ',
                                           maxLines: 1,
@@ -362,63 +331,42 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                               padding: EdgeInsets.all(2),
                                               margin: EdgeInsets.only(right: 5),
                                               decoration: BoxDecoration(
-                                                  color: BACKGROUND_COLOR
-                                                      .withOpacity(0.5),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          15)),
+                                                  color: BACKGROUND_COLOR.withOpacity(0.5),
+                                                  borderRadius: BorderRadius.circular(15)),
                                               child: widget.cartItem.count > 1
                                                   ? Icon(Icons.remove)
                                                   : Icon(
                                                       Icons.delete_outline,
-                                                      color:
-                                                          PRICE_COLOR_PRIMARY,
+                                                      color: PRICE_COLOR_PRIMARY,
                                                     ),
                                             ),
                                           ),
                                           Center(
                                             child: Container(
                                               width: 50,
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 5),
+                                              padding: EdgeInsets.symmetric(vertical: 5),
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
-                                                  color: PRIMARY_COLOR
-                                                      .withOpacity(0.1),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          15)),
+                                                  color: PRIMARY_COLOR.withOpacity(0.1),
+                                                  borderRadius: BorderRadius.circular(15)),
                                               child: TextFormField(
                                                 controller: quantityController,
                                                 //enabled: false,
-                                                keyboardType:
-                                                    TextInputType.number,
-                                                onFieldSubmitted:
-                                                    (quantityString) {
-                                                  int quantity =
-                                                      int.parse(quantityString);
-                                                  if (widget.onTextSubmit !=
-                                                      null) {
-                                                    widget
-                                                        .onTextSubmit(quantity);
+                                                keyboardType: TextInputType.number,
+                                                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                                                onFieldSubmitted: (quantityString) {
+                                                  int quantity = int.parse(quantityString);
+                                                  if (widget.onTextSubmit != null) {
+                                                    widget.onTextSubmit(quantity);
                                                   }
                                                 },
                                                 textAlign: TextAlign.center,
-                                                style: TEXT_STYLE_ON_FOREGROUND
-                                                    .copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontWeight: FontWeight.bold),
                                                 cursorColor: FOREGROUND_COLOR,
-                                                decoration: InputDecoration
-                                                        .collapsed(hintText: '')
-                                                    .copyWith(
-                                                        hintText: '',
-                                                        isDense: true,
-                                                        contentPadding:
-                                                            EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        5)),
+                                                decoration: InputDecoration.collapsed(hintText: '').copyWith(
+                                                    hintText: '',
+                                                    isDense: true,
+                                                    contentPadding: EdgeInsets.symmetric(horizontal: 5)),
                                               ),
                                             ),
                                           ),
@@ -428,11 +376,8 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                               padding: EdgeInsets.all(2),
                                               margin: EdgeInsets.only(left: 5),
                                               decoration: BoxDecoration(
-                                                  color: BACKGROUND_COLOR
-                                                      .withOpacity(0.5),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          15)),
+                                                  color: BACKGROUND_COLOR.withOpacity(0.5),
+                                                  borderRadius: BorderRadius.circular(15)),
                                               child: Icon(Icons.add),
                                             ),
                                           ),
@@ -459,8 +404,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                   child: CircleAvatar(
                     radius: 40,
                     backgroundColor: PRIMARY_COLOR,
-                    backgroundImage: CachedNetworkImageProvider(
-                        widget.cartItem.product.image),
+                    backgroundImage: CachedNetworkImageProvider(widget.cartItem.product.image),
                   ),
                 ),
               ),
@@ -472,9 +416,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                   child: Container(
                       margin: EdgeInsets.all(5),
                       padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          color: widget.backgroundColor,
-                          borderRadius: BorderRadius.circular(50)),
+                      decoration: BoxDecoration(color: widget.backgroundColor, borderRadius: BorderRadius.circular(50)),
                       child: Icon(
                         Icons.close,
                         size: 20,
@@ -539,11 +481,13 @@ class CustomProductGridItem extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
 //
-                    image: DecorationImage(
-                        image: NetworkImage(product.image), fit: BoxFit.cover),
+                    image: DecorationImage(image: NetworkImage(product.image), fit: BoxFit.cover),
                     color: PRIMARY_COLOR,
                     borderRadius: BorderRadius.circular(25)),
               ),
+            ),
+            SizedBox(
+              height: 5,
             ),
             Column(
               children: <Widget>[
@@ -572,13 +516,12 @@ class CustomProductGridItem extends StatelessWidget {
                   height: 10,
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     CustomOnTapWidget(
                       onTap: () {
                         if (currentLogin == null) {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (b) => LoginPage()));
+                          Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
                           return;
                         }
                         if (onFavourite != null) {
@@ -587,24 +530,19 @@ class CustomProductGridItem extends StatelessWidget {
                       },
                       child: Icon(
                         isFavorite ? Icons.favorite : Icons.favorite_border,
-                        size: 20,
+                        size: 25,
+                        color: FORE_TEXT_COLOR,
                       ),
-                    ),
-                    SizedBox(
-                      width: 10,
                     ),
                     CustomOnTapWidget(
                       onTap: () async {
                         if (currentLogin == null) {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (b) => LoginPage()));
+                          Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
                           return;
                         }
                         if (onAddToCart != null) {
-                          final RenderBox box = addToCartIconKey.currentContext
-                              .findRenderObject();
-                          final Offset position =
-                              box.globalToLocal(Offset.zero);
+                          final RenderBox box = addToCartIconKey.currentContext.findRenderObject();
+                          final Offset position = box.globalToLocal(Offset.zero);
                           var dx = position.dx * -1;
                           var dy = position.dy * -1;
                           //print(dx.toString() + " - " + dy.toString());
@@ -613,15 +551,15 @@ class CustomProductGridItem extends StatelessWidget {
 
                           await showAddToCartAnimation(context,
                               start: CustomPosition(dx, dy),
-                              end: CustomPosition(
-                                  cartIconPositionDx, cartIconPositionDy));
+                              end: CustomPosition(cartIconPositionDx, cartIconPositionDy));
                           onAddToCart();
                         }
                       },
                       child: Icon(
                         Icons.add_shopping_cart,
                         key: addToCartIconKey,
-                        size: 20,
+                        size: 25,
+                        color: FORE_TEXT_COLOR,
                       ),
                     )
                   ],
@@ -663,14 +601,12 @@ class CustomProductCheckOutItem extends StatelessWidget {
       child: Container(
           margin: EdgeInsets.only(left: 10, right: 10, top: 10),
           padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              color: backgroundColor, borderRadius: BorderRadius.circular(100)),
+          decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(100)),
           child: Row(
             children: <Widget>[
               CircleAvatar(
                 radius: 40,
-                backgroundImage:
-                    CachedNetworkImageProvider(cartItem.product.image),
+                backgroundImage: CachedNetworkImageProvider(cartItem.product.image),
               ),
               SizedBox(
                 width: 10,
@@ -684,46 +620,37 @@ class CustomProductCheckOutItem extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         cartItem.product.name,
-                        style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text('Price:',
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                  fontSize: 14, fontWeight: FontWeight.bold)),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
                           Text('${numberToMoneyString(cartItem.product.price)}',
                               textAlign: TextAlign.end,
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                  fontSize: 14, fontWeight: FontWeight.bold)),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text('Quantity:',
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                  fontSize: 14, fontWeight: FontWeight.bold)),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
                           Text('x ${cartItem.count}',
                               textAlign: TextAlign.end,
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                  fontSize: 14, fontWeight: FontWeight.bold)),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text('Total:',
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                  fontSize: 14, fontWeight: FontWeight.bold)),
-                          Text(
-                              '${numberToMoneyString(cartItem.count * cartItem.product.price)}',
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                          Text('${numberToMoneyString(cartItem.count * cartItem.product.price)}',
                               textAlign: TextAlign.end,
                               style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: priceTextColor)),
+                                  fontSize: 18, fontWeight: FontWeight.bold, color: priceTextColor)),
                         ],
                       )
                     ],

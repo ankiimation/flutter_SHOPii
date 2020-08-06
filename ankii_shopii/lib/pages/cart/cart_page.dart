@@ -246,10 +246,13 @@ class _CartPageState extends State<CartPage> {
 //                _onIncreaseItem(od);
 //                bloc.add(AddToCart(productID: product.id, count: 1));
                         //LoadingDialog.showLoadingDialog(context, text: 'Adding...');
+                        FocusScope.of(context).unfocus();
                         await addToCart(context, productID: product.id, count: 1);
+
                         //  LoadingDialog.hideLoadingDialog(context);
                       },
                       onDecreaseQuantity: () async {
+                        FocusScope.of(context).unfocus();
                         if (od.count - 1 <= 0) {
                           _removeFromCartConfirmDialog(
                               product: product,

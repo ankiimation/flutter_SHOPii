@@ -1,6 +1,8 @@
+import 'package:ankiishopii/blocs/checkout_bloc/service.dart';
 import 'package:ankiishopii/blocs/ordering_bloc/event.dart';
 import 'package:ankiishopii/blocs/ordering_bloc/service.dart';
 import 'package:ankiishopii/blocs/ordering_bloc/state.dart';
+import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class OrderingBloc extends Bloc<OrderingEvent, OrderingState> {
@@ -27,14 +29,19 @@ class OrderingBloc extends Bloc<OrderingEvent, OrderingState> {
   }
 
   Stream<OrderingState> mapGetAllOrderingToState(GetAllOrdering event) async* {
-    try{
-    var rs = await OrderingService().getAll();
-    if (rs != null) {
-      yield AllOrderingLoaded(rs);
-    } else {
-      yield AllOrderingLoadError('Null');
-    }}catch(e){
+    try {
+      var rs = await OrderingService().getAll();
+      if (rs != null) {
+        yield AllOrderingLoaded(rs);
+      } else {
+        yield AllOrderingLoadError('Null');
+      }
+    } catch (e) {
       yield AllOrderingLoadError('Not Logged In');
     }
+  }
+
+  cancelOrdering(int orderingId) async {
+    await OrderingService().cancelOrdering(orderingId);
   }
 }

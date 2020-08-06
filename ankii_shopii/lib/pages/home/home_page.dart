@@ -46,31 +46,42 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   GlobalKey<CartWidgetState> _cartIconKey = GlobalKey();
-  ProductBloc productForYouBloc = ProductBloc(ProductLoading())
-    ..add(GetProductsForYou());
+  ProductBloc productForYouBloc = ProductBloc(ProductLoading())..add(GetProductsForYou());
 
   double topBarHeight = kToolbarHeight + 150;
   bool _isScrollToAppBar = false;
+
+  _refresh() {
+    productForYouBloc.add(GetProductsForYou());
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    widget.scrollController.addListener(() {
-      var offset = widget.scrollController.offset;
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       var reachedHeight = topBarHeight + ScreenHelper.getPaddingTop(context);
+      widget.scrollController.addListener(() {
+        var offset = widget.scrollController.offset;
+
 //              - ScreenHelper.getPaddingTop(context) - kToolbarHeight;
-      if (offset >= reachedHeight && _isScrollToAppBar == false) {
-        setState(() {
-          _isScrollToAppBar = true;
-          _cartIconKey = GlobalKey();
-        });
-      } else if (offset < reachedHeight && _isScrollToAppBar == true) {
-        setState(() {
-          _isScrollToAppBar = false;
-          _cartIconKey = GlobalKey();
-        });
-      }
+        if (offset >= reachedHeight && _isScrollToAppBar == false) {
+          if (this.mounted) {
+            setState(() {
+              _isScrollToAppBar = true;
+              _cartIconKey = GlobalKey();
+            });
+          }
+        } else if (offset < reachedHeight && _isScrollToAppBar == true) {
+          if (this.mounted) {
+            setState(() {
+              _isScrollToAppBar = false;
+              _cartIconKey = GlobalKey();
+            });
+          }
+        }
+      });
     });
   }
 
@@ -90,14 +101,7 @@ class _HomePageState extends State<HomePage> {
           SingleChildScrollView(
             controller: widget.scrollController,
             child: Column(children: <Widget>[
-              buildAppBar(),
-//        SliverToBoxAdapter(
-//          child: InPageAppBar(
-//            showSearchButton: false,
-//            cartIconKey: _cartIconKey,
-//            title: 'Home',
-//          ),
-//        ),
+              buildBanner(),
               SizedBox(
                 height: 20,
               ),
@@ -105,49 +109,45 @@ class _HomePageState extends State<HomePage> {
               buildCategories()
             ]),
           ),
-          AnimatedSwitcher(
-            duration: Duration(milliseconds: 200),
-            child: _isScrollToAppBar
-                ? Container(
-                    padding: EdgeInsets.only(
-                        left: 10,
-                        right: 10,
-                        top: ScreenHelper.getPaddingTop(context)),
-                    child: Card(
-                      color: BACKGROUND_COLOR,
-                      elevation: 10,
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-                        height: 56,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Expanded(
-                                child: Container(
-                              color: PRIMARY_COLOR.withOpacity(0.3),
-                              child: TextField(
-                                decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(
-                                        left: 5, right: 5, bottom: 5),
-                                    hintText: 'Search',
-                                    border: InputBorder.none),
-                              ),
-                            )),
-                            CartWidget(_isScrollToAppBar ? _cartIconKey : null)
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                : null,
-          )
+          buildSearchBar()
         ],
       ),
     );
   }
 
-  Widget buildAppBar() {
+  Widget buildSearchBar() {
+    return AnimatedSwitcher(
+      duration: Duration(milliseconds: 200),
+      child: _isScrollToAppBar
+          ? Container(
+              padding: EdgeInsets.only(left: 10, right: 10, top: ScreenHelper.getPaddingTop(context)),
+              child: Card(
+                color: BACKGROUND_COLOR,
+                elevation: 10,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  height: 56,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Expanded(
+                          child: Container(
+                        child: TextField(
+                          textAlignVertical: TextAlignVertical.center,
+                          decoration: InputDecoration(hintText: 'Search', border: InputBorder.none),
+                        ),
+                      )),
+                      CartWidget(_isScrollToAppBar ? _cartIconKey : null)
+                    ],
+                  ),
+                ),
+              ),
+            )
+          : null,
+    );
+  }
+
+  Widget buildBanner() {
     return Container(
       height: topBarHeight + 30,
       child: Stack(
@@ -175,8 +175,7 @@ class _HomePageState extends State<HomePage> {
                         color: BACKGROUND_COLOR,
                         child: TextField(
                           decoration: InputDecoration(
-                              contentPadding:
-                                  EdgeInsets.only(left: 5, right: 5, bottom: 5),
+                              contentPadding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
                               hintText: 'Search',
                               border: InputBorder.none),
                         ),
@@ -201,8 +200,7 @@ class _HomePageState extends State<HomePage> {
         builder: (context, state) {
           if (state is ListProductsLoaded) {
             return Container(
-              margin: EdgeInsets.only(
-                  top: _topBottomMargin, bottom: _topBottomMargin),
+              margin: EdgeInsets.only(top: _topBottomMargin, bottom: _topBottomMargin),
               height: 250,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,28 +225,21 @@ class _HomePageState extends State<HomePage> {
                                     child: CustomProductGridItem(
                                       cartIconKey: _cartIconKey,
                                       product: product,
-                                      isFavorite:
-                                          product.isFavoriteByCurrentUser,
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (b) =>
-                                                    ProductDetailPage(
-                                                        product)));
+                                      isFavorite: product.isFavoriteByCurrentUser,
+                                      onTap: () async {
+                                        await Navigator.push(
+                                            context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+                                        _refresh();
                                       },
                                       onFavourite: () async {
                                         setState(() {
-                                          product.isFavoriteByCurrentUser =
-                                              !product.isFavoriteByCurrentUser;
+                                          product.isFavoriteByCurrentUser = !product.isFavoriteByCurrentUser;
                                         });
-                                        await ProductService()
-                                            .doFavorite(product);
+                                        await ProductService().doFavorite(product);
                                         //productForYouBloc.add(GetProductsForYou());
                                       },
                                       onAddToCart: () {
-                                        addToCart(context,
-                                            productID: product.id);
+                                        addToCart(context, productID: product.id);
                                       },
                                     ),
                                   ))

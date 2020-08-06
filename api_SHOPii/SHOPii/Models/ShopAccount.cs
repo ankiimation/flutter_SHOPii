@@ -18,6 +18,7 @@ namespace SHOPii.Models
         public string Image { get; set; }
         public string Latitude { get; set; }
         public string Longitude { get; set; }
+        public string CoverImage { get; set; }
 
         public virtual ICollection<Ordering> Ordering { get; set; }
     }

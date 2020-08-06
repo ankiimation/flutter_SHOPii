@@ -38,4 +38,14 @@ class OrderingService extends BlocService<OrderingModel> {
     }
     return null;
   }
+
+  Future<OrderingModel> cancelOrdering(int orderingId) async {
+    var rs = await HttpHelper.post(ORDERING_ENDPOINT + "/cancel", {"orderingId": orderingId},
+        bearerToken: currentLogin.token);
+    if (rs.statusCode == 200) {
+      var json = jsonDecode(rs.body);
+      return OrderingModel.fromJson(json);
+    }
+    return null;
+  }
 }

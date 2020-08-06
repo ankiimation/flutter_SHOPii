@@ -177,6 +177,46 @@ namespace SHOPii.Controllers
             return NotFound();
         }
 
+        [HttpPost("cancel")]
+        public async Task<ActionResult<Ordering>> cancelOrdering(CheckOutHelperModel checkOutHelper)
+        {
+            var ordering = await _context.Ordering.FirstOrDefaultAsync(o => o.Id == checkOutHelper.orderingId);
+            if (ordering != null)
+            {
+                if (ordering.Status == 1)
+                    ordering.Status = 4;
+
+
+                _context.Ordering.Update(ordering);
+
+                ////add to shop
+                //var orderingDetails = await _context.OrderingDetail.Include(od=>od.Product).Where(od => od.OrderingId == ordering.Id).ToListAsync();
+                //HashSet<String> setShopUsername = new HashSet<String>();
+                //if (orderingDetails.Count > 0)
+                //{
+
+                //    foreach(var orderingDetail in orderingDetails)
+                //    {
+                //        var shopUsername = orderingDetail.Product.ShopUsername;
+                //        setShopUsername.Add(shopUsername);
+                //    }
+                //    foreach(var shopUsername in setShopUsername)
+                //    {
+                //        var shopOrderingTemp = new ShopOrdering();
+                //        shopOrderingTemp.OrderingId = ordering.Id;
+                //        shopOrderingTemp.ShopUsername = shopUsername;
+                //        var addToShopOrderingResult = await _context.ShopOrdering.AddAsync(shopOrderingTemp);
+                //    }
+                //}
+
+
+
+                await _context.SaveChangesAsync();
+                return Ok(ordering);
+
+            }
+            return NotFound();
+        }
 
         [HttpPost("cart")]
         public async Task<ActionResult<Ordering>> addToCart(DoOrderModel doOrderModel)

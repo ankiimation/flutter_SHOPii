@@ -23,6 +23,7 @@ import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/graphic_widget.dart';
+import 'package:ankiishopii/widgets/loading_dialog.dart';
 import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -92,6 +93,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                           buildTotal(state.orderingModel),
                           buildCreatedDate(state.orderingModel),
                           buildStatus(state.orderingModel),
+                          buildCancel(state.orderingModel),
                           buildDivider(),
                           buildDelivery(state.orderingModel),
                           buildDivider(),
@@ -222,6 +224,30 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
         ],
       ),
     );
+  }
+
+  Widget buildCancel(OrderingModel orderingModel) {
+    return orderingModel.status == 1
+        ? FlatButton(
+            onPressed: () async {
+              LoadingDialog.showConfirm(context,
+                  text: 'Do you wanna cancel this order?',
+                  onYes: () async {
+                LoadingDialog.showLoadingDialog(context,
+                    text: 'Cancelling order...');
+                await bloc.cancelOrdering(orderingModel.id);
+                LoadingDialog.hideLoadingDialog(context);
+                bloc.add(GetOrdering(orderingModel.id));
+              }, onNo: () {});
+            },
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+                side: BorderSide(color: PRIMARY_COLOR, width: 2)),
+            child: Text(
+              'Cancel order',
+              style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
+            ))
+        : Container();
   }
 
   Widget buildTotal(OrderingModel orderingModel) {

@@ -65,9 +65,6 @@ class CustomOrderItem extends StatelessWidget {
       case 3:
         statusColor = Colors.green;
         break;
-      case 4:
-        statusColor = PRICE_COLOR_PRIMARY;
-        break;
       default:
         statusColor = Colors.black26;
         break;
@@ -111,9 +108,7 @@ class CustomOrderItem extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.end,
                       style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          letterSpacing: 1.2),
+                          fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.2),
                     ),
                   ],
                 ),
@@ -128,7 +123,8 @@ class CustomOrderItem extends StatelessWidget {
                       '${numberToMoneyString(countOrderTotal(orderingModel))}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 20, fontWeight: FontWeight.bold, color: PRICE_COLOR_ON_FORE),
+                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                          fontSize: 20, fontWeight: FontWeight.bold, color: PRICE_COLOR_ON_FORE),
                     ),
                   ],
                 ),

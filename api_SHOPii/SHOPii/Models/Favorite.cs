@@ -8,7 +8,7 @@ namespace SHOPii.Models
         public int Id { get; set; }
         public string Username { get; set; }
         public int ProductId { get; set; }
-        public bool? Isfavorite { get; set; }
+        public bool Isfavorite { get; set; }
 
         public virtual Product Product { get; set; }
         public virtual Account UsernameNavigation { get; set; }

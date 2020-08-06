@@ -134,11 +134,18 @@ class _OrderingPageState extends State<OrderingPage> {
                   ),
                 ))
           ]..addAll(orderStatusList.map<CustomTabViewItem>((status) {
-              String label = status == 1 ? 'Processing' : status == 2 ? 'Delivering' : 'Complete';
-              IconData icon = status == 1 ? Icons.repeat : status == 2 ? Icons.local_shipping : Icons.check_circle;
+              String label =
+                  status == 1 ? 'Processing' : status == 2 ? 'Delivering' : status == 3 ? 'Completed' : "Cancelled";
+              IconData icon = status == 1
+                  ? Icons.repeat
+                  : status == 2 ? Icons.local_shipping : status == 3 ? Icons.check_circle : Icons.cancel;
+              Color color = status == 1
+                  ? Color(0xfffec821)
+                  : status == 2 ? Colors.orange : status == 3 ? Colors.green : Colors.black26;
               return CustomTabViewItem(
                   icon: icon,
                   label: label,
+                  color: color,
                   child: SingleChildScrollView(
                     physics: AlwaysScrollableScrollPhysics(),
                     controller: widget.scrollController,
@@ -151,6 +158,7 @@ class _OrderingPageState extends State<OrderingPage> {
                                   onTap: () async {
                                     await Navigator.push(
                                         context, MaterialPageRoute(builder: (b) => OrderingDetailPage(o)));
+                                    bloc.add(GetAllOrdering());
                                   },
                                   child: Container(
                                     margin: EdgeInsets.only(left: 20, right: 20, top: 10),

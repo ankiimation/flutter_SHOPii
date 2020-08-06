@@ -18,6 +18,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
 //    try {
     var rs = await CategoryService().getAll();
     if (rs != null) {
+      rs = rs.reversed.toList();
       yield CategoriesLoaded(rs);
     } else {
       yield CategoriesLoadingError('List Null');

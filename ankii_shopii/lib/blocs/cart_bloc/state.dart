@@ -13,8 +13,10 @@ class CartLoaded extends CartState {
   CartLoaded(List<OrderingModel> cart) {
     List<OrderingModel> cartTemp = [];
     for (var ordering in cart) {
-      ordering.orderingDetail = ordering.orderingDetail.where((od) => od.count > 0).toList();
-      cartTemp.add(ordering);
+      if (!_isEmpty(ordering)) {
+        ordering.orderingDetail = ordering.orderingDetail.where((od) => od.count > 0).toList();
+        cartTemp.add(ordering);
+      }
     }
     this.cart = cartTemp;
   }
@@ -22,6 +24,15 @@ class CartLoaded extends CartState {
   @override
   // TODO: implement props
   List<Object> get props => [cart];
+
+  bool _isEmpty(OrderingModel orderingModel) {
+    int totalQuantity = 0;
+    for (var item in orderingModel.orderingDetail) {
+      totalQuantity += item.count;
+    }
+    if (totalQuantity > 0) return false;
+    return true;
+  }
 }
 
 class CartError extends CartState {}
