@@ -10,13 +10,15 @@ class CustomNotificationListItem extends StatelessWidget {
   final String description;
   final String dateTimeString;
 
-  CustomNotificationListItem({this.title, this.description, this.dateTimeString});
+  CustomNotificationListItem(
+      {this.title, this.description, this.dateTimeString});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(left: 20, right: 10, top: 10, bottom: 10),
-      decoration: BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(20)),
+      decoration: BoxDecoration(
+          color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(20)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -25,7 +27,8 @@ class CustomNotificationListItem extends StatelessWidget {
             title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
+            style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                fontWeight: FontWeight.bold, fontSize: 25),
           ),
           Text(
             description,
@@ -39,7 +42,9 @@ class CustomNotificationListItem extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.end,
             style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                fontWeight: FontWeight.bold, fontSize: 10, color: PRIMARY_COLOR.withOpacity(0.5)),
+                fontWeight: FontWeight.bold,
+                fontSize: 10,
+                color: PRIMARY_COLOR.withOpacity(0.5)),
           )
         ],
       ),
@@ -49,8 +54,9 @@ class CustomNotificationListItem extends StatelessWidget {
 
 class CustomOrderItem extends StatelessWidget {
   final OrderingModel orderingModel;
+  final double elevation;
 
-  CustomOrderItem({this.orderingModel});
+  CustomOrderItem({this.orderingModel, this.elevation = 1});
 
   @override
   Widget build(BuildContext context) {
@@ -70,96 +76,113 @@ class CustomOrderItem extends StatelessWidget {
         break;
     }
     return Container(
-      padding: EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
-      decoration: BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(20)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Card(
+        elevation: elevation,
+        color: FOREGROUND_COLOR,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
-                      'Order: ',
-                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          'Order: ',
+                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                              fontWeight: FontWeight.bold, fontSize: 25),
+                        ),
+                        Text(
+                          '${orderingModel.id}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                              fontWeight: FontWeight.bold, fontSize: 25),
+                        ),
+                      ],
                     ),
-                    Text(
-                      '${orderingModel.id}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          'Created: ',
+                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        Text(
+                          ' ${DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.parse(orderingModel.createdDate))}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.end,
+                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              letterSpacing: 1.2),
+                        ),
+                      ],
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          'Total: ',
+                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '${numberToMoneyString(countOrderTotal(orderingModel))}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: PRICE_COLOR_ON_FORE),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          'Status: ',
+                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                              fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '${getOrderStatus(orderingModel)}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.end,
+                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              letterSpacing: 1.2),
+                        ),
+                      ],
+                    )
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      'Created: ',
-                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontWeight: FontWeight.bold, fontSize: 15),
-                    ),
-                    Text(
-                      ' ${DateFormat('dd-MM-yyyy HH:mm:ss').format(DateTime.parse(orderingModel.createdDate))}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.end,
-                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                          fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.2),
-                    ),
-                  ],
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: BACKGROUND_COLOR,
+                child: CircleAvatar(
+                  radius: 15,
+                  backgroundColor: statusColor,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      'Total: ',
-                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      '${numberToMoneyString(countOrderTotal(orderingModel))}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                          fontSize: 20, fontWeight: FontWeight.bold, color: PRICE_COLOR_ON_FORE),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      'Status: ',
-                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 12, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      '${getOrderStatus(orderingModel)}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.end,
-                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                          fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.2),
-                    ),
-                  ],
-                )
-              ],
-            ),
+              )
+            ],
           ),
-          SizedBox(
-            width: 20,
-          ),
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: BACKGROUND_COLOR,
-            child: CircleAvatar(
-              radius: 15,
-              backgroundColor: statusColor,
-            ),
-          )
-        ],
+        ),
       ),
     );
   }

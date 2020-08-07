@@ -25,6 +25,8 @@ class CustomProductListItem extends StatelessWidget {
   final Function onFavourite;
   final Color backgroundColor;
   final bool isFavorite;
+  final bool showQuickActionButtons;
+  final double elevation;
 
   CustomProductListItem(
       {this.backgroundColor = BACKGROUND_COLOR,
@@ -33,55 +35,101 @@ class CustomProductListItem extends StatelessWidget {
       this.onTap,
       this.onAddToCart,
       this.onFavourite,
+      this.showQuickActionButtons = true,
       this.quickActionColor = FORE_TEXT_COLOR,
       this.priceTextColor = PRICE_COLOR_ON_FORE,
+      this.elevation = 1,
       this.isFavorite = false});
+
+  final double height = 120;
 
   @override
   Widget build(BuildContext context) {
     GlobalKey inkwellKey = GlobalKey();
-    double height = 120;
+
     // TODO: implement build
     return CustomOnTapWidget(
       onTap: onTap,
       child: Container(
         height: height,
         margin: EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
-        child: Stack(
-          children: <Widget>[
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.only(left: height - 50, top: 10, bottom: 10, right: 10),
-              child: Container(
-                padding: EdgeInsets.only(left: 60, top: 10, right: 20, bottom: 10),
-                decoration: BoxDecoration(
-                    color: backgroundColor,
-                    borderRadius: BorderRadius.only(topRight: Radius.circular(100), bottomRight: Radius.circular(100))),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 5,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              product.name ?? '',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              numberToMoneyString(product.price) ?? '0đ',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  letterSpacing: 1.2, color: priceTextColor, fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ),
+        child: Card(
+          elevation: elevation,
+          color: backgroundColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            padding: EdgeInsets.only(top: 10, right: 15, left: 10, bottom: 10),
+            child: Row(
+              children: <Widget>[
+                buildImage(),
+                SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Expanded(child: buildInfo()),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      buildQuickActionButton(context, inkwellKey)
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildImage() {
+    return Container(
+      width: height - 20,
+      height: height - 20,
+      child: Card(
+        elevation: 5,
+        color: PRIMARY_COLOR,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              image: DecorationImage(
+                  image: CachedNetworkImageProvider(product.image),
+                  fit: BoxFit.cover)),
+        ),
+      ),
+    );
+  }
+
+  Widget buildInfo() {
+    return Container(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            product.name ?? '',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            numberToMoneyString(product.price) ?? '0đ',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+                letterSpacing: 1.2,
+                color: priceTextColor,
+                fontSize: 16,
+                fontWeight: FontWeight.bold),
+          ),
 //                          Expanded(
 //                            child: Row(
 //                              children: <Widget>[
@@ -101,97 +149,84 @@ class CustomProductListItem extends StatelessWidget {
 //                              ],
 //                            ),
 //                          ),
-                          Expanded(
-                            child: Text(
-                              product.description ?? '',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 12, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Column(
-                        children: <Widget>[
-                          Expanded(
-                            child: InkWell(
-                              onTap: () {
-                                if (currentLogin == null) {
-                                  Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
-                                  return;
-                                }
-                                if (onFavourite != null) {
-                                  onFavourite();
-                                }
-                              },
-                              child: Container(
-                                  child: Icon(
-                                isFavorite ? Icons.favorite : Icons.favorite_border,
-                                color: quickActionColor,
-                                size: 25,
-                              )),
-                            ),
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              key: inkwellKey,
-                              onTap: () async {
-                                if (currentLogin == null) {
-                                  Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
-                                  return;
-                                }
-                                if (onAddToCart != null) {
-                                  final RenderBox box = inkwellKey.currentContext.findRenderObject();
-                                  final Offset position = box.globalToLocal(Offset.zero);
-                                  var dx = position.dx * -1;
-                                  var dy = position.dy * -1;
-                                  //print(dx.toString() + " - " + dy.toString());
+          Text(
+            product.description ?? '',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
 
-                                  updateCartIconPosition(cartIconKey: cartIconKey);
-
-                                  await showAddToCartAnimation(context,
-                                      start: CustomPosition(dx, dy),
-                                      end: CustomPosition(cartIconPositionDx, cartIconPositionDy));
-                                  onAddToCart();
-                                }
-                              },
-                              child: Container(
-                                  child: Icon(
-                                Icons.add_shopping_cart,
-                                color: quickActionColor,
-                                size: 25,
-                              )),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
+  Widget buildQuickActionButton(BuildContext context, GlobalKey inkwellKey) {
+    return showQuickActionButtons
+        ? Column(
+            children: <Widget>[
+              Expanded(
+                flex: 1,
+                child: InkWell(
+                  onTap: () {
+                    if (currentLogin == null) {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (b) => LoginPage()));
+                      return;
+                    }
+                    if (onFavourite != null) {
+                      onFavourite();
+                    }
+                  },
+                  child: Container(
+                      child: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: quickActionColor,
+                    size: 25,
+                  )),
                 ),
               ),
-            ),
-            Container(
-              width: height,
-              height: height,
-              child: CircleAvatar(
-                backgroundColor: backgroundColor,
-                child: Container(
-                  width: height - 20,
-                  height: height - 20,
+              Expanded(
+                flex: 2,
+                child: InkWell(
+                  key: inkwellKey,
+                  onTap: () async {
+                    if (currentLogin == null) {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (b) => LoginPage()));
+                      return;
+                    }
+                    if (onAddToCart != null) {
+                      final RenderBox box =
+                          inkwellKey.currentContext.findRenderObject();
+                      final Offset position = box.globalToLocal(Offset.zero);
+                      var dx = position.dx * -1;
+                      var dy = position.dy * -1;
+                      //print(dx.toString() + " - " + dy.toString());
+
+                      updateCartIconPosition(cartIconKey: cartIconKey);
+
+                      await showAddToCartAnimation(context,
+                          start: CustomPosition(dx, dy),
+                          end: CustomPosition(
+                              cartIconPositionDx, cartIconPositionDy));
+                      onAddToCart();
+                    }
+                  },
                   child: CircleAvatar(
-                    backgroundColor: PRIMARY_COLOR,
-                    backgroundImage: CachedNetworkImageProvider(product.image),
+                    backgroundColor: quickActionColor,
+                    radius: 25,
+                    child: Icon(
+                      Icons.add_shopping_cart,
+                      color: backgroundColor,
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
+            ],
+          )
+        : Container();
   }
 }
 
@@ -245,9 +280,11 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
           children: <Widget>[
             Container(
               width: double.infinity,
-              padding: EdgeInsets.only(left: height - 100, top: 10, bottom: 10, right: 10),
+              padding: EdgeInsets.only(
+                  left: height - 100, top: 10, bottom: 10, right: 10),
               child: Container(
-                padding: EdgeInsets.only(left: 60, top: 10, right: 20, bottom: 10),
+                padding:
+                    EdgeInsets.only(left: 60, top: 10, right: 20, bottom: 10),
                 decoration: BoxDecoration(
                     color: widget.backgroundColor,
                     borderRadius: BorderRadius.only(
@@ -267,7 +304,8 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                               widget.cartItem.product.name ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ),
                           Expanded(
@@ -275,7 +313,8 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                               widget.cartItem.product.description ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 12, fontWeight: FontWeight.bold),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                  fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                           ),
                           Container(
@@ -283,32 +322,35 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
                                 Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text(
                                       'Total',
-                                      style: TEXT_STYLE_ON_FOREGROUND,
+                                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                          fontSize: 14),
                                     ),
                                     SizedBox(
                                       height: 5,
                                     ),
                                     Text(
                                       'Quantity',
-                                      style: TEXT_STYLE_ON_FOREGROUND,
+                                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                          fontSize: 14),
                                     ),
                                   ],
                                 ),
-                                SizedBox(
-                                  width: 30,
-                                ),
                                 Container(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
                                       Container(
                                         child: Text(
-                                          numberToMoneyString(widget.cartItem.product.price * widget.cartItem.count)
+                                          numberToMoneyString(widget.cartItem
+                                                          .product.price *
+                                                      widget.cartItem.count)
                                                   .toString() ??
                                               '0đ',
                                           maxLines: 1,
@@ -331,42 +373,67 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                               padding: EdgeInsets.all(2),
                                               margin: EdgeInsets.only(right: 5),
                                               decoration: BoxDecoration(
-                                                  color: BACKGROUND_COLOR.withOpacity(0.5),
-                                                  borderRadius: BorderRadius.circular(15)),
+                                                  color: BACKGROUND_COLOR
+                                                      .withOpacity(0.5),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15)),
                                               child: widget.cartItem.count > 1
                                                   ? Icon(Icons.remove)
                                                   : Icon(
                                                       Icons.delete_outline,
-                                                      color: PRICE_COLOR_PRIMARY,
+                                                      color:
+                                                          PRICE_COLOR_PRIMARY,
                                                     ),
                                             ),
                                           ),
                                           Center(
                                             child: Container(
                                               width: 50,
-                                              padding: EdgeInsets.symmetric(vertical: 5),
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 5),
                                               alignment: Alignment.center,
                                               decoration: BoxDecoration(
-                                                  color: PRIMARY_COLOR.withOpacity(0.1),
-                                                  borderRadius: BorderRadius.circular(15)),
+                                                  color: PRIMARY_COLOR
+                                                      .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15)),
                                               child: TextFormField(
                                                 controller: quantityController,
                                                 //enabled: false,
-                                                keyboardType: TextInputType.number,
-                                                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
-                                                onFieldSubmitted: (quantityString) {
-                                                  int quantity = int.parse(quantityString);
-                                                  if (widget.onTextSubmit != null) {
-                                                    widget.onTextSubmit(quantity);
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                inputFormatters: [
+                                                  WhitelistingTextInputFormatter
+                                                      .digitsOnly
+                                                ],
+                                                onFieldSubmitted:
+                                                    (quantityString) {
+                                                  int quantity =
+                                                      int.parse(quantityString);
+                                                  if (widget.onTextSubmit !=
+                                                      null) {
+                                                    widget
+                                                        .onTextSubmit(quantity);
                                                   }
                                                 },
                                                 textAlign: TextAlign.center,
-                                                style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontWeight: FontWeight.bold),
+                                                style: TEXT_STYLE_ON_FOREGROUND
+                                                    .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold),
                                                 cursorColor: FOREGROUND_COLOR,
-                                                decoration: InputDecoration.collapsed(hintText: '').copyWith(
-                                                    hintText: '',
-                                                    isDense: true,
-                                                    contentPadding: EdgeInsets.symmetric(horizontal: 5)),
+                                                decoration: InputDecoration
+                                                        .collapsed(hintText: '')
+                                                    .copyWith(
+                                                        hintText: '',
+                                                        isDense: true,
+                                                        contentPadding:
+                                                            EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        5)),
                                               ),
                                             ),
                                           ),
@@ -376,8 +443,11 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                                               padding: EdgeInsets.all(2),
                                               margin: EdgeInsets.only(left: 5),
                                               decoration: BoxDecoration(
-                                                  color: BACKGROUND_COLOR.withOpacity(0.5),
-                                                  borderRadius: BorderRadius.circular(15)),
+                                                  color: BACKGROUND_COLOR
+                                                      .withOpacity(0.5),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15)),
                                               child: Icon(Icons.add),
                                             ),
                                           ),
@@ -404,7 +474,8 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                   child: CircleAvatar(
                     radius: 40,
                     backgroundColor: PRIMARY_COLOR,
-                    backgroundImage: CachedNetworkImageProvider(widget.cartItem.product.image),
+                    backgroundImage: CachedNetworkImageProvider(
+                        widget.cartItem.product.image),
                   ),
                 ),
               ),
@@ -416,7 +487,9 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
                   child: Container(
                       margin: EdgeInsets.all(5),
                       padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(color: widget.backgroundColor, borderRadius: BorderRadius.circular(50)),
+                      decoration: BoxDecoration(
+                          color: widget.backgroundColor,
+                          borderRadius: BorderRadius.circular(50)),
                       child: Icon(
                         Icons.close,
                         size: 20,
@@ -442,6 +515,7 @@ class CustomProductGridItem extends StatelessWidget {
   final Function onFavourite;
   final Color backgroundColor;
   final bool isFavorite;
+  final double elevation;
 
   CustomProductGridItem(
       {this.cartIconKey,
@@ -453,6 +527,7 @@ class CustomProductGridItem extends StatelessWidget {
       this.onAddToCart,
       this.onFavourite,
       this.backgroundColor = BACKGROUND_COLOR,
+      this.elevation = 1,
       this.isFavorite});
 
   @override
@@ -461,112 +536,132 @@ class CustomProductGridItem extends StatelessWidget {
     double height = width * 1.3;
     return CustomOnTapWidget(
       onTap: onTap,
-      child: Container(
-        width: width,
-        height: height,
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
+      child: Card(
+        color: backgroundColor,
+        elevation: elevation,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        child: Container(
+          width: width,
+          height: height,
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
 //                              boxShadow: [
 //                                BoxShadow(
 //                                    color: Colors.black26,
 //                                    offset: Offset(5, 5),
 //                                    blurRadius: 5)
 //                              ],
-            color: FOREGROUND_COLOR,
-            borderRadius: BorderRadius.circular(30)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
+
+              borderRadius: BorderRadius.circular(30)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
 //
-                    image: DecorationImage(image: NetworkImage(product.image), fit: BoxFit.cover),
-                    color: PRIMARY_COLOR,
-                    borderRadius: BorderRadius.circular(25)),
+                      image: DecorationImage(
+                          image: NetworkImage(product.image),
+                          fit: BoxFit.cover),
+                      color: PRIMARY_COLOR,
+                      borderRadius: BorderRadius.circular(25)),
+                ),
               ),
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Column(
-              children: <Widget>[
-                Text(
-                  product.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  numberToMoneyString(product.price),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                    color: PRICE_COLOR_ON_FORE,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    CustomOnTapWidget(
-                      onTap: () {
-                        if (currentLogin == null) {
-                          Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
-                          return;
-                        }
-                        if (onFavourite != null) {
-                          onFavourite();
-                        }
-                      },
-                      child: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border,
-                        size: 25,
-                        color: FORE_TEXT_COLOR,
-                      ),
+              SizedBox(
+                height: 5,
+              ),
+              Column(
+                children: <Widget>[
+                  Text(
+                    product.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-                    CustomOnTapWidget(
-                      onTap: () async {
-                        if (currentLogin == null) {
-                          Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
-                          return;
-                        }
-                        if (onAddToCart != null) {
-                          final RenderBox box = addToCartIconKey.currentContext.findRenderObject();
-                          final Offset position = box.globalToLocal(Offset.zero);
-                          var dx = position.dx * -1;
-                          var dy = position.dy * -1;
-                          //print(dx.toString() + " - " + dy.toString());
-
-                          updateCartIconPosition(cartIconKey: cartIconKey);
-
-                          await showAddToCartAnimation(context,
-                              start: CustomPosition(dx, dy),
-                              end: CustomPosition(cartIconPositionDx, cartIconPositionDy));
-                          onAddToCart();
-                        }
-                      },
-                      child: Icon(
-                        Icons.add_shopping_cart,
-                        key: addToCartIconKey,
-                        size: 25,
-                        color: FORE_TEXT_COLOR,
+                  ),
+                  Text(
+                    numberToMoneyString(product.price),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                      color: PRICE_COLOR_ON_FORE,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      CustomOnTapWidget(
+                        onTap: () {
+                          if (currentLogin == null) {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (b) => LoginPage()));
+                            return;
+                          }
+                          if (onFavourite != null) {
+                            onFavourite();
+                          }
+                        },
+                        child: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          size: 25,
+                          color: FORE_TEXT_COLOR,
+                        ),
                       ),
-                    )
-                  ],
-                )
-              ],
-            ),
-          ],
+                      SizedBox(
+                        width: 10,
+                      ),
+                      CustomOnTapWidget(
+                        onTap: () async {
+                          if (currentLogin == null) {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (b) => LoginPage()));
+                            return;
+                          }
+                          if (onAddToCart != null) {
+                            final RenderBox box = addToCartIconKey
+                                .currentContext
+                                .findRenderObject();
+                            final Offset position =
+                                box.globalToLocal(Offset.zero);
+                            var dx = position.dx * -1;
+                            var dy = position.dy * -1;
+                            //print(dx.toString() + " - " + dy.toString());
+
+                            updateCartIconPosition(cartIconKey: cartIconKey);
+
+                            await showAddToCartAnimation(context,
+                                start: CustomPosition(dx, dy),
+                                end: CustomPosition(
+                                    cartIconPositionDx, cartIconPositionDy));
+                            onAddToCart();
+                          }
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: quickActionColor,
+                          radius: 25,
+                          child: Icon(
+                            Icons.add_shopping_cart,
+                            key: addToCartIconKey,
+                            size: 25,
+                            color: backgroundColor,
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -601,12 +696,14 @@ class CustomProductCheckOutItem extends StatelessWidget {
       child: Container(
           margin: EdgeInsets.only(left: 10, right: 10, top: 10),
           padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(100)),
+          decoration: BoxDecoration(
+              color: backgroundColor, borderRadius: BorderRadius.circular(100)),
           child: Row(
             children: <Widget>[
               CircleAvatar(
                 radius: 40,
-                backgroundImage: CachedNetworkImageProvider(cartItem.product.image),
+                backgroundImage:
+                    CachedNetworkImageProvider(cartItem.product.image),
               ),
               SizedBox(
                 width: 10,
@@ -620,37 +717,46 @@ class CustomProductCheckOutItem extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         cartItem.product.name,
-                        style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text('Price:',
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.bold)),
                           Text('${numberToMoneyString(cartItem.product.price)}',
                               textAlign: TextAlign.end,
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.bold)),
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text('Quantity:',
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.bold)),
                           Text('x ${cartItem.count}',
                               textAlign: TextAlign.end,
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.bold)),
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text('Total:',
-                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
-                          Text('${numberToMoneyString(cartItem.count * cartItem.product.price)}',
+                              style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                  fontSize: 14, fontWeight: FontWeight.bold)),
+                          Text(
+                              '${numberToMoneyString(cartItem.count * cartItem.product.price)}',
                               textAlign: TextAlign.end,
                               style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                  fontSize: 18, fontWeight: FontWeight.bold, color: priceTextColor)),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: priceTextColor)),
                         ],
                       )
                     ],

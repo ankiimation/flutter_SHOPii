@@ -106,9 +106,13 @@ class _ProductPageState extends State<ProductPage> {
   Widget buildProducts(List<ProductModel> products) {
     List<Widget> children = products
         .map<Widget>((product) => CustomProductListItem(
+              elevation: 10,
               cartIconKey: cartGlobalKey,
               onTap: () async {
-                await Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (b) => ProductDetailPage(product)));
                 _refresh();
               },
               product: product,

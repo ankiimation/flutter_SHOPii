@@ -32,7 +32,8 @@ class _FavoritePageState extends State<FavoritePage> {
 
   Future _doFavorite(ProductModel productModel) async {
     setState(() {
-      productModel.isFavoriteByCurrentUser = !productModel.isFavoriteByCurrentUser;
+      productModel.isFavoriteByCurrentUser =
+          !productModel.isFavoriteByCurrentUser;
     });
     await ProductService().doFavorite(productModel);
     bloc.add(GetAllProducts());
@@ -98,22 +99,28 @@ class _FavoritePageState extends State<FavoritePage> {
     }
     return CustomTabView(
         hideIcon: true,
-        barShadow: true,
+//        barShadow: true,
         backgroundColor: BACKGROUND_COLOR,
         children: categories.map((categoryName) {
-          var favoriteProducts =
-              products.where((product) => product.category.name == categoryName && product.isFavoriteByCurrentUser);
+          var favoriteProducts = products.where((product) =>
+              product.category.name == categoryName &&
+              product.isFavoriteByCurrentUser);
           return CustomTabViewItem(
               label: categoryName,
               icon: Icons.favorite,
               child: SingleChildScrollView(
+                controller: widget.scrollController,
                 child: Column(
                     children: favoriteProducts
                         .map((favoriteProduct) => CustomProductListItem(
+                              elevation: 10,
                               cartIconKey: cartIconKey,
                               onTap: () async {
                                 await Navigator.push(
-                                    context, MaterialPageRoute(builder: (b) => ProductDetailPage(favoriteProduct)));
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (b) => ProductDetailPage(
+                                            favoriteProduct)));
                                 bloc.add(GetAllProducts());
                               },
                               onFavourite: () {
@@ -121,11 +128,13 @@ class _FavoritePageState extends State<FavoritePage> {
                               },
                               onAddToCart: () async {
                                 // LoadingDialog.showLoadingDialog(context);
-                                await addToCart(context, productID: favoriteProduct.id, count: 1);
+                                await addToCart(context,
+                                    productID: favoriteProduct.id, count: 1);
                                 //LoadingDialog.hideLoadingDialog(context);
                               },
                               product: favoriteProduct,
-                              isFavorite: favoriteProduct.isFavoriteByCurrentUser,
+                              isFavorite:
+                                  favoriteProduct.isFavoriteByCurrentUser,
                               backgroundColor: FOREGROUND_COLOR,
                             ))
                         .toList()),

@@ -40,7 +40,8 @@ class _CustomTabViewState extends State<CustomTabView> {
   }
 
   void onTapChangePage(int index) {
-    pageViewController.animateToPage(index, duration: Duration(milliseconds: 200), curve: Curves.easeInOut);
+    pageViewController.animateToPage(index,
+        duration: Duration(milliseconds: 200), curve: Curves.easeInOut);
   }
 
   @override
@@ -57,7 +58,9 @@ class _CustomTabViewState extends State<CustomTabView> {
       children: <Widget>[
         Container(
           padding: EdgeInsets.only(top: 60),
-          decoration: BoxDecoration(color: widget.backgroundColor, borderRadius: BorderRadius.circular(20)),
+          decoration: BoxDecoration(
+              color: widget.backgroundColor,
+              borderRadius: BorderRadius.circular(20)),
           // margin: EdgeInsets.only(top: 35),
           // padding: EdgeInsets.only(top: 25),
           child: PageView(
@@ -78,42 +81,60 @@ class _CustomTabViewState extends State<CustomTabView> {
           decoration: BoxDecoration(
               color: widget.backgroundColor,
               boxShadow: widget.barShadow
-                  ? [BoxShadow(color: Colors.black26, offset: Offset(0, 6), blurRadius: 3)]
+                  ? [
+                      BoxShadow(
+                          color: Colors.black26,
+                          offset: Offset(0, 6),
+                          blurRadius: 3)
+                    ]
                   : null),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: widget.children.map((child) {
-              var color = child.color ?? widget.itemColor;
-              var icon = child.icon;
-              var label = child.label;
-              var index = widget.children.indexOf(child);
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: widget.children.map((child) {
+                var color = child.color ?? widget.itemColor;
+                var icon = child.icon;
+                var label = child.label;
+                var index = widget.children.indexOf(child);
 
-              return CustomOnTapWidget(
-                  onTap: () {
-                    onTapChangePage(index);
-                  },
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 300),
-                    padding: EdgeInsets.only(top: 10, left: 10, right: 10),
-                    margin: EdgeInsets.only(top: _currentIndex == index ? 5 : 0),
-                    child: Column(
-                      children: <Widget>[
-                        widget.hideIcon
-                            ? Container()
-                            : Icon(
-                                icon,
-                                size: 20,
-                                color: _currentIndex == index ? color : color.withOpacity(0.3),
-                              ),
-                        Text(
-                          _currentIndex == index || widget.alwaysShowLabel || widget.hideIcon ? label : '',
-                          style:
-                              TextStyle(color: _currentIndex == index ? color : color.withOpacity(0.3), fontSize: 14),
-                        )
-                      ],
-                    ),
-                  ));
-            }).toList(),
+                return CustomOnTapWidget(
+                    onTap: () {
+                      onTapChangePage(index);
+                    },
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+                      margin:
+                          EdgeInsets.only(top: _currentIndex == index ? 5 : 0),
+                      child: Column(
+                        children: <Widget>[
+                          widget.hideIcon
+                              ? Container()
+                              : Icon(
+                                  icon,
+                                  size: 20,
+                                  color: _currentIndex == index
+                                      ? color
+                                      : color.withOpacity(0.3),
+                                ),
+                          Text(
+                            _currentIndex == index ||
+                                    widget.alwaysShowLabel ||
+                                    widget.hideIcon
+                                ? label
+                                : '',
+                            style: TextStyle(
+                                color: _currentIndex == index
+                                    ? color
+                                    : color.withOpacity(0.3),
+                                fontSize: 14),
+                          )
+                        ],
+                      ),
+                    ));
+              }).toList(),
+            ),
           ),
         ),
       ],
@@ -127,5 +148,9 @@ class CustomTabViewItem {
   final Color color;
   final Widget child;
 
-  CustomTabViewItem({@required this.icon, @required this.label, this.color, @required this.child});
+  CustomTabViewItem(
+      {@required this.icon,
+      @required this.label,
+      this.color,
+      @required this.child});
 }

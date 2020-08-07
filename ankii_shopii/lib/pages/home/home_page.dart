@@ -46,7 +46,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   GlobalKey<CartWidgetState> _cartIconKey = GlobalKey();
-  ProductBloc productForYouBloc = ProductBloc(ProductLoading())..add(GetProductsForYou());
+  ProductBloc productForYouBloc = ProductBloc(ProductLoading())
+    ..add(GetProductsForYou());
 
   double topBarHeight = kToolbarHeight + 150;
   bool _isScrollToAppBar = false;
@@ -120,7 +121,10 @@ class _HomePageState extends State<HomePage> {
       duration: Duration(milliseconds: 200),
       child: _isScrollToAppBar
           ? Container(
-              padding: EdgeInsets.only(left: 10, right: 10, top: ScreenHelper.getPaddingTop(context)),
+              padding: EdgeInsets.only(
+                  left: 10,
+                  right: 10,
+                  top: ScreenHelper.getPaddingTop(context)),
               child: Card(
                 color: BACKGROUND_COLOR,
                 elevation: 10,
@@ -134,10 +138,17 @@ class _HomePageState extends State<HomePage> {
                           child: Container(
                         child: TextField(
                           textAlignVertical: TextAlignVertical.center,
-                          decoration: InputDecoration(hintText: 'Search', border: InputBorder.none),
+                          decoration: InputDecoration(
+                              hintText: 'Search', border: InputBorder.none),
                         ),
                       )),
-                      CartWidget(_isScrollToAppBar ? _cartIconKey : null)
+                      CustomOnTapWidget(
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (b) => CartPage()));
+                          },
+                          child: CartWidget(
+                              _isScrollToAppBar ? _cartIconKey : null))
                     ],
                   ),
                 ),
@@ -175,14 +186,21 @@ class _HomePageState extends State<HomePage> {
                         color: BACKGROUND_COLOR,
                         child: TextField(
                           decoration: InputDecoration(
-                              contentPadding: EdgeInsets.only(left: 5, right: 5, bottom: 5),
+                              contentPadding:
+                                  EdgeInsets.only(left: 5, right: 5, bottom: 5),
                               hintText: 'Search',
                               border: InputBorder.none),
                         ),
                       )),
-                      CartWidget(
-                        _isScrollToAppBar ? null : _cartIconKey,
-                        size: 20,
+                      CustomOnTapWidget(
+                        onTap: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (b) => CartPage()));
+                        },
+                        child: CartWidget(
+                          _isScrollToAppBar ? null : _cartIconKey,
+                          size: 20,
+                        ),
                       )
                     ],
                   )),
@@ -200,7 +218,8 @@ class _HomePageState extends State<HomePage> {
         builder: (context, state) {
           if (state is ListProductsLoaded) {
             return Container(
-              margin: EdgeInsets.only(top: _topBottomMargin, bottom: _topBottomMargin),
+              margin: EdgeInsets.only(
+                  top: _topBottomMargin, bottom: _topBottomMargin),
               height: 250,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,22 +243,31 @@ class _HomePageState extends State<HomePage> {
                                     margin: EdgeInsets.only(left: 10),
                                     child: CustomProductGridItem(
                                       cartIconKey: _cartIconKey,
+                                      backgroundColor: FOREGROUND_COLOR,
                                       product: product,
-                                      isFavorite: product.isFavoriteByCurrentUser,
+                                      isFavorite:
+                                          product.isFavoriteByCurrentUser,
                                       onTap: () async {
                                         await Navigator.push(
-                                            context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (b) =>
+                                                    ProductDetailPage(
+                                                        product)));
                                         _refresh();
                                       },
                                       onFavourite: () async {
                                         setState(() {
-                                          product.isFavoriteByCurrentUser = !product.isFavoriteByCurrentUser;
+                                          product.isFavoriteByCurrentUser =
+                                              !product.isFavoriteByCurrentUser;
                                         });
-                                        await ProductService().doFavorite(product);
+                                        await ProductService()
+                                            .doFavorite(product);
                                         //productForYouBloc.add(GetProductsForYou());
                                       },
                                       onAddToCart: () {
-                                        addToCart(context, productID: product.id);
+                                        addToCart(context,
+                                            productID: product.id);
                                       },
                                     ),
                                   ))

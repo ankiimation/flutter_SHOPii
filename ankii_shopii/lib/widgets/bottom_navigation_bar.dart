@@ -20,7 +20,8 @@ class CustomBottomNavigationBar extends StatefulWidget {
       this.onChange});
 
   @override
-  _CustomBottomNavigationBarState createState() => _CustomBottomNavigationBarState();
+  _CustomBottomNavigationBarState createState() =>
+      _CustomBottomNavigationBarState();
 }
 
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
@@ -42,8 +43,14 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
       height: 60,
       decoration: BoxDecoration(
           color: widget.backgroundColor,
-          boxShadow:
-              widget.barShadow ? [BoxShadow(color: Colors.black26, offset: Offset(0, -3), blurRadius: 3)] : null),
+          boxShadow: widget.barShadow
+              ? [
+                  BoxShadow(
+                      color: Colors.black26,
+                      offset: Offset(0, -2),
+                      blurRadius: 2)
+                ]
+              : null),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: widget.children.map((item) {
@@ -57,13 +64,17 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
             },
             child: AnimatedContainer(
               duration: Duration(milliseconds: 300),
-              width:
-                  widget.currentIndex == index ? MediaQuery.of(context).size.width / widget.children.length + 20 : 50,
+              width: widget.currentIndex == index
+                  ? MediaQuery.of(context).size.width / widget.children.length +
+                      20
+                  : 50,
               padding: EdgeInsets.only(left: 10, right: 10),
               margin: EdgeInsets.only(top: 10, bottom: 10),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                  color: widget.currentIndex == index ? color : color.withOpacity(0),
+                  color: widget.currentIndex == index
+                      ? color
+                      : color.withOpacity(0),
                   borderRadius: BorderRadius.circular(20)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -71,7 +82,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                   Icon(
                     icon,
                     size: 20,
-                    color: widget.currentIndex == index ? widget.backgroundColor : color.withOpacity(0.5),
+                    color: widget.currentIndex == index
+                        ? widget.backgroundColor
+                        : color.withOpacity(0.5),
                   ),
                   Expanded(
                       flex: 2,
@@ -101,5 +114,6 @@ class CustomBottomNavigationItem {
   final String label;
   final Color color;
 
-  CustomBottomNavigationItem({@required this.icon, @required this.label, this.color});
+  CustomBottomNavigationItem(
+      {@required this.icon, @required this.label, this.color});
 }

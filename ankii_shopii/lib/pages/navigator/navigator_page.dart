@@ -31,7 +31,8 @@ List<Widget> pages = [];
 var _pageController = PageController(keepPage: false);
 
 void changePageViewPage(int index) {
-  _pageController.animateToPage(index, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+  _pageController.animateToPage(index,
+      duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
 }
 
 class NavigatorPage extends StatefulWidget {
@@ -83,7 +84,8 @@ class _NavigatorPageState extends State<NavigatorPage> {
       hideTopBottomBar(isScrollUp);
     });
     scrollController.addListener(() {
-      bool upDirection = scrollController.position.userScrollDirection == ScrollDirection.reverse;
+      bool upDirection = scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse;
       _scrollStreamController.sink.add(upDirection);
     });
 
@@ -107,7 +109,9 @@ class _NavigatorPageState extends State<NavigatorPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        onWillPop: () {},
+        onWillPop: () {
+          changePageViewPage(0);
+        },
         child: StreamBuilder(
           stream: navigationPageStreamController.stream,
           builder: (context, snapshot) {
@@ -147,7 +151,8 @@ class _NavigatorPageState extends State<NavigatorPage> {
           CustomBottomNavigationItem(icon: Icons.reorder, label: 'Categories'),
           CustomBottomNavigationItem(icon: Icons.favorite, label: 'Favorite'),
           CustomBottomNavigationItem(icon: Icons.receipt, label: 'Orders'),
-          CustomBottomNavigationItem(icon: Icons.account_circle, label: 'Account'),
+          CustomBottomNavigationItem(
+              icon: Icons.account_circle, label: 'Account'),
         ],
       ),
     );

@@ -41,7 +41,8 @@ class _CartPageState extends State<CartPage> {
     super.initState();
     bloc = BlocProvider.of<CartBloc>(context);
     _scrollController.addListener(() {
-      bool isScrollUp = _scrollController.position.userScrollDirection == ScrollDirection.reverse;
+      bool isScrollUp = _scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse;
       _scrollStreamController.sink.add(isScrollUp);
     });
   }
@@ -69,7 +70,10 @@ class _CartPageState extends State<CartPage> {
                         controller: _scrollController,
                         physics: AlwaysScrollableScrollPhysics(),
                         child: Column(
-                          children: <Widget>[buildAppBar(), buildCartDetail(state.cart)],
+                          children: <Widget>[
+                            buildAppBar(),
+                            buildCartDetail(state.cart)
+                          ],
                         ),
                       ),
                     ),
@@ -108,9 +112,10 @@ class _CartPageState extends State<CartPage> {
           builder: (context, snapshot) {
             return AnimatedContainer(
               duration: Duration(milliseconds: 100),
-              decoration: BoxDecoration(
-                  color: BACKGROUND_COLOR,
-                  boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(0, -3), blurRadius: 3)]),
+              decoration: BoxDecoration(color: BACKGROUND_COLOR, boxShadow: [
+                BoxShadow(
+                    color: Colors.black26, offset: Offset(0, -2), blurRadius: 2)
+              ]),
               height: snapshot.hasData && snapshot.data == true ? 0 : 55,
               child: Row(
                 children: <Widget>[
@@ -122,19 +127,25 @@ class _CartPageState extends State<CartPage> {
                       children: <Widget>[
                         Text(
                           'Total:',
-                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
+                          style: TEXT_STYLE_PRIMARY.copyWith(
+                              fontWeight: FontWeight.bold),
                         ),
                         Text(
                           numberToMoneyString(total) + "d",
                           style: TEXT_STYLE_PRIMARY.copyWith(
-                              fontWeight: FontWeight.bold, fontSize: 20, color: PRICE_COLOR_PRIMARY),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: PRICE_COLOR_PRIMARY),
                         )
                       ],
                     ),
                   )),
                   CustomOnTapWidget(
                     onTap: () async {
-                      Navigator.push(context, MaterialPageRoute(builder: (b) => CheckOutPage(cart)));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (b) => CheckOutPage(cart)));
                     },
                     child: Container(
                       padding: EdgeInsets.all(10),
@@ -208,11 +219,17 @@ class _CartPageState extends State<CartPage> {
               ),
               Container(
                 child: Column(
-                  children: orderingDetail.where((od) => od.orderingId == ordering.id).toList().map<Widget>((od) {
+                  children: orderingDetail
+                      .where((od) => od.orderingId == ordering.id)
+                      .toList()
+                      .map<Widget>((od) {
                     var product = od.product;
                     return CustomProductCartItem(
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (b) => ProductDetailPage(product)));
                       },
                       onDelete: () {
                         _removeFromCartConfirmDialog(
@@ -220,7 +237,8 @@ class _CartPageState extends State<CartPage> {
                             onYes: () async {
 //                      bloc.add(AddToCart(productID: product.id, count: od.count * -1));
                               //  LoadingDialog.showLoadingDialog(context, text: 'Removing...');
-                              await addToCart(context, productID: product.id, count: od.count * -1);
+                              await addToCart(context,
+                                  productID: product.id, count: od.count * -1);
                               // LoadingDialog.hideLoadingDialog(context);
                             });
                       },
@@ -235,11 +253,15 @@ class _CartPageState extends State<CartPage> {
                               onYes: () async {
 //                        bloc.add(AddToCart(productID: product.id, count: -1));
                                 //    LoadingDialog.showLoadingDialog(context, text: 'Removing...');
-                                await addToCart(context, productID: product.id, count: od.count * -1);
+                                await addToCart(context,
+                                    productID: product.id,
+                                    count: od.count * -1);
                                 //  LoadingDialog.hideLoadingDialog(context);
                               });
                         } else {
-                          await addToCart(context, productID: product.id, count: quantity - od.count);
+                          await addToCart(context,
+                              productID: product.id,
+                              count: quantity - od.count);
                         }
                       },
                       onIncreaseQuantity: () async {
@@ -247,7 +269,8 @@ class _CartPageState extends State<CartPage> {
 //                bloc.add(AddToCart(productID: product.id, count: 1));
                         //LoadingDialog.showLoadingDialog(context, text: 'Adding...');
                         FocusScope.of(context).unfocus();
-                        await addToCart(context, productID: product.id, count: 1);
+                        await addToCart(context,
+                            productID: product.id, count: 1);
 
                         //  LoadingDialog.hideLoadingDialog(context);
                       },
@@ -259,14 +282,16 @@ class _CartPageState extends State<CartPage> {
                               onYes: () async {
 //                        bloc.add(AddToCart(productID: product.id, count: -1));
                                 //    LoadingDialog.showLoadingDialog(context, text: 'Removing...');
-                                await addToCart(context, productID: product.id, count: -1);
+                                await addToCart(context,
+                                    productID: product.id, count: -1);
                                 //  LoadingDialog.hideLoadingDialog(context);
                               });
                         } else {
 //                  _onDecreaseItem(od);
 //                  bloc.add(AddToCart(productID: product.id, count: -1));
                           // LoadingDialog.showLoadingDialog(context, text: 'Removing...');
-                          await addToCart(context, productID: product.id, count: -1);
+                          await addToCart(context,
+                              productID: product.id, count: -1);
                           //  LoadingDialog.hideLoadingDialog(context);
                         }
                       },
@@ -274,9 +299,9 @@ class _CartPageState extends State<CartPage> {
                       cartItem: od,
                     );
                   }).toList()
-                    ..add(Container(
-                      height: 60,
-                    )),
+                        ..add(Container(
+                          height: 60,
+                        )),
                 ),
               ),
             ],
@@ -337,13 +362,17 @@ class _CartPageState extends State<CartPage> {
     });
   }
 
-  _removeFromCartConfirmDialog({@required ProductModel product, @required Function onYes, Function onNo}) {
+  _removeFromCartConfirmDialog(
+      {@required ProductModel product,
+      @required Function onYes,
+      Function onNo}) {
     showDialog(
         context: context,
         builder: (_) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25), side: BorderSide(color: FOREGROUND_COLOR, width: 2)),
+                borderRadius: BorderRadius.circular(25),
+                side: BorderSide(color: FOREGROUND_COLOR, width: 2)),
             backgroundColor: BACKGROUND_COLOR,
             title: Text(product.name),
             content: Text('You wanna remove this item from cart?'),
@@ -361,7 +390,8 @@ class _CartPageState extends State<CartPage> {
                   },
                   child: Text(
                     'No',
-                    style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
+                    style: TEXT_STYLE_PRIMARY.copyWith(
+                        fontWeight: FontWeight.bold),
                   )),
             ],
           );

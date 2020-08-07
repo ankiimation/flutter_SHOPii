@@ -59,7 +59,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     bloc.add(GetProductById(widget.product.id));
     shopAccountBloc.add(GetShopAccount(widget.product.shopUsername));
     _scrollController.addListener(() {
-      bool isScrollUp = _scrollController.position.userScrollDirection == ScrollDirection.reverse;
+      bool isScrollUp = _scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse;
       _scrollStreamController.sink.add(isScrollUp);
     });
   }
@@ -123,67 +124,85 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               .map(
                 (product) => CustomOnTapWidget(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (b) => ProductDetailPage(product)));
                   },
                   child: Container(
-                    width: 150,
-                    margin: EdgeInsets.only(left: products.indexOf(product) == 0 ? 20 : 0, right: 20),
                     padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
+                    child: Card(
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                      child: Container(
+                        width: 150,
+                        decoration: BoxDecoration(
 //                              boxShadow: [
 //                                BoxShadow(
 //                                    color: Colors.black26,
 //                                    offset: Offset(5, 5),
 //                                    blurRadius: 5)
 //                              ],
-                        color: FOREGROUND_COLOR,
-                        borderRadius: BorderRadius.circular(30)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 5,
-                          child: Container(
-                            decoration: BoxDecoration(
+                            color: FOREGROUND_COLOR,
+                            borderRadius: BorderRadius.circular(30)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Expanded(
+                              flex: 5,
+                              child: Container(
+                                margin: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
 //
-                                image: DecorationImage(image: NetworkImage(product.image), fit: BoxFit.cover),
-                                color: PRIMARY_COLOR,
-                                borderRadius: BorderRadius.circular(25)),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            children: <Widget>[
-                              Expanded(
-                                child: Text(
-                                  product.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                  style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                    image: DecorationImage(
+                                        image: NetworkImage(product.image),
+                                        fit: BoxFit.cover),
+                                    color: PRIMARY_COLOR,
+                                    borderRadius: BorderRadius.circular(25)),
                               ),
-                              Expanded(
-                                child: Text(
-                                  numberToMoneyString(product.price),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                  style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                    color: PRICE_COLOR_ON_FORE,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Column(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      product.name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  Expanded(
+                                    child: Text(
+                                      numberToMoneyString(product.price),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                        color: PRICE_COLOR_ON_FORE,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -203,8 +222,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 : Container(
                     decoration: BoxDecoration(
                         color: BACKGROUND_COLOR.withOpacity(0.8),
-                        borderRadius:
-                            BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25))),
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(25),
+                            bottomRight: Radius.circular(25))),
                     child: InPageAppBar(
                       showAwesomeBackground: true,
                       cartIconKey: cartIconKey,
@@ -240,13 +260,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   Widget buildInfo(ProductModel productModel) {
     return Container(
-      constraints: BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.65),
+      constraints:
+          BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.65),
       margin: EdgeInsets.only(top: ScreenHelper.getPaddingTop(context) + 180),
       padding: EdgeInsets.only(bottom: 100, left: 10, right: 10),
       decoration: BoxDecoration(
-          boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(0, -2), blurRadius: 2)],
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black26, offset: Offset(0, -2), blurRadius: 2)
+          ],
           color: BACKGROUND_COLOR,
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
       child: Column(
         children: <Widget>[
           Container(
@@ -285,11 +310,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 CustomOnTapWidget(
                   onTap: () {
                     Navigator.push(
-                        context, MaterialPageRoute(builder: (b) => ShopAccountDetailPage(productModel.shopUsername)));
+                        context,
+                        MaterialPageRoute(
+                            builder: (b) => ShopAccountDetailPage(
+                                productModel.shopUsername)));
                   },
                   child: Text(
                     productModel.shopUsername,
-                    style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TEXT_STYLE_PRIMARY.copyWith(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 )
               ],
@@ -302,13 +331,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 child: Text(
                   numberToMoneyString(productModel.price),
                   style: TEXT_STYLE_PRIMARY.copyWith(
-                      color: PRICE_COLOR_PRIMARY, fontSize: 30, fontWeight: FontWeight.bold),
+                      color: PRICE_COLOR_PRIMARY,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold),
                 ),
               )),
           Container(
               width: double.maxFinite,
               child: Theme(
-                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
                   initiallyExpanded: true,
                   title: Text('Description', style: TEXT_STYLE_PRIMARY),
@@ -316,7 +348,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     Container(
                       margin: EdgeInsets.all(10),
                       child: Text(
-                          productModel.description != null && productModel.description.length > 0
+                          productModel.description != null &&
+                                  productModel.description.length > 0
                               ? productModel.description
                               : 'No Description',
                           style: TEXT_STYLE_PRIMARY),
@@ -327,26 +360,31 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           Container(
               width: double.maxFinite,
               child: Theme(
-                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
                   initiallyExpanded: true,
                   title: Text('Images', style: TEXT_STYLE_PRIMARY),
                   children: <Widget>[
-                    Container(margin: EdgeInsets.all(10), child: _buildCarousel(productModel.productImage))
+                    Container(
+                        margin: EdgeInsets.all(10),
+                        child: _buildCarousel(productModel.productImage))
                   ],
                 ),
               )),
           Container(
               width: double.maxFinite,
               child: Theme(
-                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
                   title: Text('Reviews', style: TEXT_STYLE_PRIMARY),
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.all(10),
                       child: Text(
-                          productModel.description != null && productModel.description.length > 0
+                          productModel.description != null &&
+                                  productModel.description.length > 0
                               ? productModel.description
                               : 'No Review',
                           style: TEXT_STYLE_PRIMARY),
@@ -357,11 +395,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           Container(
               width: double.maxFinite,
               child: Theme(
-                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
                   initiallyExpanded: true,
                   title: Text('Related', style: TEXT_STYLE_PRIMARY),
-                  children: <Widget>[Container(child: buildRelated(productModel.category.product))],
+                  children: <Widget>[
+                    Container(
+                        child: buildRelated(productModel.category.product))
+                  ],
                 ),
               )),
         ],
@@ -379,18 +421,29 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (b) => ImagesViewer(images.map((image) => Image.network(image.image)).toList())));
+                  builder: (b) => ImagesViewer(images
+                      .map((image) => Image.network(image.image))
+                      .toList())));
         },
         child: CarouselSlider(
             items: images
-                .map((image) => Container(
-                      margin: EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          image: DecorationImage(image: CachedNetworkImageProvider(image.image), fit: BoxFit.cover)),
+                .map((image) => Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            image: DecorationImage(
+                                image: CachedNetworkImageProvider(image.image),
+                                fit: BoxFit.cover)),
+                      ),
                     ))
                 .toList(),
-            options: CarouselOptions(enlargeCenterPage: true, autoPlay: true, autoPlayInterval: Duration(seconds: 2))),
+            options: CarouselOptions(
+                enlargeCenterPage: true,
+                autoPlay: true,
+                autoPlayInterval: Duration(seconds: 2))),
       );
     } else {
       return Container(
@@ -413,7 +466,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     height: kBottomNavigationBarHeight,
                     // margin: EdgeInsets.only(bottom: 10, left: 20, right: 20),
                     decoration: BoxDecoration(
-                      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 2, offset: Offset(0, -2))],
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 2,
+                            offset: Offset(0, -2))
+                      ],
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround, //
@@ -421,10 +479,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         CustomOnTapWidget(
                           onTap: () {
                             if (currentLogin == null) {
-                              Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (b) => LoginPage()));
                               return;
                             }
-                            bloc.add(DoFavorite(productModel, isDoFromListProducts: false));
+                            bloc.add(DoFavorite(productModel,
+                                isDoFromListProducts: false));
                             bloc.add(GetProductById(widget.product.id));
                           },
                           child: Container(
@@ -437,7 +499,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 //  boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(-2, -2), blurRadius: 3)],
                               ),
                               child: Icon(
-                                productModel.isFavoriteByCurrentUser ? Icons.favorite : Icons.favorite_border,
+                                productModel.isFavoriteByCurrentUser
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
                                 color: PRIMARY_COLOR,
                               )),
                         ),
@@ -445,7 +509,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             child: CustomOnTapWidget(
                           onTap: () {
                             if (currentLogin == null) {
-                              Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (b) => LoginPage()));
                               return;
                             }
                             showMyModalBottomSheet(productModel);
@@ -461,7 +528,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               child: Text(
                                 'Get it',
                                 textAlign: TextAlign.center,
-                                style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 20),
+                                style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                                    fontSize: 20),
                               )),
                         ))
                       ],
@@ -478,11 +546,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     showModalBottomSheet(
         isScrollControlled: true,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(25), topRight: Radius.circular(25))),
         context: context,
         builder: (_) {
           return Container(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 10),
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 10),
             margin: EdgeInsets.symmetric(horizontal: 20),
             //   height: ScreenHelper.getHeight(context) * 0.4,
             child: SingleChildScrollView(
@@ -501,7 +571,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           child: CircleAvatar(
                             backgroundColor: FOREGROUND_COLOR,
                             radius: 45,
-                            backgroundImage: CachedNetworkImageProvider(widget.product.image),
+                            backgroundImage: CachedNetworkImageProvider(
+                                widget.product.image),
                           ),
                         ),
                         SizedBox(
@@ -515,14 +586,17 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 widget.product.name,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                                style: TEXT_STYLE_PRIMARY.copyWith(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                               Text(
                                 numberToMoneyString(widget.product.price),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TEXT_STYLE_PRIMARY.copyWith(
-                                    fontSize: 20, fontWeight: FontWeight.bold, color: PRICE_COLOR_PRIMARY),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: PRICE_COLOR_PRIMARY),
                               ),
                             ],
                           ),
@@ -547,15 +621,17 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   if (quantity > 1) {
                                     setState(() {
                                       quantity--;
-                                      quantityController.text = quantity.toString();
+                                      quantityController.text =
+                                          quantity.toString();
                                     });
                                   }
                                 },
                                 child: Container(
                                   margin: EdgeInsets.symmetric(horizontal: 5),
                                   padding: EdgeInsets.all(3),
-                                  decoration:
-                                      BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(50)),
+                                  decoration: BoxDecoration(
+                                      color: FOREGROUND_COLOR,
+                                      borderRadius: BorderRadius.circular(50)),
                                   child: Icon(
                                     Icons.remove,
                                     color: FORE_TEXT_COLOR,
@@ -568,17 +644,25 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   padding: EdgeInsets.symmetric(vertical: 5),
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                      color: PRIMARY_COLOR.withOpacity(0.1), borderRadius: BorderRadius.circular(15)),
+                                      color: PRIMARY_COLOR.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(15)),
                                   child: TextFormField(
                                     // enabled: false,
                                     controller: quantityController,
                                     keyboardType: TextInputType.number,
-                                    inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                                    inputFormatters: [
+                                      WhitelistingTextInputFormatter.digitsOnly
+                                    ],
                                     textAlign: TextAlign.center,
-                                    style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
+                                    style: TEXT_STYLE_PRIMARY.copyWith(
+                                        fontWeight: FontWeight.bold),
                                     cursorColor: FOREGROUND_COLOR,
                                     decoration: InputDecoration.collapsed()
-                                        .copyWith(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 5)),
+                                        .copyWith(
+                                            isDense: true,
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                    horizontal: 5)),
                                   ),
                                 ),
                               ),
@@ -588,15 +672,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
                                   setState(() {
                                     quantity++;
-                                    quantityController.text = quantity.toString();
+                                    quantityController.text =
+                                        quantity.toString();
                                   });
                                 },
                                 child: Container(
                                   margin: EdgeInsets.symmetric(horizontal: 5),
                                   padding: EdgeInsets.all(3),
-                                  decoration:
-                                      BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(50)),
-                                  child: Icon(Icons.add, color: FORE_TEXT_COLOR),
+                                  decoration: BoxDecoration(
+                                      color: FOREGROUND_COLOR,
+                                      borderRadius: BorderRadius.circular(50)),
+                                  child:
+                                      Icon(Icons.add, color: FORE_TEXT_COLOR),
                                 ),
                               ),
                             ],
@@ -621,8 +708,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               alignment: Alignment.center,
                               padding: EdgeInsets.all(5),
                               margin: EdgeInsets.only(left: 5),
-                              decoration:
-                                  BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(30)),
+                              decoration: BoxDecoration(
+                                  color: FOREGROUND_COLOR,
+                                  borderRadius: BorderRadius.circular(30)),
                               child: Text(
                                 'S',
                                 style: TEXT_STYLE_ON_FOREGROUND,
@@ -634,8 +722,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               alignment: Alignment.center,
                               padding: EdgeInsets.all(5),
                               margin: EdgeInsets.only(left: 5),
-                              decoration:
-                                  BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(30)),
+                              decoration: BoxDecoration(
+                                  color: FOREGROUND_COLOR,
+                                  borderRadius: BorderRadius.circular(30)),
                               child: Text('M', style: TEXT_STYLE_ON_FOREGROUND),
                             ),
                             Container(
@@ -644,8 +733,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               alignment: Alignment.center,
                               padding: EdgeInsets.all(5),
                               margin: EdgeInsets.only(left: 5),
-                              decoration:
-                                  BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(30)),
+                              decoration: BoxDecoration(
+                                  color: FOREGROUND_COLOR,
+                                  borderRadius: BorderRadius.circular(30)),
                               child: Text('L', style: TEXT_STYLE_ON_FOREGROUND),
                             ),
                             Container(
@@ -654,9 +744,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               alignment: Alignment.center,
                               padding: EdgeInsets.all(5),
                               margin: EdgeInsets.only(left: 5),
-                              decoration:
-                                  BoxDecoration(color: FOREGROUND_COLOR, borderRadius: BorderRadius.circular(30)),
-                              child: Text('XL', style: TEXT_STYLE_ON_FOREGROUND),
+                              decoration: BoxDecoration(
+                                  color: FOREGROUND_COLOR,
+                                  borderRadius: BorderRadius.circular(30)),
+                              child:
+                                  Text('XL', style: TEXT_STYLE_ON_FOREGROUND),
                             ),
                           ],
                         )
@@ -672,17 +764,23 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       await showAddToCartAnimation(context,
                           overlayWidget: Container(
                             padding: EdgeInsets.all(5),
-                            decoration:
-                                BoxDecoration(color: BACKGROUND_COLOR, borderRadius: BorderRadius.circular(100)),
+                            decoration: BoxDecoration(
+                                color: BACKGROUND_COLOR,
+                                borderRadius: BorderRadius.circular(100)),
                             child: Text(
                               quantityController.text,
-                              style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
+                              style: TEXT_STYLE_PRIMARY.copyWith(
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                           start: CustomPosition(
-                              ScreenHelper.getWidth(context) * 0.7, ScreenHelper.getHeight(context) * 0.9),
-                          end: CustomPosition(cartIconPositionDx, cartIconPositionDy));
-                      await addToCart(context, productID: productModel.id, count: int.parse(quantityController.text));
+                              ScreenHelper.getWidth(context) * 0.7,
+                              ScreenHelper.getHeight(context) * 0.9),
+                          end: CustomPosition(
+                              cartIconPositionDx, cartIconPositionDy));
+                      await addToCart(context,
+                          productID: productModel.id,
+                          count: int.parse(quantityController.text));
 
                       Navigator.pop(context);
                     },
@@ -698,7 +796,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         child: Text(
                           'Add To Cart',
                           textAlign: TextAlign.center,
-                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 20),
+                          style:
+                              TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 20),
                         )),
                   )
                 ],

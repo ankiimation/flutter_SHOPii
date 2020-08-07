@@ -55,7 +55,8 @@ class _OrderingPageState extends State<OrderingPage> {
               cubit: bloc,
               builder: (context, state) {
                 if (state is AllOrderingLoaded) {
-                  return Expanded(child: buildOrdersWithFilter(state.orderings));
+                  return Expanded(
+                      child: buildOrdersWithFilter(state.orderings));
                 } else if (state is AllOrderingLoadError) {
                   return Center(
                     child: CustomErrorWidget(
@@ -73,39 +74,43 @@ class _OrderingPageState extends State<OrderingPage> {
     );
   }
 
-  Widget buildOrders(List<OrderingModel> orders) {
-    orders = orders.reversed.toList();
-    return Container(
-      margin: EdgeInsets.only(left: 20, right: 20),
-      child: Column(
-        children: orders.map((o) {
-          return CustomOnTapWidget(
-            onTap: () async {
-              await Navigator.push(context, MaterialPageRoute(builder: (b) => OrderingDetailPage(o)));
-            },
-            child: Container(
-              width: double.maxFinite,
-              margin: EdgeInsets.only(top: orders.indexOf(o) == 0 ? 10 : 0, bottom: 10),
-              child: CustomOrderItem(
-                orderingModel: o,
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
+//  Widget buildOrders(List<OrderingModel> orders) {
+//    orders = orders.reversed.toList();
+//    return Container(
+//      margin: EdgeInsets.only(left: 20, right: 20),
+//      child: Column(
+//        children: orders.map((o) {
+//          return CustomOnTapWidget(
+//            onTap: () async {
+//              await Navigator.push(context,
+//                  MaterialPageRoute(builder: (b) => OrderingDetailPage(o)));
+//            },
+//            child: Container(
+//              width: double.maxFinite,
+//              margin: EdgeInsets.only(
+//                  top: orders.indexOf(o) == 0 ? 10 : 0, bottom: 10),
+//              child: CustomOrderItem(
+//                elevation: 10,
+//                orderingModel: o,
+//              ),
+//            ),
+//          );
+//        }).toList(),
+//      ),
+//    );
+//  }
 
   Widget buildOrdersWithFilter(List<OrderingModel> orders) {
     orders = orders.reversed.toList();
-    var orderStatusList = orders.map<int>((order) => order.status).toSet().toList()
-      ..sort((int a, int b) {
-        return a.compareTo(b);
-      });
+    var orderStatusList =
+        orders.map<int>((order) => order.status).toSet().toList()
+          ..sort((int a, int b) {
+            return a.compareTo(b);
+          });
     return Container(
       child: CustomTabView(
           alwaysShowLabel: true,
-          barShadow: true,
+//          barShadow: true,
           children: [
             CustomTabViewItem(
                 icon: Icons.list,
@@ -120,11 +125,16 @@ class _OrderingPageState extends State<OrderingPage> {
                           .map<Widget>((o) => CustomOnTapWidget(
                                 onTap: () async {
                                   await Navigator.push(
-                                      context, MaterialPageRoute(builder: (b) => OrderingDetailPage(o)));
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (b) =>
+                                              OrderingDetailPage(o)));
                                 },
                                 child: Container(
-                                  margin: EdgeInsets.only(left: 20, right: 20, top: 10),
+                                  margin: EdgeInsets.only(
+                                      left: 20, right: 20, top: 10),
                                   child: CustomOrderItem(
+                                    elevation: 10,
                                     orderingModel: o,
                                   ),
                                 ),
@@ -134,14 +144,21 @@ class _OrderingPageState extends State<OrderingPage> {
                   ),
                 ))
           ]..addAll(orderStatusList.map<CustomTabViewItem>((status) {
-              String label =
-                  status == 1 ? 'Processing' : status == 2 ? 'Delivering' : status == 3 ? 'Completed' : "Cancelled";
+              String label = status == 1
+                  ? 'Processing'
+                  : status == 2
+                      ? 'Delivering'
+                      : status == 3 ? 'Completed' : "Cancelled";
               IconData icon = status == 1
                   ? Icons.repeat
-                  : status == 2 ? Icons.local_shipping : status == 3 ? Icons.check_circle : Icons.cancel;
+                  : status == 2
+                      ? Icons.local_shipping
+                      : status == 3 ? Icons.check_circle : Icons.cancel;
               Color color = status == 1
                   ? Color(0xfffec821)
-                  : status == 2 ? Colors.orange : status == 3 ? Colors.green : Colors.black26;
+                  : status == 2
+                      ? Colors.orange
+                      : status == 3 ? Colors.green : Colors.black26;
               return CustomTabViewItem(
                   icon: icon,
                   label: label,
@@ -157,12 +174,17 @@ class _OrderingPageState extends State<OrderingPage> {
                             .map<Widget>((o) => CustomOnTapWidget(
                                   onTap: () async {
                                     await Navigator.push(
-                                        context, MaterialPageRoute(builder: (b) => OrderingDetailPage(o)));
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (b) =>
+                                                OrderingDetailPage(o)));
                                     bloc.add(GetAllOrdering());
                                   },
                                   child: Container(
-                                    margin: EdgeInsets.only(left: 20, right: 20, top: 10),
+                                    margin: EdgeInsets.only(
+                                        left: 20, right: 20, top: 10),
                                     child: CustomOrderItem(
+                                      elevation: 10,
                                       orderingModel: o,
                                     ),
                                   ),

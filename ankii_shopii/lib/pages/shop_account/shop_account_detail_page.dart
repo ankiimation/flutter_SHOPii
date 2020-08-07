@@ -77,7 +77,7 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
                 physics: AlwaysScrollableScrollPhysics(),
                 child: Column(
                   children: <Widget>[
-                    buildAppBar(state.shopAccountModel),
+                    buildAppBar(),
                     buildAvatar(state.shopAccountModel),
                     buildInfo(state.shopAccountModel),
                     buildProducts()
@@ -97,7 +97,7 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
     );
   }
 
-  Widget buildAppBar(ShopAccountModel shopAccountModel) {
+  Widget buildAppBar() {
     return InPageAppBar(
       cartIconKey: cartIconKey,
       leading: CustomOnTapWidget(
@@ -106,7 +106,6 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
         },
         child: Icon(Icons.arrow_back_ios),
       ),
-      title: shopAccountModel.name,
     );
   }
 
@@ -122,7 +121,9 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 image: DecorationImage(
-                    image: CachedNetworkImageProvider('${shopAccountModel.coverImage}'), fit: BoxFit.cover)),
+                    image: CachedNetworkImageProvider(
+                        '${shopAccountModel.coverImage}'),
+                    fit: BoxFit.cover)),
           ),
           Align(
             alignment: Alignment.bottomCenter,
@@ -132,7 +133,8 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
               child: CircleAvatar(
                   radius: 40,
                   backgroundColor: FOREGROUND_COLOR,
-                  backgroundImage: CachedNetworkImageProvider('${shopAccountModel.image}')),
+                  backgroundImage:
+                      CachedNetworkImageProvider('${shopAccountModel.image}')),
             ),
           )
         ],
@@ -147,13 +149,32 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
         children: <Widget>[
           Row(
             children: <Widget>[
+              Icon(Icons.store),
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: Text(
+                  shopAccountModel.name,
+                  style: TEXT_STYLE_PRIMARY.copyWith(
+                      fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              )
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            children: <Widget>[
               Icon(Icons.location_on),
               SizedBox(
                 width: 10,
               ),
               Text(
                 shopAccountModel.address,
-                style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TEXT_STYLE_PRIMARY.copyWith(
+                    fontSize: 16, fontWeight: FontWeight.bold),
               )
             ],
           ),
@@ -168,7 +189,8 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
               ),
               Text(
                 shopAccountModel.phoneNumber,
-                style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TEXT_STYLE_PRIMARY.copyWith(
+                    fontSize: 16, fontWeight: FontWeight.bold),
               )
             ],
           ),
@@ -189,13 +211,6 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
         Icon(Icons.star),
         Icon(Icons.star_half),
         Icon(Icons.star_border),
-        SizedBox(
-          width: 10,
-        ),
-        Text(
-          'Delicious',
-          style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
-        )
       ],
     );
   }
@@ -205,8 +220,10 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
         cubit: productBloc,
         builder: (_, state) {
           if (state is ListProductsLoaded) {
-            var products =
-                state.products.where((product) => product.shopUsername == widget.shopAccountUsername).toList();
+            var products = state.products
+                .where((product) =>
+                    product.shopUsername == widget.shopAccountUsername)
+                .toList();
             return Container(
                 margin: EdgeInsets.symmetric(vertical: 10),
                 child: Wrap(
@@ -217,7 +234,10 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
                               width: ScreenHelper.getWidth(context) * 0.45,
                               onTap: () async {
                                 await Navigator.push(
-                                    context, MaterialPageRoute(builder: (b) => ProductDetailPage(product)));
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (b) =>
+                                            ProductDetailPage(product)));
                                 _refresh();
                               },
                               cartIconKey: cartIconKey,
