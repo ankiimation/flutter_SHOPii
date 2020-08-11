@@ -71,38 +71,48 @@ class _CategoriesPageState extends State<CategoriesPage> {
   Widget buildListCategories(List<CategoryModel> categories) {
     return Container(
         margin: EdgeInsets.only(left: 20, right: 20, bottom: 30),
-        child: Column(children: categories.map((category) => _buildCategoryItem(category)).toList()));
+        child: Column(
+            children: categories
+                .map((category) => _buildCategoryItem(category))
+                .toList()));
   }
 
   Widget _buildCategoryItem(CategoryModel category) {
     return CustomOnTapWidget(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (b) => ProductPage(category: category)));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (b) => ProductPage(category: category)));
       },
       child: Container(
         margin: EdgeInsets.only(top: 20),
         height: 200,
         width: double.infinity,
         decoration: BoxDecoration(
-            image: DecorationImage(image: CachedNetworkImageProvider(category.image), fit: BoxFit.cover),
+            image: DecorationImage(
+                image: CachedNetworkImageProvider(category.image),
+                fit: BoxFit.cover),
             color: FOREGROUND_COLOR,
             borderRadius: BorderRadius.circular(20)),
         child: Container(
           padding: EdgeInsets.only(left: 20, right: 20),
-          decoration: BoxDecoration(color: PRIMARY_COLOR.withOpacity(0.7), borderRadius: BorderRadius.circular(20)),
+          decoration: BoxDecoration(
+              color: PRIMARY_COLOR.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(20)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
                 category.name ?? '',
-                style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 40, color: BACKGROUND_COLOR),
+                style: TEXT_STYLE_PRIMARY.copyWith(
+                    fontSize: 40, color: BACKGROUND_COLOR),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
                 category.description ?? '',
-                style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 20, color: FOREGROUND_COLOR),
+                style: TEXT_STYLE_PRIMARY.copyWith(
+                    fontSize: 20, color: BACKGROUND_COLOR.withOpacity(0.5)),
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

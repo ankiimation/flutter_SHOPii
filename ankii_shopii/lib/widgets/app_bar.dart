@@ -23,7 +23,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AppBar appBar;
 
   CustomAppBar(
-      {Key key, this.padding, this.backgroundColor = BACKGROUND_COLOR, this.primaryColor = PRIMARY_COLOR, this.appBar})
+      {Key key,
+      this.padding,
+      this.backgroundColor = BACKGROUND_COLOR,
+      this.primaryColor = PRIMARY_COLOR,
+      this.appBar})
       : super(key: key);
 
   @override
@@ -80,10 +84,13 @@ class InPageAppBar extends StatelessWidget {
       child: Container(
         height: 60,
         alignment: Alignment.center,
-        margin: EdgeInsets.only(left: 20, right: 20, top: ScreenHelper.getPaddingTop(context) + 10),
+        margin: EdgeInsets.only(
+            left: 20, right: 20, top: ScreenHelper.getPaddingTop(context) + 10),
         child: Row(
           children: <Widget>[
-            Container(margin: EdgeInsets.only(right: this.leading != null ? 10 : 0), child: this.leading),
+            Container(
+                margin: EdgeInsets.only(right: this.leading != null ? 10 : 0),
+                child: this.leading),
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -102,7 +109,10 @@ class InPageAppBar extends StatelessWidget {
                       showSearchButton
                           ? CustomOnTapWidget(
                               onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (b) => SearchPage()));
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (b) => SearchPage()));
                               },
                               child: Icon(
                                 Icons.search,
@@ -110,6 +120,9 @@ class InPageAppBar extends StatelessWidget {
                               ),
                             )
                           : Container(),
+                      SizedBox(
+                        width: 15,
+                      ),
                       showCartButton
                           ? BlocBuilder(
                               cubit: BlocProvider.of<LoginBloc>(context),
@@ -117,7 +130,10 @@ class InPageAppBar extends StatelessWidget {
                                 if (state is LoginSuccessfully) {
                                   return CustomOnTapWidget(
                                     onTap: () {
-                                      Navigator.push(context, MaterialPageRoute(builder: (b) => CartPage()));
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (b) => CartPage()));
                                     },
                                     child: CartWidget(cartIconKey),
                                   );
@@ -140,8 +156,10 @@ class InPageAppBar extends StatelessWidget {
 class CartWidget extends StatefulWidget {
   final GlobalKey cartKey;
   final double size;
+  final Color color;
 
-  CartWidget(this.cartKey, {this.size = 25}) : super(key: cartKey);
+  CartWidget(this.cartKey, {this.size = 25, this.color = PRIMARY_COLOR})
+      : super(key: cartKey);
 
   @override
   CartWidgetState createState() => CartWidgetState();
@@ -165,7 +183,7 @@ class CartWidgetState extends State<CartWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(left: 15),
+//      margin: EdgeInsets.only(left: 15),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -182,19 +200,21 @@ class CartWidgetState extends State<CartWidget> {
                   if (totalCount == 0) return Container();
                   return Text(
                     totalCount.toString(),
-                    style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: widget.size / 2),
+                    style: TEXT_STYLE_PRIMARY.copyWith(
+                        color: widget.color,
+                        fontWeight: FontWeight.bold,
+                        fontSize: widget.size / 2),
                   );
                 } else {
                   return Container();
                 }
               }),
           Icon(
-                  Icons.shopping_cart,
-                  //  key: widget.cartKey,
-                  color: PRIMARY_TEXT_COLOR,
-                  size: _inProcess ? widget.size * 1.2 : widget.size,
-                )
-
+            Icons.shopping_cart,
+            //  key: widget.cartKey,
+            color: widget.color,
+            size: _inProcess ? widget.size * 1.2 : widget.size,
+          )
         ],
       ),
     );

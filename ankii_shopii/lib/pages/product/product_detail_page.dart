@@ -14,14 +14,18 @@ import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/helpers/string_helper.dart';
 import 'package:ankiishopii/models/product_model.dart';
 import 'package:ankiishopii/pages/account/login_page.dart';
+import 'package:ankiishopii/pages/cart/cart_page.dart';
+import 'package:ankiishopii/pages/search/search_page.dart';
 import 'package:ankiishopii/pages/shop_account/shop_account_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/add_to_cart_effect.dart';
 import 'package:ankiishopii/widgets/app_bar.dart';
+import 'package:ankiishopii/widgets/base/animated_button.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
 import 'package:ankiishopii/widgets/graphic_widget.dart';
 import 'package:ankiishopii/widgets/image_viewer.dart';
+import 'package:ankiishopii/widgets/product_item.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -97,7 +101,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     alignment: Alignment.bottomCenter,
                     child: buildFloatingBottomBar(state.product),
                   ),
-                  buildAppBar(state.product)
+                  Align(
+                      alignment: Alignment.topCenter,
+                      child: buildAppBar(state.product))
                 ],
               );
             } else if (state is ProductLoadingError) {
@@ -122,89 +128,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           scrollDirection: Axis.horizontal,
           children: products
               .map(
-                (product) => CustomOnTapWidget(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (b) => ProductDetailPage(product)));
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    child: Card(
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
-                      child: Container(
-                        width: 150,
-                        decoration: BoxDecoration(
-//                              boxShadow: [
-//                                BoxShadow(
-//                                    color: Colors.black26,
-//                                    offset: Offset(5, 5),
-//                                    blurRadius: 5)
-//                              ],
-                            color: FOREGROUND_COLOR,
-                            borderRadius: BorderRadius.circular(30)),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 5,
-                              child: Container(
-                                margin: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-//
-                                    image: DecorationImage(
-                                        image: NetworkImage(product.image),
-                                        fit: BoxFit.cover),
-                                    color: PRIMARY_COLOR,
-                                    borderRadius: BorderRadius.circular(25)),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Column(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                      product.name,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      numberToMoneyString(product.price),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                                        color: PRICE_COLOR_ON_FORE,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                (product) => CustomProductGridItem(
+                  backgroundColor: FOREGROUND_COLOR,
+                  showQuickAction: false,
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (b) => ProductDetailPage(product))),
+                  elevation: 5,
+                  product: product,
                 ),
               )
               .toList()),
@@ -216,30 +148,86 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         stream: _scrollStreamController.stream,
         builder: (context, snapshot) {
           return AnimatedSwitcher(
-            duration: Duration(milliseconds: 100),
-            child: snapshot.hasData && snapshot.data == true
-                ? null
-                : Container(
-                    decoration: BoxDecoration(
-                        color: BACKGROUND_COLOR.withOpacity(0.8),
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(25),
-                            bottomRight: Radius.circular(25))),
-                    child: InPageAppBar(
-                      showAwesomeBackground: true,
-                      cartIconKey: cartIconKey,
-                      title: productModel.name,
-                      leading: IconButton(
-                          icon: Icon(
-                            Icons.arrow_back_ios,
-                            color: PRIMARY_TEXT_COLOR,
+              duration: Duration(milliseconds: 100),
+              child: snapshot.hasData && snapshot.data == true
+                  ? null
+                  : Container(
+                      height: kToolbarHeight,
+                      margin: EdgeInsets.only(
+                          top: ScreenHelper.getPaddingTop(context) + 5,
+                          left: 5,
+                          right: 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          CustomAnimatedButton(
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            color: BACKGROUND_COLOR,
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              height: 40,
+                              width: 40,
+                              alignment: Alignment.center,
+                              child: Icon(
+                                Icons.arrow_back_ios,
+                                size: 25,
+                                color: PRIMARY_COLOR,
+                              ),
+                            ),
                           ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          }),
-                    ),
-                  ),
-          );
+                          Row(
+                            children: <Widget>[
+                              CustomAnimatedButton(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                elevation: 5,
+                                color: BACKGROUND_COLOR,
+                                onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (b) => SearchPage())),
+                                child: Container(
+                                  height: 40,
+                                  width: 40,
+                                  alignment: Alignment.center,
+                                  child: Icon(
+                                    Icons.search,
+                                    size: 25,
+                                    color: PRIMARY_COLOR,
+                                  ),
+                                ),
+                              ),
+                              currentLogin != null
+                                  ? CustomAnimatedButton(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      elevation: 5,
+                                      color: BACKGROUND_COLOR,
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (b) => CartPage()));
+                                      },
+                                      child: Container(
+                                          height: 40,
+                                          width: 40,
+                                          alignment: Alignment.center,
+                                          child: CartWidget(
+                                            cartIconKey,
+                                            size: 20,
+                                            color: PRIMARY_COLOR,
+                                          )),
+                                    )
+                                  : Container(),
+                            ],
+                          )
+                        ],
+                      ),
+                    ));
         });
   }
 
@@ -281,7 +269,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 Icon(
                   Icons.store,
                   size: 20,
-                  color: PRIMARY_TEXT_COLOR,
+                  color: PRIMARY_COLOR,
                 ),
                 SizedBox(
                   width: 10,
@@ -318,7 +306,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   child: Text(
                     productModel.shopUsername,
                     style: TEXT_STYLE_PRIMARY.copyWith(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                        color: PRIMARY_COLOR,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
                   ),
                 )
               ],
@@ -327,12 +317,22 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           Container(
               width: double.maxFinite,
               child: Container(
-                margin: EdgeInsets.all(20),
+                margin: EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  productModel.name,
+                  style: TEXT_STYLE_PRIMARY.copyWith(
+                      fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+              )),
+          Container(
+              width: double.maxFinite,
+              child: Container(
+                margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
                 child: Text(
                   numberToMoneyString(productModel.price),
                   style: TEXT_STYLE_PRIMARY.copyWith(
                       color: PRICE_COLOR_PRIMARY,
-                      fontSize: 30,
+                      fontSize: 25,
                       fontWeight: FontWeight.bold),
                 ),
               )),
@@ -463,20 +463,23 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             child: snapshot.hasData && snapshot.data == true
                 ? null
                 : Container(
-                    height: kBottomNavigationBarHeight,
-                    // margin: EdgeInsets.only(bottom: 10, left: 20, right: 20),
+                    height: kBottomNavigationBarHeight + 10,
+                    margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
+                    padding: EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 2,
-                            offset: Offset(0, -2))
-                      ],
-                    ),
+                        color: BACKGROUND_COLOR,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black26, blurRadius: 10)
+                        ]),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround, //
                       children: <Widget>[
-                        CustomOnTapWidget(
+                        CustomAnimatedButton(
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          color: BACKGROUND_COLOR,
                           onTap: () {
                             if (currentLogin == null) {
                               Navigator.push(
@@ -490,23 +493,27 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             bloc.add(GetProductById(widget.product.id));
                           },
                           child: Container(
-                              width: ScreenHelper.getWidth(context) * 0.25,
-                              // alignment: Alignment.center,
+                              width: kBottomNavigationBarHeight - 5,
+                              height: kBottomNavigationBarHeight,
+                              alignment: Alignment.center,
                               //margin: EdgeInsets.only(right: 10),
-                              padding: EdgeInsets.all(15),
-                              decoration: BoxDecoration(
-                                color: BACKGROUND_COLOR,
-                                //  boxShadow: [BoxShadow(color: Colors.black26, offset: Offset(-2, -2), blurRadius: 3)],
-                              ),
+                              padding: EdgeInsets.all(10),
                               child: Icon(
                                 productModel.isFavoriteByCurrentUser
                                     ? Icons.favorite
                                     : Icons.favorite_border,
-                                color: PRIMARY_COLOR,
+                                color: FOREGROUND_COLOR,
                               )),
                         ),
+                        SizedBox(
+                          width: 5,
+                        ),
                         Expanded(
-                            child: CustomOnTapWidget(
+                            child: CustomAnimatedButton(
+                          color: FOREGROUND_COLOR,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          elevation: 1,
                           onTap: () {
                             if (currentLogin == null) {
                               Navigator.push(
@@ -519,12 +526,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           },
                           child: Container(
                               alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: FOREGROUND_COLOR,
-                                //  boxShadow: [
-//                                      BoxShadow(color: Colors.black26, offset: Offset(-2, -2), blurRadius: 3)
-//                                    ],
-                              ),
                               child: Text(
                                 'Get it',
                                 textAlign: TextAlign.center,

@@ -6,7 +6,9 @@ using System.Web.Http.OData;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SHOPii.Helpers;
 using SHOPii.Models;
 
@@ -62,10 +64,10 @@ namespace SHOPii.Controllers
             List<Product> listResult = new List<Product>();
             var listProducts = await getBuyedProduct(username);
             HashSet<int> setCategoryId = listProducts.Select(p => p.CategoryId).ToList().ToHashSet();
-              foreach(int id in setCategoryId)
+            foreach (int id in setCategoryId)
             {
                 var listRandomProduct = await getRandomProductFromCategoryId(id, 5);
-                foreach(var product in listRandomProduct)
+                foreach (var product in listRandomProduct)
                 {
                     product.OrderingDetail = null;
                     listResult.Add(product);
@@ -75,6 +77,8 @@ namespace SHOPii.Controllers
 
 
         }
+
+
 
 
         private async Task<List<Product>> getRandomProductFromCategoryId(int categoryId, int limit)
@@ -155,6 +159,20 @@ namespace SHOPii.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetProduct", new { id = product.Id }, product);
+        }
+
+        [HttpPost("search")]
+        public async Task<ActionResult<IEnumerable<Product>>> SearchProduct(String keyword, int? from, int? limit)
+        {
+            var query = "select * from Product " +
+            " where  name COLLATE Latin1_General_CI_AI  like @name";
+            var results = _context.Product
+                                   .FromSqlRaw(query, new SqlParameter("@name", "%"+keyword+"%"));
+            return await new QueryHelper<Product>(results).pagingQuery(from, limit).ToListAsync();
+
+            //return Ok(QueryHelper<Product>.removeAccents(keyword));
+
+
         }
 
         // DELETE: api/Products/5

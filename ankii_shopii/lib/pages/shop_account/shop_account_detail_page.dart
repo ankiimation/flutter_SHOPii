@@ -231,6 +231,7 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
                       .map<Widget>((product) => Container(
                             margin: EdgeInsets.all(5),
                             child: CustomProductGridItem(
+                              elevation: 5,
                               width: ScreenHelper.getWidth(context) * 0.45,
                               onTap: () async {
                                 await Navigator.push(
@@ -242,7 +243,6 @@ class _ShopAccountDetailPageState extends State<ShopAccountDetailPage> {
                               },
                               cartIconKey: cartIconKey,
                               product: product,
-                              isFavorite: product.isFavoriteByCurrentUser,
                               backgroundColor: FOREGROUND_COLOR,
                               onFavourite: () async {
                                 _doFavorite(product);

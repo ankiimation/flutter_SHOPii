@@ -242,11 +242,10 @@ class _HomePageState extends State<HomePage> {
                               .map<Widget>((product) => Container(
                                     margin: EdgeInsets.only(left: 10),
                                     child: CustomProductGridItem(
+                                      elevation: 5,
                                       cartIconKey: _cartIconKey,
                                       backgroundColor: FOREGROUND_COLOR,
                                       product: product,
-                                      isFavorite:
-                                          product.isFavoriteByCurrentUser,
                                       onTap: () async {
                                         await Navigator.push(
                                             context,

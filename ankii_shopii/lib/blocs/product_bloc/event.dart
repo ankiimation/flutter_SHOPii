@@ -24,6 +24,12 @@ class GetProductById extends ProductEvent {
   GetProductById(this.productID);
 }
 
+class SearchProduct extends ProductEvent{
+  final String keyword;
+
+  SearchProduct(this.keyword);
+}
+
 class DoFavorite extends ProductEvent {
   final ProductModel product;
   final bool isDoFromListProducts;

@@ -14,7 +14,7 @@ import 'package:flutter/services.dart';
 import '../themes/constant.dart';
 import 'base/custom_ontap_widget.dart';
 
-class CustomProductListItem extends StatelessWidget {
+class CustomProductListItem extends StatefulWidget {
   final GlobalKey cartIconKey;
   final ProductModel product;
   final Color priceTextColor;
@@ -24,24 +24,47 @@ class CustomProductListItem extends StatelessWidget {
   final Function onAddToCart;
   final Function onFavourite;
   final Color backgroundColor;
-  final bool isFavorite;
   final bool showQuickActionButtons;
   final double elevation;
 
-  CustomProductListItem(
-      {this.backgroundColor = BACKGROUND_COLOR,
-      this.product,
-      this.cartIconKey,
-      this.onTap,
-      this.onAddToCart,
-      this.onFavourite,
-      this.showQuickActionButtons = true,
-      this.quickActionColor = FORE_TEXT_COLOR,
-      this.priceTextColor = PRICE_COLOR_ON_FORE,
-      this.elevation = 1,
-      this.isFavorite = false});
+  CustomProductListItem({
+    this.backgroundColor = BACKGROUND_COLOR,
+    this.product,
+    this.cartIconKey,
+    this.onTap,
+    this.onAddToCart,
+    this.onFavourite,
+    this.showQuickActionButtons = true,
+    this.quickActionColor = FORE_TEXT_COLOR,
+    this.priceTextColor = PRICE_COLOR_ON_FORE,
+    this.elevation = 1,
+  });
 
+  @override
+  _CustomProductListItemState createState() => _CustomProductListItemState();
+}
+
+class _CustomProductListItemState extends State<CustomProductListItem>
+    with SingleTickerProviderStateMixin {
   final double height = 120;
+  bool isTapDown = false;
+  AnimationController _animationController;
+  Animation<double> _animationTween;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _animationController = AnimationController(
+      duration: Duration(milliseconds: 30),
+      vsync: this,
+    );
+    _animationTween =
+        Tween(begin: widget.elevation, end: 0.0).animate(_animationController);
+    _animationController.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +72,20 @@ class CustomProductListItem extends StatelessWidget {
 
     // TODO: implement build
     return CustomOnTapWidget(
-      onTap: onTap,
+      onTapDown: () {
+        _animationController.forward();
+      },
+      onTapUp: () {
+        _animationController.reverse();
+      },
+      onTap: widget.onTap,
       child: Container(
         height: height,
-        margin: EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+        margin:
+            EdgeInsets.only(left: 20, right: 20, bottom: widget.elevation + 10),
         child: Card(
-          elevation: elevation,
-          color: backgroundColor,
+          elevation: _animationTween.value,
+          color: widget.backgroundColor,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Container(
@@ -100,7 +130,7 @@ class CustomProductListItem extends StatelessWidget {
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               image: DecorationImage(
-                  image: CachedNetworkImageProvider(product.image),
+                  image: CachedNetworkImageProvider(widget.product.image),
                   fit: BoxFit.cover)),
         ),
       ),
@@ -110,23 +140,23 @@ class CustomProductListItem extends StatelessWidget {
   Widget buildInfo() {
     return Container(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            product.name ?? '',
+            widget.product.name ?? '',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TEXT_STYLE_ON_FOREGROUND.copyWith(
                 fontSize: 16, fontWeight: FontWeight.bold),
           ),
           Text(
-            numberToMoneyString(product.price) ?? '0đ',
+            numberToMoneyString(widget.product.price) ?? '0đ',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
                 letterSpacing: 1.2,
-                color: priceTextColor,
+                color: widget.priceTextColor,
                 fontSize: 16,
                 fontWeight: FontWeight.bold),
           ),
@@ -150,7 +180,7 @@ class CustomProductListItem extends StatelessWidget {
 //                            ),
 //                          ),
           Text(
-            product.description ?? '',
+            widget.product.description ?? '',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TEXT_STYLE_ON_FOREGROUND.copyWith(
@@ -161,64 +191,66 @@ class CustomProductListItem extends StatelessWidget {
     );
   }
 
-  Widget buildQuickActionButton(BuildContext context, GlobalKey inkwellKey) {
-    return showQuickActionButtons
+  Widget buildQuickActionButton(BuildContext context, GlobalKey onTapKey) {
+    return widget.showQuickActionButtons
         ? Column(
             children: <Widget>[
               Expanded(
                 flex: 1,
-                child: InkWell(
+                child: CustomOnTapWidget(
                   onTap: () {
                     if (currentLogin == null) {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (b) => LoginPage()));
                       return;
                     }
-                    if (onFavourite != null) {
-                      onFavourite();
+                    if (widget.onFavourite != null) {
+                      widget.onFavourite();
                     }
                   },
                   child: Container(
                       child: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: quickActionColor,
+                    widget.product.isFavoriteByCurrentUser
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    color: widget.quickActionColor,
                     size: 25,
                   )),
                 ),
               ),
               Expanded(
                 flex: 2,
-                child: InkWell(
-                  key: inkwellKey,
+                child: GestureDetector(
+                  key: onTapKey,
                   onTap: () async {
                     if (currentLogin == null) {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (b) => LoginPage()));
                       return;
                     }
-                    if (onAddToCart != null) {
+                    if (widget.onAddToCart != null) {
                       final RenderBox box =
-                          inkwellKey.currentContext.findRenderObject();
+                          onTapKey.currentContext.findRenderObject();
                       final Offset position = box.globalToLocal(Offset.zero);
                       var dx = position.dx * -1;
                       var dy = position.dy * -1;
                       //print(dx.toString() + " - " + dy.toString());
 
-                      updateCartIconPosition(cartIconKey: cartIconKey);
+                      updateCartIconPosition(cartIconKey: widget.cartIconKey);
 
                       await showAddToCartAnimation(context,
                           start: CustomPosition(dx, dy),
                           end: CustomPosition(
                               cartIconPositionDx, cartIconPositionDy));
-                      onAddToCart();
+                      widget.onAddToCart();
                     }
                   },
                   child: CircleAvatar(
-                    backgroundColor: quickActionColor,
+                    backgroundColor: widget.quickActionColor,
                     radius: 25,
                     child: Icon(
                       Icons.add_shopping_cart,
-                      color: backgroundColor,
+                      color: widget.backgroundColor,
                       size: 20,
                     ),
                   ),
@@ -503,7 +535,7 @@ class _CustomProductCartItemState extends State<CustomProductCartItem> {
   }
 }
 
-class CustomProductGridItem extends StatelessWidget {
+class CustomProductGridItem extends StatefulWidget {
   final GlobalKey cartIconKey;
   final ProductModel product;
   final Color priceTextColor;
@@ -514,8 +546,8 @@ class CustomProductGridItem extends StatelessWidget {
   final Function onAddToCart;
   final Function onFavourite;
   final Color backgroundColor;
-  final bool isFavorite;
   final double elevation;
+  final bool showQuickAction;
 
   CustomProductGridItem(
       {this.cartIconKey,
@@ -528,23 +560,50 @@ class CustomProductGridItem extends StatelessWidget {
       this.onFavourite,
       this.backgroundColor = BACKGROUND_COLOR,
       this.elevation = 1,
-      this.isFavorite});
+      this.showQuickAction = true});
+
+  @override
+  _CustomProductGridItemState createState() => _CustomProductGridItemState();
+}
+
+class _CustomProductGridItemState extends State<CustomProductGridItem>
+    with SingleTickerProviderStateMixin {
+  AnimationController animationController;
+  Animation animatedTween;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 30));
+    animatedTween =
+        Tween(begin: widget.elevation, end: 0.0).animate(animationController);
+    animatedTween.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     GlobalKey addToCartIconKey = GlobalKey();
-    double height = width * 1.3;
+    double height = widget.width * 1.3;
     return CustomOnTapWidget(
-      onTap: onTap,
-      child: Card(
-        color: backgroundColor,
-        elevation: elevation,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        child: Container(
-          width: width,
-          height: height,
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
+      onTapDown: () => animationController.forward(),
+      onTapUp: () => animationController.reverse(),
+      onTap: widget.onTap,
+      child: Container(
+        margin: EdgeInsets.only(bottom: widget.elevation + 5),
+        child: Card(
+          color: widget.backgroundColor,
+          elevation: animatedTween.value,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          child: Container(
+            width: widget.width,
+            height: height,
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
 //                              boxShadow: [
 //                                BoxShadow(
 //                                    color: Colors.black26,
@@ -552,115 +611,125 @@ class CustomProductGridItem extends StatelessWidget {
 //                                    blurRadius: 5)
 //                              ],
 
-              borderRadius: BorderRadius.circular(30)),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30)),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
 //
-                      image: DecorationImage(
-                          image: NetworkImage(product.image),
-                          fit: BoxFit.cover),
-                      color: PRIMARY_COLOR,
-                      borderRadius: BorderRadius.circular(25)),
+                        image: DecorationImage(
+                            image: NetworkImage(widget.product.image),
+                            fit: BoxFit.cover),
+                        color: PRIMARY_COLOR,
+                        borderRadius: BorderRadius.circular(25)),
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Column(
-                children: <Widget>[
-                  Text(
-                    product.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    numberToMoneyString(product.price),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                      color: PRICE_COLOR_ON_FORE,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      CustomOnTapWidget(
-                        onTap: () {
-                          if (currentLogin == null) {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (b) => LoginPage()));
-                            return;
-                          }
-                          if (onFavourite != null) {
-                            onFavourite();
-                          }
-                        },
-                        child: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          size: 25,
-                          color: FORE_TEXT_COLOR,
-                        ),
+                SizedBox(
+                  height: 5,
+                ),
+                Column(
+                  children: <Widget>[
+                    Text(
+                      widget.product.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
-                      SizedBox(
-                        width: 10,
+                    ),
+                    Text(
+                      numberToMoneyString(widget.product.price),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                        color: PRICE_COLOR_ON_FORE,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      CustomOnTapWidget(
-                        onTap: () async {
-                          if (currentLogin == null) {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (b) => LoginPage()));
-                            return;
-                          }
-                          if (onAddToCart != null) {
-                            final RenderBox box = addToCartIconKey
-                                .currentContext
-                                .findRenderObject();
-                            final Offset position =
-                                box.globalToLocal(Offset.zero);
-                            var dx = position.dx * -1;
-                            var dy = position.dy * -1;
-                            //print(dx.toString() + " - " + dy.toString());
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    widget.showQuickAction
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              CustomOnTapWidget(
+                                onTap: () {
+                                  if (currentLogin == null) {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (b) => LoginPage()));
+                                    return;
+                                  }
+                                  if (widget.onFavourite != null) {
+                                    widget.onFavourite();
+                                  }
+                                },
+                                child: Icon(
+                                  widget.product.isFavoriteByCurrentUser
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  size: 25,
+                                  color: FORE_TEXT_COLOR,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              CustomOnTapWidget(
+                                onTap: () async {
+                                  if (currentLogin == null) {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (b) => LoginPage()));
+                                    return;
+                                  }
+                                  if (widget.onAddToCart != null) {
+                                    final RenderBox box = addToCartIconKey
+                                        .currentContext
+                                        .findRenderObject();
+                                    final Offset position =
+                                        box.globalToLocal(Offset.zero);
+                                    var dx = position.dx * -1;
+                                    var dy = position.dy * -1;
+                                    //print(dx.toString() + " - " + dy.toString());
 
-                            updateCartIconPosition(cartIconKey: cartIconKey);
+                                    updateCartIconPosition(
+                                        cartIconKey: widget.cartIconKey);
 
-                            await showAddToCartAnimation(context,
-                                start: CustomPosition(dx, dy),
-                                end: CustomPosition(
-                                    cartIconPositionDx, cartIconPositionDy));
-                            onAddToCart();
-                          }
-                        },
-                        child: CircleAvatar(
-                          backgroundColor: quickActionColor,
-                          radius: 25,
-                          child: Icon(
-                            Icons.add_shopping_cart,
-                            key: addToCartIconKey,
-                            size: 25,
-                            color: backgroundColor,
-                          ),
-                        ),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ],
+                                    await showAddToCartAnimation(context,
+                                        start: CustomPosition(dx, dy),
+                                        end: CustomPosition(cartIconPositionDx,
+                                            cartIconPositionDy));
+                                    widget.onAddToCart();
+                                  }
+                                },
+                                child: CircleAvatar(
+                                  backgroundColor: widget.quickActionColor,
+                                  radius: 25,
+                                  child: Icon(
+                                    Icons.add_shopping_cart,
+                                    key: addToCartIconKey,
+                                    size: 25,
+                                    color: widget.backgroundColor,
+                                  ),
+                                ),
+                              )
+                            ],
+                          )
+                        : Container()
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -27,7 +27,8 @@ class ProductService extends BlocService<ProductModel> {
   Future<List<ProductModel>> getAll({int from = 0, int limit}) async {
     // TODO: implement getAll
 
-    var rs = await HttpHelper.get(PRODUCT_ENDPOINT + '?${getQueryString({'from': from, 'limit': limit})}');
+    var rs = await HttpHelper.get(PRODUCT_ENDPOINT +
+        '?${getQueryString({'from': from, 'limit': limit})}');
     if (rs.statusCode == 200) {
       var jsonList = jsonDecode(rs.body) as List;
       // print(jsonList.toList());
@@ -41,14 +42,16 @@ class ProductService extends BlocService<ProductModel> {
   }
 
   ProductModel _checkIsFavoriteByCurrentUser(ProductModel product) {
-    var favorite = FavoriteService().getFavoriteFromLocalByProductId(product.id);
+    var favorite =
+        FavoriteService().getFavoriteFromLocalByProductId(product.id);
     if (favorite != null) {
       product.isFavoriteByCurrentUser = favorite.isfavorite;
     }
     return product;
   }
 
-  ProductModel _checkIsFavoriteByFavoriteModel({ProductModel productModel, FavoriteModel favoriteModel}) {
+  ProductModel _checkIsFavoriteByFavoriteModel(
+      {ProductModel productModel, FavoriteModel favoriteModel}) {
     if (favoriteModel != null) {
       productModel.isFavoriteByCurrentUser = favoriteModel.isfavorite;
     }
@@ -56,16 +59,20 @@ class ProductService extends BlocService<ProductModel> {
   }
 
   Future<ProductModel> doFavorite(ProductModel productModel) async {
-    var favorite = await FavoriteService().doFavorite(productID: productModel.id);
-    var rs = _checkIsFavoriteByFavoriteModel(productModel: productModel, favoriteModel: favorite);
+    var favorite =
+        await FavoriteService().doFavorite(productID: productModel.id);
+    var rs = _checkIsFavoriteByFavoriteModel(
+        productModel: productModel, favoriteModel: favorite);
     // print(jsonEncode(rs.isFavoriteByCurrentUser));
     return rs;
   }
 
-  Future<List<ProductModel>> getAllWithCategoryId(int categoryID, {int from = 0, int limit}) async {
+  Future<List<ProductModel>> getAllWithCategoryId(int categoryID,
+      {int from = 0, int limit}) async {
     // TODO: implement getAll
-    var rs = await HttpHelper.get(
-        PRODUCT_ENDPOINT + "?categoryID=$categoryID" + '&${getQueryString({'from': from, 'limit': limit})}');
+    var rs = await HttpHelper.get(PRODUCT_ENDPOINT +
+        "?categoryID=$categoryID" +
+        '&${getQueryString({'from': from, 'limit': limit})}');
     if (rs.statusCode == 200) {
       var jsonList = jsonDecode(rs.body) as List;
       // print(jsonList.toList());
@@ -80,7 +87,33 @@ class ProductService extends BlocService<ProductModel> {
 
   Future<List<ProductModel>> getProductsForYou() async {
     if (currentLogin != null) {
-      var rs = await HttpHelper.get(PRODUCT_ENDPOINT + "/foryou", bearerToken: currentLogin.token);
+      var rs = await HttpHelper.get(PRODUCT_ENDPOINT + "/foryou",
+          bearerToken: currentLogin.token);
+      if (rs.statusCode == 200) {
+        var jsonList = jsonDecode(rs.body) as List;
+        var products = jsonList.map((j) => ProductModel.fromJson(j)).toList();
+        for (var product in products) {
+          product = _checkIsFavoriteByCurrentUser(product);
+        }
+        return products;
+      }
+      return null;
+    }
+    return getAll(limit: 10, from: Random().nextInt(10));
+  }
+
+  Future<List<ProductModel>> searchProduct(String keyword,
+      {int limit, int from = 0}) async {
+    if (currentLogin != null) {
+      var rs = await HttpHelper.post(
+          PRODUCT_ENDPOINT +
+              "/search?${getQueryString({
+                'keyword': keyword,
+                'from': from,
+                'limit': limit
+              })}",
+          {},
+          bearerToken: currentLogin.token);
       if (rs.statusCode == 200) {
         var jsonList = jsonDecode(rs.body) as List;
         var products = jsonList.map((j) => ProductModel.fromJson(j)).toList();

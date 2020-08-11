@@ -2,7 +2,9 @@
 using SHOPii.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SHOPii.Helpers
@@ -23,6 +25,24 @@ namespace SHOPii.Helpers
                 return queryable.Skip(takeFrom);
             }
             return queryable.Skip(takeFrom).Take(takeLimit);
+        }
+
+
+        public static String removeAccents(String input)
+        {
+            var normalizedString = input.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
 
     }

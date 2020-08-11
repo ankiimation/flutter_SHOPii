@@ -133,8 +133,6 @@ class _FavoritePageState extends State<FavoritePage> {
                                 //LoadingDialog.hideLoadingDialog(context);
                               },
                               product: favoriteProduct,
-                              isFavorite:
-                                  favoriteProduct.isFavoriteByCurrentUser,
                               backgroundColor: FOREGROUND_COLOR,
                             ))
                         .toList()),

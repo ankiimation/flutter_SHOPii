@@ -175,7 +175,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
         statusIcon = Icon(
           Icons.repeat,
           size: 20,
-          color: FOREGROUND_COLOR,
+          color: Colors.amber,
         );
         break;
       case 2:
@@ -231,8 +231,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
         ? FlatButton(
             onPressed: () async {
               LoadingDialog.showConfirm(context,
-                  text: 'Do you wanna cancel this order?',
-                  onYes: () async {
+                  text: 'Do you wanna cancel this order?', onYes: () async {
                 LoadingDialog.showLoadingDialog(context,
                     text: 'Cancelling order...');
                 await bloc.cancelOrdering(orderingModel.id);
@@ -275,7 +274,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
                       TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '${numberToMoneyString(total)} đ',
+                  '${numberToMoneyString(total)}',
                   style: TEXT_STYLE_PRIMARY.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,

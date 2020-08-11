@@ -2,13 +2,14 @@ import 'dart:async';
 
 import 'package:ankiishopii/blocs/cart_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/cart_bloc/event.dart';
-import 'package:ankiishopii/blocs/cart_bloc/service.dart';
 import 'package:ankiishopii/blocs/cart_bloc/state.dart';
 import 'package:ankiishopii/global/global_function.dart';
+import 'package:ankiishopii/global/global_variable.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/helpers/string_helper.dart';
 import 'package:ankiishopii/models/ordering_model.dart';
 import 'package:ankiishopii/models/product_model.dart';
+import 'package:ankiishopii/pages/account/login_page.dart';
 import 'package:ankiishopii/pages/checkout/check_out_page.dart';
 import 'package:ankiishopii/pages/product/product_detail_page.dart';
 import 'package:ankiishopii/themes/constant.dart';
@@ -16,9 +17,7 @@ import 'package:ankiishopii/widgets/app_bar.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
 import 'package:ankiishopii/widgets/debug_widget.dart';
 import 'package:ankiishopii/widgets/graphic_widget.dart';
-import 'package:ankiishopii/widgets/loading_dialog.dart';
 import 'package:ankiishopii/widgets/product_item.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,6 +38,7 @@ class _CartPageState extends State<CartPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     bloc = BlocProvider.of<CartBloc>(context);
     _scrollController.addListener(() {
       bool isScrollUp = _scrollController.position.userScrollDirection ==
@@ -62,23 +62,23 @@ class _CartPageState extends State<CartPage> {
           cubit: bloc,
           builder: (context, state) {
             if (state is CartLoaded) {
-              return Column(
+              return Stack(
                 children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        physics: AlwaysScrollableScrollPhysics(),
-                        child: Column(
-                          children: <Widget>[
-                            buildAppBar(),
-                            buildCartDetail(state.cart)
-                          ],
-                        ),
+                  Container(
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      physics: AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        children: <Widget>[
+                          buildAppBar(),
+                          buildCartDetail(state.cart)
+                        ],
                       ),
                     ),
                   ),
-                  buildNavigation(state.cart)
+                  Align(
+                      alignment: Alignment.bottomCenter,
+                      child: buildNavigation(state.cart))
                 ],
               );
             } else if (state is CartError) {
@@ -110,57 +110,75 @@ class _CartPageState extends State<CartPage> {
       return StreamBuilder(
           stream: _scrollStreamController.stream,
           builder: (context, snapshot) {
-            return AnimatedContainer(
+            return AnimatedSwitcher(
               duration: Duration(milliseconds: 100),
-              decoration: BoxDecoration(color: BACKGROUND_COLOR, boxShadow: [
-                BoxShadow(
-                    color: Colors.black26, offset: Offset(0, -2), blurRadius: 2)
-              ]),
-              height: snapshot.hasData && snapshot.data == true ? 0 : 55,
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                      child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          'Total:',
-                          style: TEXT_STYLE_PRIMARY.copyWith(
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          numberToMoneyString(total) + "d",
-                          style: TEXT_STYLE_PRIMARY.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                              color: PRICE_COLOR_PRIMARY),
-                        )
-                      ],
-                    ),
-                  )),
-                  CustomOnTapWidget(
-                    onTap: () async {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (b) => CheckOutPage(cart)));
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(10),
+              child: snapshot.hasData && snapshot.data == true
+                  ? null
+                  : Container(
+                      margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
+                      decoration: BoxDecoration(
+                          color: BACKGROUND_COLOR,
+                          boxShadow: [
+                            BoxShadow(color: Colors.black26, blurRadius: 5),
+                          ],
+                          borderRadius: BorderRadius.circular(10)),
                       height: 55,
-                      width: 110,
-                      color: FOREGROUND_COLOR,
-                      child: Icon(
-                        Icons.forward,
-                        size: 25,
-                        color: FORE_TEXT_COLOR,
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  'Total:',
+                                  style: TEXT_STYLE_PRIMARY.copyWith(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  numberToMoneyString(total),
+                                  style: TEXT_STYLE_PRIMARY.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      color: PRICE_COLOR_PRIMARY),
+                                )
+                              ],
+                            ),
+                          )),
+                          CustomOnTapWidget(
+                            onTap: () async {
+                              if (currentLogin == null) {
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (b) => LoginPage()));
+                              } else {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (b) => CheckOutPage(cart)));
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              height: 55,
+                              width: 110,
+                              decoration: BoxDecoration(
+                                  color: FOREGROUND_COLOR,
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(10),
+                                      bottomRight: Radius.circular(10))),
+                              child: Icon(
+                                Icons.forward,
+                                size: 25,
+                                color: FORE_TEXT_COLOR,
+                              ),
+                            ),
+                          )
+                        ],
                       ),
                     ),
-                  )
-                ],
-              ),
             );
           });
     }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ankiishopii/blocs/product_bloc/bloc.dart';
 import 'package:ankiishopii/blocs/product_bloc/event.dart';
 import 'package:ankiishopii/blocs/product_bloc/state.dart';
@@ -19,7 +21,17 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  ProductBloc bloc = ProductBloc(ProductLoading())..add(GetAllProducts());
+  ProductBloc bloc = ProductBloc(ProductLoading())..add(GetProductsForYou());
+  TextEditingController textEditingController = TextEditingController();
+
+  Timer searchTimer;
+  onChangeSearch(String s){
+    if(searchTimer!=null){
+      searchTimer.cancel();
+    }else{
+      
+    }
+  }
 
   @override
   void dispose() {
@@ -81,13 +93,22 @@ class _SearchPageState extends State<SearchPage> {
                     Expanded(
                         child: Container(
                       child: TextField(
+                        controller: textEditingController,
+                        onSubmitted: (s) {
+                          bloc.add(SearchProduct(s));
+                        },
+                        onChanged: (s) {
+                          bloc.add(SearchProduct(s));
+                        },
                         textAlignVertical: TextAlignVertical.center,
                         decoration: InputDecoration(
                             hintText: 'Search', border: InputBorder.none),
                       ),
                     )),
                     CustomOnTapWidget(
-                      onTap: () {},
+                      onTap: () {
+                        bloc.add(SearchProduct(textEditingController.text));
+                      },
                       child: Icon(
                         Icons.search,
                         color: PRIMARY_TEXT_COLOR,
@@ -128,8 +149,10 @@ class _SearchPageState extends State<SearchPage> {
               child: CustomDotLoading(),
             );
           } else {
-            return CustomErrorWidget(
-              error: 'No Result',
+            return Center(
+              child: CustomErrorWidget(
+                error: 'No Result',
+              ),
             );
           }
         });

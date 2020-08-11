@@ -4,9 +4,8 @@ abstract class BlocService<M> {
   String getQueryString(Map<String, dynamic> condition) {
     String result = '';
     for (var key in condition.keys) {
-      String value = condition[key] is String
-          ? '\'${condition[key].toString()}\''
-          : condition[key] == null ? '' : '${condition[key].toString()}';
+      String value =
+          condition[key] == null ? '' : '${condition[key].toString()}';
       result += '&$key=$value';
     }
     //remove first &

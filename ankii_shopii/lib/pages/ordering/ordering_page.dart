@@ -122,21 +122,19 @@ class _OrderingPageState extends State<OrderingPage> {
                     margin: EdgeInsets.only(bottom: 100),
                     child: Column(
                       children: orders
-                          .map<Widget>((o) => CustomOnTapWidget(
-                                onTap: () async {
-                                  await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (b) =>
-                                              OrderingDetailPage(o)));
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                      left: 20, right: 20, top: 10),
-                                  child: CustomOrderItem(
-                                    elevation: 10,
-                                    orderingModel: o,
-                                  ),
+                          .map<Widget>((o) => Container(
+                                margin: EdgeInsets.only(left: 20, right: 20),
+                                child: CustomOrderItem(
+                                  elevation: 10,
+                                  orderingModel: o,
+                                  onTap: () async {
+                                    await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (b) =>
+                                                OrderingDetailPage(o)));
+                                    bloc.add(GetAllOrdering());
+                                  },
                                 ),
                               ))
                           .toList(),
@@ -155,10 +153,10 @@ class _OrderingPageState extends State<OrderingPage> {
                       ? Icons.local_shipping
                       : status == 3 ? Icons.check_circle : Icons.cancel;
               Color color = status == 1
-                  ? Color(0xfffec821)
+                  ? Color(0xffFFCC2E)
                   : status == 2
                       ? Colors.orange
-                      : status == 3 ? Colors.green : Colors.black26;
+                      : status == 3 ? Colors.green : Colors.red;
               return CustomTabViewItem(
                   icon: icon,
                   label: label,
@@ -171,22 +169,19 @@ class _OrderingPageState extends State<OrderingPage> {
                       child: Column(
                         children: orders
                             .where((o) => o.status == status)
-                            .map<Widget>((o) => CustomOnTapWidget(
-                                  onTap: () async {
-                                    await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (b) =>
-                                                OrderingDetailPage(o)));
-                                    bloc.add(GetAllOrdering());
-                                  },
-                                  child: Container(
-                                    margin: EdgeInsets.only(
-                                        left: 20, right: 20, top: 10),
-                                    child: CustomOrderItem(
-                                      elevation: 10,
-                                      orderingModel: o,
-                                    ),
+                            .map<Widget>((o) => Container(
+                                  margin: EdgeInsets.only(left: 20, right: 20),
+                                  child: CustomOrderItem(
+                                    elevation: 10,
+                                    orderingModel: o,
+                                    onTap: () async {
+                                      await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (b) =>
+                                                  OrderingDetailPage(o)));
+                                      bloc.add(GetAllOrdering());
+                                    },
                                   ),
                                 ))
                             .toList(),

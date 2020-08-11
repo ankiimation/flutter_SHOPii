@@ -117,7 +117,6 @@ class _ProductPageState extends State<ProductPage> {
               },
               product: product,
               backgroundColor: FOREGROUND_COLOR,
-              isFavorite: product.isFavoriteByCurrentUser,
               onFavourite: () async {
                 _doFavorite(product);
               },
