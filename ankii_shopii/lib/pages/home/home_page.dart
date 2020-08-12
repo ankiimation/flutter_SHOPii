@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                 height: 20,
               ),
               buildForYou(),
-              buildCategories()
+              buildShops()
             ]),
           ),
           buildSearchBar()
@@ -183,7 +183,6 @@ class _HomePageState extends State<HomePage> {
                     children: <Widget>[
                       Expanded(
                           child: Container(
-                        color: BACKGROUND_COLOR,
                         child: TextField(
                           decoration: InputDecoration(
                               contentPadding:
@@ -204,7 +203,7 @@ class _HomePageState extends State<HomePage> {
                       )
                     ],
                   )),
-              color: Colors.white,
+              color: BACKGROUND_COLOR,
             ),
           )
         ],
@@ -240,7 +239,8 @@ class _HomePageState extends State<HomePage> {
                           scrollDirection: Axis.horizontal,
                           children: state.products
                               .map<Widget>((product) => Container(
-                                    margin: EdgeInsets.only(left: 10),
+                                    margin:
+                                        EdgeInsets.only(left: 10, bottom: 20),
                                     child: CustomProductGridItem(
                                       elevation: 5,
                                       cartIconKey: _cartIconKey,
@@ -289,9 +289,10 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  Widget buildCategories() {
+  Widget buildShops() {
     return Container(
-      height: 1000,
+      height: 500,
+      color: FOREGROUND_COLOR,
     );
   }
 }

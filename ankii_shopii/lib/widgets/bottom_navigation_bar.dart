@@ -7,6 +7,8 @@ class CustomBottomNavigationBar extends StatefulWidget {
   final bool barShadow;
   final Color backgroundColor;
   final Color itemColor;
+  final Color selectedItemColor;
+  final Color overlayColor;
   final List<CustomBottomNavigationItem> children;
   final Function(int) onChange;
   final int currentIndex;
@@ -17,6 +19,8 @@ class CustomBottomNavigationBar extends StatefulWidget {
       this.itemColor = PRIMARY_COLOR,
       this.currentIndex = 0,
       @required this.children,
+      this.selectedItemColor = FORE_TEXT_COLOR,
+      this.overlayColor = PRIMARY_COLOR,
       this.onChange});
 
   @override
@@ -73,9 +77,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                   color: widget.currentIndex == index
-                      ? color
-                      : color.withOpacity(0),
-                  borderRadius: BorderRadius.circular(20)),
+                      ? widget.overlayColor
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(5)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
@@ -83,7 +87,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                     icon,
                     size: 20,
                     color: widget.currentIndex == index
-                        ? widget.backgroundColor
+                        ? widget.selectedItemColor
                         : color.withOpacity(0.5),
                   ),
                   Expanded(
@@ -95,7 +99,8 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                                 label ?? '',
                                 overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(color: widget.backgroundColor),
+                                style:
+                                    TextStyle(color: widget.selectedItemColor),
                               )
                             : Container(),
                       ))

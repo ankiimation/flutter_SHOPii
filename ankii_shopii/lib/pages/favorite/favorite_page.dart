@@ -110,32 +110,35 @@ class _FavoritePageState extends State<FavoritePage> {
               icon: Icons.favorite,
               child: SingleChildScrollView(
                 controller: widget.scrollController,
-                child: Column(
-                    children: favoriteProducts
-                        .map((favoriteProduct) => CustomProductListItem(
-                              elevation: 10,
-                              cartIconKey: cartIconKey,
-                              onTap: () async {
-                                await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (b) => ProductDetailPage(
-                                            favoriteProduct)));
-                                bloc.add(GetAllProducts());
-                              },
-                              onFavourite: () {
-                                _doFavorite(favoriteProduct);
-                              },
-                              onAddToCart: () async {
-                                // LoadingDialog.showLoadingDialog(context);
-                                await addToCart(context,
-                                    productID: favoriteProduct.id, count: 1);
-                                //LoadingDialog.hideLoadingDialog(context);
-                              },
-                              product: favoriteProduct,
-                              backgroundColor: FOREGROUND_COLOR,
-                            ))
-                        .toList()),
+                child: Container(
+                  margin: EdgeInsets.only(top: 10, bottom: 100),
+                  child: Column(
+                      children: favoriteProducts
+                          .map((favoriteProduct) => CustomProductListItem(
+                                elevation: 10,
+                                cartIconKey: cartIconKey,
+                                onTap: () async {
+                                  await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (b) => ProductDetailPage(
+                                              favoriteProduct)));
+                                  bloc.add(GetAllProducts());
+                                },
+                                onFavourite: () {
+                                  _doFavorite(favoriteProduct);
+                                },
+                                onAddToCart: () async {
+                                  // LoadingDialog.showLoadingDialog(context);
+                                  await addToCart(context,
+                                      productID: favoriteProduct.id, count: 1);
+                                  //LoadingDialog.hideLoadingDialog(context);
+                                },
+                                product: favoriteProduct,
+                                backgroundColor: FOREGROUND_COLOR,
+                              ))
+                          .toList()),
+                ),
               ));
         }).toList());
   }

@@ -119,7 +119,7 @@ class _OrderingPageState extends State<OrderingPage> {
                   physics: AlwaysScrollableScrollPhysics(),
                   controller: widget.scrollController,
                   child: Container(
-                    margin: EdgeInsets.only(bottom: 100),
+                    margin: EdgeInsets.only(top: 10, bottom: 100),
                     child: Column(
                       children: orders
                           .map<Widget>((o) => Container(
@@ -165,7 +165,7 @@ class _OrderingPageState extends State<OrderingPage> {
                     physics: AlwaysScrollableScrollPhysics(),
                     controller: widget.scrollController,
                     child: Container(
-                      margin: EdgeInsets.only(bottom: 100),
+                      margin: EdgeInsets.only(top: 10, bottom: 100),
                       child: Column(
                         children: orders
                             .where((o) => o.status == status)

@@ -47,23 +47,11 @@ class CustomProductListItem extends StatefulWidget {
 class _CustomProductListItemState extends State<CustomProductListItem>
     with SingleTickerProviderStateMixin {
   final double height = 120;
-  bool isTapDown = false;
-  AnimationController _animationController;
-  Animation<double> _animationTween;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _animationController = AnimationController(
-      duration: Duration(milliseconds: 30),
-      vsync: this,
-    );
-    _animationTween =
-        Tween(begin: widget.elevation, end: 0.0).animate(_animationController);
-    _animationController.addListener(() {
-      setState(() {});
-    });
   }
 
   @override
@@ -71,45 +59,37 @@ class _CustomProductListItemState extends State<CustomProductListItem>
     GlobalKey inkwellKey = GlobalKey();
 
     // TODO: implement build
-    return CustomOnTapWidget(
-      onTapDown: () {
-        _animationController.forward();
-      },
-      onTapUp: () {
-        _animationController.reverse();
-      },
-      onTap: widget.onTap,
-      child: Container(
-        height: height,
-        margin:
-            EdgeInsets.only(left: 20, right: 20, bottom: widget.elevation + 10),
-        child: Card(
-          elevation: _animationTween.value,
-          color: widget.backgroundColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          child: Container(
-            padding: EdgeInsets.only(top: 10, right: 15, left: 10, bottom: 10),
-            child: Row(
-              children: <Widget>[
-                buildImage(),
-                SizedBox(
-                  width: 10,
+    return Container(
+      height: height,
+      margin:
+          EdgeInsets.only(left: 20, right: 20, bottom: widget.elevation + 10),
+      child: RaisedButton(
+        onPressed: widget.onTap,
+        elevation: widget.elevation,
+        color: widget.backgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        padding: EdgeInsets.all(0),
+        child: Container(
+          padding: EdgeInsets.only(top: 10, right: 15, left: 10, bottom: 10),
+          child: Row(
+            children: <Widget>[
+              buildImage(),
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(child: buildInfo()),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    buildQuickActionButton(context, inkwellKey)
+                  ],
                 ),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Expanded(child: buildInfo()),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      buildQuickActionButton(context, inkwellKey)
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -194,65 +174,64 @@ class _CustomProductListItemState extends State<CustomProductListItem>
   Widget buildQuickActionButton(BuildContext context, GlobalKey onTapKey) {
     return widget.showQuickActionButtons
         ? Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Expanded(
-                flex: 1,
-                child: CustomOnTapWidget(
-                  onTap: () {
-                    if (currentLogin == null) {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (b) => LoginPage()));
-                      return;
-                    }
-                    if (widget.onFavourite != null) {
-                      widget.onFavourite();
-                    }
-                  },
-                  child: Container(
-                      child: Icon(
-                    widget.product.isFavoriteByCurrentUser
-                        ? Icons.favorite
-                        : Icons.favorite_border,
-                    color: widget.quickActionColor,
-                    size: 25,
-                  )),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: GestureDetector(
-                  key: onTapKey,
-                  onTap: () async {
-                    if (currentLogin == null) {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (b) => LoginPage()));
-                      return;
-                    }
-                    if (widget.onAddToCart != null) {
-                      final RenderBox box =
-                          onTapKey.currentContext.findRenderObject();
-                      final Offset position = box.globalToLocal(Offset.zero);
-                      var dx = position.dx * -1;
-                      var dy = position.dy * -1;
-                      //print(dx.toString() + " - " + dy.toString());
-
-                      updateCartIconPosition(cartIconKey: widget.cartIconKey);
-
-                      await showAddToCartAnimation(context,
-                          start: CustomPosition(dx, dy),
-                          end: CustomPosition(
-                              cartIconPositionDx, cartIconPositionDy));
-                      widget.onAddToCart();
-                    }
-                  },
-                  child: CircleAvatar(
-                    backgroundColor: widget.quickActionColor,
-                    radius: 25,
+              CustomOnTapWidget(
+                onTap: () {
+                  if (currentLogin == null) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (b) => LoginPage()));
+                    return;
+                  }
+                  if (widget.onFavourite != null) {
+                    widget.onFavourite();
+                  }
+                },
+                child: Container(
                     child: Icon(
-                      Icons.add_shopping_cart,
-                      color: widget.backgroundColor,
-                      size: 20,
-                    ),
+                  widget.product.isFavoriteByCurrentUser
+                      ? Icons.favorite
+                      : Icons.favorite_border,
+                  color: widget.quickActionColor,
+                  size: 25,
+                )),
+              ),
+              ClipOval(
+                child: Material(
+                  color: widget.quickActionColor, // button color
+                  child: InkWell(
+                    key: onTapKey,
+                    splashColor: widget.backgroundColor, // inkwell color
+                    child: SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: Icon(
+                          Icons.add_shopping_cart,
+                          color: widget.backgroundColor,
+                        )),
+                    onTap: () async {
+                      if (currentLogin == null) {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (b) => LoginPage()));
+                        return;
+                      }
+                      if (widget.onAddToCart != null) {
+                        final RenderBox box =
+                            onTapKey.currentContext.findRenderObject();
+                        final Offset position = box.globalToLocal(Offset.zero);
+                        var dx = position.dx * -1;
+                        var dy = position.dy * -1;
+                        //print(dx.toString() + " - " + dy.toString());
+
+                        updateCartIconPosition(cartIconKey: widget.cartIconKey);
+
+                        await showAddToCartAnimation(context,
+                            start: CustomPosition(dx, dy),
+                            end: CustomPosition(
+                                cartIconPositionDx, cartIconPositionDy));
+                        widget.onAddToCart();
+                      }
+                    },
                   ),
                 ),
               ),
@@ -566,173 +545,148 @@ class CustomProductGridItem extends StatefulWidget {
   _CustomProductGridItemState createState() => _CustomProductGridItemState();
 }
 
-class _CustomProductGridItemState extends State<CustomProductGridItem>
-    with SingleTickerProviderStateMixin {
-  AnimationController animationController;
-  Animation animatedTween;
-
+class _CustomProductGridItemState extends State<CustomProductGridItem> {
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 30));
-    animatedTween =
-        Tween(begin: widget.elevation, end: 0.0).animate(animationController);
-    animatedTween.addListener(() {
-      setState(() {});
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    GlobalKey addToCartIconKey = GlobalKey();
     double height = widget.width * 1.3;
-    return CustomOnTapWidget(
-      onTapDown: () => animationController.forward(),
-      onTapUp: () => animationController.reverse(),
-      onTap: widget.onTap,
-      child: Container(
-        margin: EdgeInsets.only(bottom: widget.elevation + 5),
-        child: Card(
-          color: widget.backgroundColor,
-          elevation: animatedTween.value,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-          child: Container(
-            width: widget.width,
-            height: height,
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-//                              boxShadow: [
-//                                BoxShadow(
-//                                    color: Colors.black26,
-//                                    offset: Offset(5, 5),
-//                                    blurRadius: 5)
-//                              ],
-
-                borderRadius: BorderRadius.circular(30)),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
+    return Container(
+//      margin: EdgeInsets.only(bottom: widget.elevation),
+      width: widget.width,
+      height: height,
+      child: RaisedButton(
+        color: widget.backgroundColor,
+        elevation: widget.elevation,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        padding: EdgeInsets.all(10),
+        onPressed: () {
+          widget.onTap();
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
 //
-                        image: DecorationImage(
-                            image: NetworkImage(widget.product.image),
-                            fit: BoxFit.cover),
-                        color: PRIMARY_COLOR,
-                        borderRadius: BorderRadius.circular(25)),
+                    image: DecorationImage(
+                        image: NetworkImage(widget.product.image),
+                        fit: BoxFit.cover),
+                    color: PRIMARY_COLOR,
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Column(
+              children: <Widget>[
+                Text(
+                  widget.product.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  numberToMoneyString(widget.product.price),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                    color: PRICE_COLOR_ON_FORE,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
-                Column(
-                  children: <Widget>[
-                    Text(
-                      widget.product.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      numberToMoneyString(widget.product.price),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: TEXT_STYLE_ON_FOREGROUND.copyWith(
-                        color: PRICE_COLOR_ON_FORE,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    widget.showQuickAction
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              CustomOnTapWidget(
-                                onTap: () {
-                                  if (currentLogin == null) {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (b) => LoginPage()));
-                                    return;
-                                  }
-                                  if (widget.onFavourite != null) {
-                                    widget.onFavourite();
-                                  }
-                                },
-                                child: Icon(
-                                  widget.product.isFavoriteByCurrentUser
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                  size: 25,
-                                  color: FORE_TEXT_COLOR,
-                                ),
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              CustomOnTapWidget(
-                                onTap: () async {
-                                  if (currentLogin == null) {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (b) => LoginPage()));
-                                    return;
-                                  }
-                                  if (widget.onAddToCart != null) {
-                                    final RenderBox box = addToCartIconKey
-                                        .currentContext
-                                        .findRenderObject();
-                                    final Offset position =
-                                        box.globalToLocal(Offset.zero);
-                                    var dx = position.dx * -1;
-                                    var dy = position.dy * -1;
-                                    //print(dx.toString() + " - " + dy.toString());
-
-                                    updateCartIconPosition(
-                                        cartIconKey: widget.cartIconKey);
-
-                                    await showAddToCartAnimation(context,
-                                        start: CustomPosition(dx, dy),
-                                        end: CustomPosition(cartIconPositionDx,
-                                            cartIconPositionDy));
-                                    widget.onAddToCart();
-                                  }
-                                },
-                                child: CircleAvatar(
-                                  backgroundColor: widget.quickActionColor,
-                                  radius: 25,
-                                  child: Icon(
-                                    Icons.add_shopping_cart,
-                                    key: addToCartIconKey,
-                                    size: 25,
-                                    color: widget.backgroundColor,
-                                  ),
-                                ),
-                              )
-                            ],
-                          )
-                        : Container()
-                  ],
-                ),
+                widget.showQuickAction ? buildQuickAction() : Container()
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildQuickAction() {
+    GlobalKey addToCartIconKey = GlobalKey();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        CustomOnTapWidget(
+          onTap: () {
+            if (currentLogin == null) {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (b) => LoginPage()));
+              return;
+            }
+            if (widget.onFavourite != null) {
+              widget.onFavourite();
+            }
+          },
+          child: Icon(
+            widget.product.isFavoriteByCurrentUser
+                ? Icons.favorite
+                : Icons.favorite_border,
+            size: 25,
+            color: FORE_TEXT_COLOR,
+          ),
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        ClipOval(
+          child: Material(
+            color: widget.quickActionColor, // button color
+            child: InkWell(
+              key: addToCartIconKey,
+              splashColor: widget.backgroundColor,
+              // inkwell color
+              child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: Icon(
+                    Icons.add_shopping_cart,
+                    color: widget.backgroundColor,
+                  )),
+              onTap: () async {
+                if (currentLogin == null) {
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (b) => LoginPage()));
+                  return;
+                }
+                if (widget.onAddToCart != null) {
+                  final RenderBox box =
+                      addToCartIconKey.currentContext.findRenderObject();
+                  final Offset position = box.globalToLocal(Offset.zero);
+                  var dx = position.dx * -1;
+                  var dy = position.dy * -1;
+                  //print(dx.toString() + " - " + dy.toString());
+
+                  updateCartIconPosition(cartIconKey: widget.cartIconKey);
+
+                  await showAddToCartAnimation(context,
+                      start: CustomPosition(dx, dy),
+                      end: CustomPosition(
+                          cartIconPositionDx, cartIconPositionDy));
+                  widget.onAddToCart();
+                }
+              },
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

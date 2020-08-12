@@ -89,6 +89,8 @@ class InPageAppBar extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Container(
+                width: 20,
+                height: 20,
                 margin: EdgeInsets.only(right: this.leading != null ? 10 : 0),
                 child: this.leading),
             Expanded(
@@ -101,7 +103,7 @@ class InPageAppBar extends StatelessWidget {
                           title ?? '',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 30),
+                          style: TEXT_STYLE_PRIMARY.copyWith(fontSize: 20),
                         ),
                   ),
                   Row(
@@ -116,6 +118,7 @@ class InPageAppBar extends StatelessWidget {
                               },
                               child: Icon(
                                 Icons.search,
+                                size: 20,
                                 color: PRIMARY_TEXT_COLOR,
                               ),
                             )
@@ -135,7 +138,7 @@ class InPageAppBar extends StatelessWidget {
                                           MaterialPageRoute(
                                               builder: (b) => CartPage()));
                                     },
-                                    child: CartWidget(cartIconKey),
+                                    child: CartWidget(cartIconKey,size: 20,),
                                   );
                                 }
                                 return Container();

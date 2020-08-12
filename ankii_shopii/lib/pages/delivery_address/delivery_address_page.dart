@@ -95,7 +95,8 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
   Widget buildAddNewAddressButton() {
     return CustomOnTapWidget(
       onTap: () async {
-        await Navigator.push(context, MaterialPageRoute(builder: (b) => AddDeliveryAddressPage()));
+        await Navigator.push(context,
+            MaterialPageRoute(builder: (b) => AddDeliveryAddressPage()));
         bloc.add(GetAllDeliveryAddresses());
       },
       child: Container(
@@ -115,13 +116,15 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
     return Column(
         mainAxisSize: MainAxisSize.min,
         children: deliveryAddresses
-            .map<Widget>((address) =>
-                Container(margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10), child: addressItem(address)))
+            .map<Widget>((address) => Container(
+                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                child: addressItem(address)))
             .toList());
   }
 
   Widget addressItem(DeliveryAddressModel deliveryAddressModel) {
-    bool isDefault = deliveryAddressModel.id == currentLogin.account.defaultDeliveryId;
+    bool isDefault =
+        deliveryAddressModel.id == currentLogin.account.defaultDeliveryId;
     return Column(
       children: <Widget>[
         Row(
@@ -144,11 +147,15 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                   alignment: Alignment.center,
                   width: double.maxFinite,
                   height: 30,
-                  color: isDefault ? PRIMARY_COLOR : PRIMARY_COLOR.withOpacity(0.1),
+                  color: isDefault
+                      ? PRIMARY_COLOR
+                      : PRIMARY_COLOR.withOpacity(0.1),
                   child: isDefault
                       ? Text(
                           'Default Address',
-                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, color: FOREGROUND_COLOR),
+                          style: TEXT_STYLE_PRIMARY.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: FOREGROUND_COLOR),
                         )
                       : Text(
                           'Tap to set default delivery address',
@@ -201,7 +208,12 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Expanded(flex: 1, child: Text('Name:')),
+                      Expanded(
+                          flex: 1,
+                          child: Text(
+                            'Name:',
+                            style: TEXT_STYLE_ON_FOREGROUND,
+                          )),
                       SizedBox(
                         width: 20,
                       ),
@@ -210,7 +222,8 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                         child: Text(
                           deliveryAddressModel.fullname,
                           textAlign: TextAlign.right,
-                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       )
                     ],
@@ -222,13 +235,17 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Expanded(flex: 1, child: Text('Address:')),
+                      Expanded(
+                          flex: 1,
+                          child: Text('Address:',
+                              style: TEXT_STYLE_ON_FOREGROUND)),
                       Expanded(
                         flex: 2,
                         child: Text(
                           deliveryAddressModel.address,
                           textAlign: TextAlign.right,
-                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                              fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                       )
                     ],
@@ -240,13 +257,17 @@ class _DeliveryAddressPageState extends State<DeliveryAddressPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Expanded(flex: 1, child: Text('Phone:')),
+                      Expanded(
+                          flex: 1,
+                          child:
+                              Text('Phone:', style: TEXT_STYLE_ON_FOREGROUND)),
                       Expanded(
                         flex: 2,
                         child: Text(
                           deliveryAddressModel.phoneNumber,
                           textAlign: TextAlign.right,
-                          style: TEXT_STYLE_PRIMARY.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       )
                     ],

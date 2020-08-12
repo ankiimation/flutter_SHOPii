@@ -128,15 +128,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           scrollDirection: Axis.horizontal,
           children: products
               .map(
-                (product) => CustomProductGridItem(
-                  backgroundColor: FOREGROUND_COLOR,
-                  showQuickAction: false,
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (b) => ProductDetailPage(product))),
-                  elevation: 5,
-                  product: product,
+                (product) => Container(
+                  margin: EdgeInsets.only(left: 10, bottom: 15),
+                  child: CustomProductGridItem(
+                    width: 150,
+                    backgroundColor: FOREGROUND_COLOR,
+                    showQuickAction: false,
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (b) => ProductDetailPage(product))),
+                    elevation: 5,
+                    product: product,
+                  ),
                 ),
               )
               .toList()),
@@ -161,7 +165,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           CustomAnimatedButton(
-                            elevation: 5,
+                            elevation: 0,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
                             color: BACKGROUND_COLOR,
@@ -172,8 +176,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               alignment: Alignment.center,
                               child: Icon(
                                 Icons.arrow_back_ios,
-                                size: 25,
-                                color: PRIMARY_COLOR,
+                                size: 20,
+                                color: PRIMARY_TEXT_COLOR,
                               ),
                             ),
                           ),
@@ -182,7 +186,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               CustomAnimatedButton(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10)),
-                                elevation: 5,
+                                elevation: 0,
                                 color: BACKGROUND_COLOR,
                                 onTap: () => Navigator.push(
                                     context,
@@ -194,8 +198,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   alignment: Alignment.center,
                                   child: Icon(
                                     Icons.search,
-                                    size: 25,
-                                    color: PRIMARY_COLOR,
+                                    size: 20,
+                                    color: PRIMARY_TEXT_COLOR,
                                   ),
                                 ),
                               ),
@@ -204,7 +208,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(10)),
-                                      elevation: 5,
+                                      elevation: 0,
                                       color: BACKGROUND_COLOR,
                                       onTap: () {
                                         Navigator.push(
@@ -219,7 +223,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                           child: CartWidget(
                                             cartIconKey,
                                             size: 20,
-                                            color: PRIMARY_COLOR,
+                                            color: PRIMARY_TEXT_COLOR,
                                           )),
                                     )
                                   : Container(),
@@ -269,7 +273,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 Icon(
                   Icons.store,
                   size: 20,
-                  color: PRIMARY_COLOR,
+                  color: PRIMARY_TEXT_COLOR,
                 ),
                 SizedBox(
                   width: 10,
@@ -306,9 +310,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   child: Text(
                     productModel.shopUsername,
                     style: TEXT_STYLE_PRIMARY.copyWith(
-                        color: PRIMARY_COLOR,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 )
               ],
@@ -512,7 +514,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             child: CustomAnimatedButton(
                           color: FOREGROUND_COLOR,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
+                              borderRadius: BorderRadius.circular(5)),
                           elevation: 1,
                           onTap: () {
                             if (currentLogin == null) {
@@ -759,8 +761,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   SizedBox(
                     height: 20,
                   ),
-                  CustomOnTapWidget(
-                    onTap: () async {
+                  RaisedButton(
+                    onPressed: () async {
                       updateCartIconPosition(cartIconKey: cartIconKey);
                       await showAddToCartAnimation(context,
                           overlayWidget: Container(
@@ -785,20 +787,17 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
                       Navigator.pop(context);
                     },
+                    color: FOREGROUND_COLOR,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
                     child: Container(
                         alignment: Alignment.center,
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: FOREGROUND_COLOR,
-                          //  boxShadow: [
-//                                      BoxShadow(color: Colors.black26, offset: Offset(-2, -2), blurRadius: 3)
-//                                    ],
-                        ),
+                        padding: EdgeInsets.all(15),
                         child: Text(
                           'Add To Cart',
                           textAlign: TextAlign.center,
                           style:
-                              TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 20),
+                              TEXT_STYLE_ON_FOREGROUND.copyWith(fontSize: 16),
                         )),
                   )
                 ],

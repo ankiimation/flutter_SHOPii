@@ -45,7 +45,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
   ScrollController _scrollController = ScrollController();
   StreamController _scrollStreamController = StreamController();
   bool _isDoingCheckoutConfirm = false;
-  int _choosenDeliveryId;
+  int _chosenDeliveryId = -1;
 
   @override
   void initState() {
@@ -55,10 +55,10 @@ class _CheckOutPageState extends State<CheckOutPage> {
 
     var ordering = widget.cart.first;
     if (ordering.deliveryId != -1) {
-      _choosenDeliveryId = ordering.deliveryId;
+      _chosenDeliveryId = ordering.deliveryId;
       deliveryAddressBloc.add(GetDeliveryAddress(ordering.deliveryId));
     } else {
-      _choosenDeliveryId = currentLogin.account.defaultDeliveryId;
+      _chosenDeliveryId = currentLogin.account.defaultDeliveryId;
       deliveryAddressBloc
           .add(GetDeliveryAddress(currentLogin.account.defaultDeliveryId));
     }
@@ -124,6 +124,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
         child: Icon(
           Icons.arrow_back_ios,
           color: PRIMARY_TEXT_COLOR,
+          size: 20,
         ),
       ),
     );
@@ -144,9 +145,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
 
     bool _canCheckout = true;
     for (var ordering in orderingModels) {
-      if ((ordering.deliveryId == -1 &&
-              currentLogin.account.defaultDeliveryId == -1) ||
-          ordering.status > 0) _canCheckout = false;
+      if (_chosenDeliveryId == -1 || ordering.status > 0) _canCheckout = false;
       break;
     }
     return Align(
@@ -204,18 +203,16 @@ class _CheckOutPageState extends State<CheckOutPage> {
                                     }
                                   },
                                   child: Container(
-                                    padding: EdgeInsets.all(10),
+                                    margin: EdgeInsets.all(5),
                                     height: kBottomNavigationBarHeight,
-                                    width: 110,
+                                    width: 90,
                                     decoration: BoxDecoration(
                                         color: FOREGROUND_COLOR,
-                                        borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(10),
-                                            bottomRight: Radius.circular(10))),
+                                        borderRadius: BorderRadius.circular(5)),
                                     child: Icon(
                                       Icons.check,
                                       size: 25,
-                                      color: FORE_TEXT_COLOR,
+                                      color: BACKGROUND_COLOR,
                                     ),
                                   ),
                                 )
@@ -283,8 +280,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
   Widget buildDelivery(List<OrderingModel> orderingModels) {
     OrderingModel firstOrdering = orderingModels.first;
     return CustomOnTapWidget(
-      onTap: () {
-        showAddressChooserDialog(firstOrdering);
+      onTap: () async {
+        await showAddressChooserDialog(firstOrdering);
+        setState(() {});
       },
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -436,14 +434,15 @@ class _CheckOutPageState extends State<CheckOutPage> {
       barrierDismissible: false,
     );
     if (rs != null && rs is DeliveryAddressModel) {
-      _choosenDeliveryId = rs.id;
+      _chosenDeliveryId = rs.id;
       LoadingDialog.showLoadingDialog(context);
 
       //await Future.delayed(Duration(seconds: 2));
       //await CheckoutService().checkOut(ordering, deliveryId: rs.id);
       deliveryAddressBloc.add(GetDeliveryAddress(rs.id));
-      setState(() {});
-
+      setState(() {
+        _chosenDeliveryId = rs.id;
+      });
       LoadingDialog.hideLoadingDialog(context);
     }
   }
@@ -456,7 +455,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
     List<OrderingModel> isAllCheckOutOk = [];
     for (var ordering in orderingModels) {
       var isCheckoutOk = await CheckoutService()
-          .checkOut(ordering, status: 1, deliveryId: _choosenDeliveryId);
+          .checkOut(ordering, status: 1, deliveryId: _chosenDeliveryId);
       if (isCheckoutOk != null) {
         isAllCheckOutOk.add(isCheckoutOk);
       }

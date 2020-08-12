@@ -133,6 +133,7 @@ class _OrderingDetailPageState extends State<OrderingDetailPage> {
         child: Icon(
           Icons.arrow_back_ios,
           color: PRIMARY_TEXT_COLOR,
+          size: 20,
         ),
       ),
     );

@@ -49,8 +49,6 @@ class _NavigatorPageState extends State<NavigatorPage> {
   var _scrollStreamController = StreamController();
   var scrollController = ScrollController();
 
-  bool _isHideTopBottomBar = false;
-
   //int _currentIndex = 0;
 
   void _openCloseSearchInput() {
@@ -66,23 +64,11 @@ class _NavigatorPageState extends State<NavigatorPage> {
     navigationPageStreamController.sink.add(index);
   }
 
-  void hideTopBottomBar(bool isScrollUp) {
-    if (_isHideTopBottomBar != isScrollUp) {
-      print(isScrollUp);
-      setState(() {
-        _isHideTopBottomBar = isScrollUp;
-      });
-    }
-  }
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    _scrollStreamController.stream.listen((isScrollUp) {
-      hideTopBottomBar(isScrollUp);
-    });
     scrollController.addListener(() {
       bool upDirection = scrollController.position.userScrollDirection ==
           ScrollDirection.reverse;
@@ -118,43 +104,76 @@ class _NavigatorPageState extends State<NavigatorPage> {
             var index = 0;
             if (snapshot.hasData) index = snapshot.data;
             return Scaffold(
-                backgroundColor: BACKGROUND_COLOR,
-                // appBar: buildAppBar(),
-                drawer: buildDrawer(),
-                body: PageView(
-                  onPageChanged: (index) {
-                    changePage(index);
-                    setState(() {
-                      _isHideTopBottomBar = false;
-                    });
-                  },
-                  controller: _pageController,
-                  children: pages,
-                ),
-                bottomNavigationBar: buildBottomNavigator(index));
+              backgroundColor: BACKGROUND_COLOR,
+              // appBar: buildAppBar(),
+              drawer: buildDrawer(),
+              body: StreamBuilder(
+                  stream: _scrollStreamController.stream,
+                  builder: (context, scrollSnapshot) {
+                    bool isHideBar =
+                        scrollSnapshot.hasData && scrollSnapshot.data == true;
+                    return Stack(
+                      children: [
+                        PageView(
+                          onPageChanged: (index) {
+                            changePage(index);
+                            setState(() {
+                              _scrollStreamController.sink.add(false);
+                            });
+                          },
+                          controller: _pageController,
+                          children: pages,
+                        ),
+                        Align(
+                            alignment: Alignment.bottomCenter,
+                            child: buildBottomNavigator(index, isHideBar))
+                      ],
+                    );
+                  }),
+            );
           },
         ));
   }
 
-  Widget buildBottomNavigator(int currentIndex) {
-    return AnimatedContainer(
+  Widget buildBottomNavigator(int currentIndex, bool _isHideTopBottomBar) {
+    return AnimatedSwitcher(
       duration: Duration(milliseconds: 200),
-      height: _isHideTopBottomBar ? 0 : 60,
-      child: CustomBottomNavigationBar(
-        barShadow: true,
-        currentIndex: currentIndex,
-        onChange: (index) {
-          changePageViewPage(index);
-        },
-        children: [
-          CustomBottomNavigationItem(icon: Icons.store, label: 'Home'),
-          CustomBottomNavigationItem(icon: Icons.reorder, label: 'Categories'),
-          CustomBottomNavigationItem(icon: Icons.favorite, label: 'Favorite'),
-          CustomBottomNavigationItem(icon: Icons.receipt, label: 'Orders'),
-          CustomBottomNavigationItem(
-              icon: Icons.account_circle, label: 'Account'),
-        ],
-      ),
+      child: _isHideTopBottomBar
+          ? null
+          : Container(
+              margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
+              child: Card(
+                elevation: 5,
+                color: BACKGROUND_COLOR,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  height: 60,
+                  child: CustomBottomNavigationBar(
+                    selectedItemColor: FORE_TEXT_COLOR,
+                    overlayColor: PRIMARY_COLOR,
+                    currentIndex: currentIndex,
+                    backgroundColor: Colors.transparent,
+                    onChange: (index) {
+                      changePageViewPage(index);
+                    },
+                    children: [
+                      CustomBottomNavigationItem(
+                          icon: Icons.store, label: 'Home'),
+                      CustomBottomNavigationItem(
+                          icon: Icons.reorder, label: 'Categories'),
+                      CustomBottomNavigationItem(
+                          icon: Icons.favorite, label: 'Favorite'),
+                      CustomBottomNavigationItem(
+                          icon: Icons.receipt, label: 'Orders'),
+                      CustomBottomNavigationItem(
+                          icon: Icons.account_circle, label: 'Account'),
+                    ],
+                  ),
+                ),
+              ),
+            ),
     );
   }
 

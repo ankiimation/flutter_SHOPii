@@ -25,12 +25,11 @@ class _SearchPageState extends State<SearchPage> {
   TextEditingController textEditingController = TextEditingController();
 
   Timer searchTimer;
-  onChangeSearch(String s){
-    if(searchTimer!=null){
+
+  onChangeSearch(String s) {
+    if (searchTimer != null) {
       searchTimer.cancel();
-    }else{
-      
-    }
+    } else {}
   }
 
   @override
@@ -75,6 +74,7 @@ class _SearchPageState extends State<SearchPage> {
             child: Icon(
               Icons.arrow_back_ios,
               color: PRIMARY_TEXT_COLOR,
+              size: 20,
             ),
           ),
           SizedBox(

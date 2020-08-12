@@ -50,7 +50,8 @@ class _AccountPageState extends State<AccountPage> {
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: SingleChildScrollView(
-                          controller: widget.scrollController, child: buildProfile(state.account)),
+                          controller: widget.scrollController,
+                          child: buildProfile(state.account)),
                     )
                   ],
                 );
@@ -68,18 +69,32 @@ class _AccountPageState extends State<AccountPage> {
 
   Widget buildAvatar(AccountModel accountModel) {
     return Container(
-      padding: EdgeInsets.all(30),
+      margin: EdgeInsets.only(top: 15),
       alignment: Alignment.topCenter,
-      child: CircleAvatar(
-        radius: 70,
-        backgroundImage: accountModel.image != null ? CachedNetworkImageProvider(accountModel.image) : null,
-        child: accountModel.image != null
-            ? null
-            : Icon(
-                Icons.account_circle,
-                size: 70,
-                color: FOREGROUND_COLOR,
-              ),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 70,
+            backgroundImage: accountModel.image != null
+                ? CachedNetworkImageProvider(accountModel.image)
+                : null,
+            child: accountModel.image != null
+                ? null
+                : Icon(
+                    Icons.account_circle,
+                    size: 70,
+                    color: FOREGROUND_COLOR,
+                  ),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Text(
+            accountModel.fullname ?? 'Lê Nguyên Khoa',
+            style: TEXT_STYLE_ON_FOREGROUND.copyWith(
+                fontWeight: FontWeight.bold, fontSize: 20),
+          )
+        ],
       ),
     );
   }
@@ -88,18 +103,21 @@ class _AccountPageState extends State<AccountPage> {
     return Column(
       children: <Widget>[
         Container(
-          constraints: BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.7),
+          constraints:
+              BoxConstraints(minHeight: ScreenHelper.getHeight(context) * 0.7),
           margin: EdgeInsets.only(top: 200),
           padding: EdgeInsets.only(top: 50, bottom: 50, left: 20, right: 20),
           decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black38, offset: Offset(0, -3), blurRadius: 5)],
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black38, offset: Offset(0, -3), blurRadius: 5)
+              ],
               color: BACKGROUND_COLOR,
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20), topRight: Radius.circular(20))),
           child: Column(
             children: <Widget>[
               _buildInfoItem(key: 'Username', value: account.username),
-              _buildDivider(),
-              _buildInfoItem(key: 'Full Name', value: account.fullname),
               _buildDivider(),
               _buildInfoItem(key: 'Phone', value: account.phoneNumber),
               _buildDivider(),
@@ -107,9 +125,13 @@ class _AccountPageState extends State<AccountPage> {
               _buildDivider(),
               CustomOnTapWidget(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (b) => DeliveryAddressPage()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (b) => DeliveryAddressPage()));
                   },
-                  child: _buildInfoItem(key: 'Delivery Addresses', value: '<Tap to view>')),
+                  child: _buildInfoItem(
+                      key: 'Delivery Addresses', value: '<Tap to view>')),
               SizedBox(
                 height: 50,
               ),
@@ -148,7 +170,8 @@ class _AccountPageState extends State<AccountPage> {
     return RaisedButton(
       elevation: 0,
       onPressed: () async {
-        await Navigator.push(context, MaterialPageRoute(builder: (b) => LoginPage()));
+        await Navigator.push(
+            context, MaterialPageRoute(builder: (b) => LoginPage()));
         bloc.add(GetLocalAccount());
       },
       color: BACKGROUND_COLOR,

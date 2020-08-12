@@ -161,14 +161,13 @@ class _CartPageState extends State<CartPage> {
                               }
                             },
                             child: Container(
+                              margin: EdgeInsets.all(5),
                               padding: EdgeInsets.all(10),
                               height: 55,
-                              width: 110,
+                              width: 90,
                               decoration: BoxDecoration(
                                   color: FOREGROUND_COLOR,
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(10),
-                                      bottomRight: Radius.circular(10))),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Icon(
                                 Icons.forward,
                                 size: 25,
@@ -196,6 +195,7 @@ class _CartPageState extends State<CartPage> {
         child: Icon(
           Icons.arrow_back_ios,
           color: PRIMARY_TEXT_COLOR,
+          size: 20,
         ),
       ),
     );
