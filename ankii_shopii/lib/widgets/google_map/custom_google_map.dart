@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:ankiishopii/global/global_variable.dart';
 import 'package:ankiishopii/helpers/media_query_helper.dart';
 import 'package:ankiishopii/themes/constant.dart';
 import 'package:ankiishopii/widgets/base/custom_ontap_widget.dart';
@@ -8,7 +7,6 @@ import 'package:ankiishopii/widgets/loading_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 

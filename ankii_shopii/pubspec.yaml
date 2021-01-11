@@ -37,17 +37,17 @@ dependencies:
   rxdart: ^0.25.0
 
   #map
-  google_maps_flutter:
-  geolocator:
-  flutter_polyline_points:
+  google_maps_flutter: ^1.0.10
+  geolocator: 5.3.1
+  flutter_polyline_points: ^0.2.4
 
 
   #ui
-  intl:
-  google_fonts:
-  carousel_slider:
-  cached_network_image:
-  font_awesome_flutter:
+  intl: ^0.16.1
+  google_fonts: ^1.1.1
+  carousel_slider: ^2.3.1
+  cached_network_image: ^2.5.0
+  font_awesome_flutter: ^8.11.0
 
   #local
 
