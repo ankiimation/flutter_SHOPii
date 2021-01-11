@@ -7,5 +7,6 @@ by editing this MSBuild file. In order to learn more about this please visit htt
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
     <EncryptedPassword />
+    <_PublishTargetUrl>D:\Khoa_Projects\_localhost\SHOPii\publish</_PublishTargetUrl>
   </PropertyGroup>
 </Project>

@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
-const DOMAIN =
-    'https://shopii.azurewebsites.net/api/'; //const DOMAIN = 'http://10.0.2.2:50107/api/';
+const DOMAIN = 'https://shopii.azurewebsites.net/api/';
+// const DOMAIN = 'http://10.0.3.2:50107/api/';
 const CATEGORY_ENDPOINT = DOMAIN + 'categories';
 const PRODUCT_ENDPOINT = DOMAIN + 'products';
 const LOGIN_ENDPOINT = DOMAIN + 'login';
